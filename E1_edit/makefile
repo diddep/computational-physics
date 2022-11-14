@@ -12,9 +12,9 @@ CFLAGS_OPT = \
 	     -march=native
 
 LIB = \
-      -lm \
-	  -lgslcblas \
-	  -lgsl
+	  -lm \
+	  -lgsl \
+      -lgslcblas \
 
 OBJ = \
       obj/tools.o
@@ -24,6 +24,8 @@ E1code1 = \
 
 E1code3 = \
        obj/pow_gen_E1code3.o
+
+
 	   
 
 E1code4 = \
