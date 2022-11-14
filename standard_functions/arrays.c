@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 
-#include "vector.h"
+#include "arrays.h"
 
 void
 elementwise_addition(
