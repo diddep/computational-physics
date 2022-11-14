@@ -12,14 +12,12 @@ CFLAGS_OPT = \
 	     -march=native
 
 LIB = \
-      -lm
+      -lm \
+	  -lgslcblas \
+	  -lgsl
 
 OBJ = \
-      obj/tools.o #\
-	  obj/fft.c
-
-# MAIN = \
-#       obj/ht_gen_E1code1.o
+      obj/tools.o
 
 E1code1 = \
        obj/ht_gen_E1code1.o
@@ -51,14 +49,6 @@ _vel_verlet: $(E1code4) $(OBJ)
 
 	$(CC) $(CFLAGS) $^ -o vel_verlet $(LIB)
 vel_verlet: obj _vel_verlet
-
-#_program: $(MAIN) $(OBJ)
-#	$(CC) $(CFLAGS) $^ -o program $(LIB)
-
-#program: obj _program
-
-#_program: $(MAIN) $(OBJ)
-#	$(CC) $(CFLAGS) $^ -o program $(LIB)
 
 obj/%.o: src/%.c
 	$(CC) -MMD -c $(CFLAGS) $< -o $@ 
