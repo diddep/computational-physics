@@ -93,45 +93,6 @@ destroy_2D_array(
 	free(array);
 }
 
-/*
-void
-matrix_multiplication(
-		      double **result,
-		      double **v1,
-		      double **v2,
-		      unsigned int m,
-		      unsigned int n
-		     )
-{
-	printf("V1: \n");
-	for(int ix = 0; ix < m; ++ix){
-	for(int jx = 0; jx < n; ++jx){
-	    v1[ix][jx] = ix;
-        printf("%f ",v1[ix][jx]);
-	}
-    printf("\n");
-    }
-    printf("\n");
-	printf("V2: \n");
-    for(int ix = 0; ix < n; ++ix){
-	for(int jx = 0; jx < m; ++jx){
-	    v2[ix][jx] = jx;
-        printf("%f ",v2[ix][jx]);
-	}
-    printf("\n");
-    }
-	printf("result: \n");
-	for(int ix = 0; ix < m; ++ix){
-	for(int jx = 0; jx < m; ++jx){ //Change later to allow general dimensions mxn X nxp
-	for(int kx = 0; kx < m-1; ++kx){
-	    result[ix][jx] += v1[ix][kx] * v2[kx][jx];
-	}
-	printf("%f ",result[ix][jx]);
-    }
-	printf("\n");
-	}
-}
-*/
 void
 matrix_multiplication(
 		      double **result,
@@ -239,4 +200,64 @@ distance_between_vectors(
 	free(distance);
 
     return result;
+}
+
+void
+print_vector(
+        double *vec,  // Vector to print
+        unsigned int ndims  // Number of dimensions
+        )
+{
+    for (int i = 0; i < ndims; i++) {
+        printf("%10.5f ", vec[i]);
+    }
+}
+
+int save_vector_to_csv(
+        double *vec,  // Vector to save
+        unsigned int ndims,  // Number of dimensions
+        char *filename // filename
+        )
+{
+    FILE *fp1;
+    fp1 = fopen(filename, "w"); // Create a file
+    if (fp1 == NULL)
+    {
+        printf("Error while opening the file.\n");
+        return 1;
+    }
+    fprintf(fp1, "%10.5f,%10.5f,%10.5f", vec[0], vec[1], vec[2]);
+
+    fprintf(fp1,"\n");
+
+    fclose(fp1);
+    return 0;
+}
+
+int save_matrix_to_csv(
+        double **matrix,  // Matrix to save
+        unsigned int ncols,  // Number of dimensions
+		unsigned int nrows,  // Number of dimensions
+        char *filename // filename
+        )
+{
+    FILE *fp1;
+    fp1 = fopen(filename, "w"); // Create a file
+    if (fp1 == NULL)
+    {
+        printf("Error while opening the file.\n");
+        return 1;
+    }
+
+	for(int ix = 0; ix<nrows; ix++)
+	{
+		for(int jx = 0; jx<ncols; jx++)
+		{
+			fprintf(fp1, "%10.5f, ", matrix[jx][ix]);
+		}
+	fprintf(fp1,"\n");
+	}
+
+    fclose(fp1);
+    return 0;
 }

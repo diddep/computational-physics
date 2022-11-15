@@ -129,3 +129,24 @@ distance_between_vectors(
 			 double *v2,
 			 unsigned int len
 	                );
+
+void
+print_vector(
+        double *vec,
+        unsigned int ndims
+        );
+
+int 
+save_vector_to_csv(
+        double *vec,
+        unsigned int ndims,
+        char *filename
+        );
+
+int 
+save_matrix_to_csv(
+        double **matrix,
+        unsigned int ncols,
+		unsigned int nrows,
+        char *filename
+        );

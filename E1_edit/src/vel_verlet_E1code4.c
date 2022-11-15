@@ -13,6 +13,12 @@
  * @kappa - Spring constant
  * @size_of_u - the size of the position, acceleration and mass array
  */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include "tools.h"
+
 void calc_acc(double *a, double *u, double *m, double kappa, int size_of_u)
 {
     /* Declaration of variables */
@@ -42,11 +48,13 @@ void velocity_verlet(int n_timesteps, int n_particles, double *v, double *q_1,
 		     double *q_2, double *q_3, double dt, double *m,
 		     double kappa)
 {
+
     double q[n_particles];
     double a[n_particles];
     q[0] = q_1[0];
     q[1] = q_2[0];
     q[2] = q_3[0];
+
     calc_acc(a, q, m, kappa, n_particles);
     for (int i = 1; i < n_timesteps + 1; i++) {
         /* v(t+dt/2) */
@@ -71,11 +79,58 @@ void velocity_verlet(int n_timesteps, int n_particles, double *v, double *q_1,
         q_1[i] = q[0];
         q_2[i] = q[1];
         q_3[i] = q[2];
+
     }
-}
+    }
 
 int main(int argc, char **argv)
 {
+    // Setting standard variables
+    int n_timesteps = 1e3; int n_particles = 3; double dt = 1e-3; double kappa = 1; 
     
+    // Retrieving mass vector with carbon mass in asu with sizeof(n_particles)
+    double carbon_amu = 12.01; double m_asu = 9649; // m_asu=eV*(ps)^2/Å^2 
+    double carbon_asu = carbon_amu/m_asu;
+    double *m = calloc(sizeof(double), n_particles);
+
+    for(int ix = 0; ix < n_particles; ix++)
+    {
+        m[ix] = carbon_asu;
+    }
+
+    // (Empty allocated) velocity array: sizeof(v) = n_particles
+    double *v = calloc(sizeof(double), n_particles);
+    
+
+    // (Empty allocated) q arrays: sizeof(q) = n_timesteps +1
+    double *q_1 = calloc(sizeof(double), n_timesteps+1);
+    double *q_2 = calloc(sizeof(double), n_timesteps+1);
+    double *q_3 = calloc(sizeof(double), n_timesteps+1);
+
+    // Setting initial conditions (Å)
+    q_1[0] = 0.01; q_2[0] = 0; q_3[0] = 0; v[0] = 0; 
+
+    // Performing velocity verlet algorithm
+    velocity_verlet((int) n_timesteps, (int) n_particles, (double *) v, \
+                    (double *) q_1, (double *) q_2, (double *) q_3, \
+                    (double) dt, (double *) m, (double) kappa);
+
+    // Saving trajectory and velocity vectors to files
+    double **q_matrix = NULL;
+    create_2D_array(&q_matrix, n_particles, n_timesteps);
+    for(int ix = 0; ix < n_timesteps; ix++)
+    {
+        q_matrix[ix][0] = q_1[ix];
+        q_matrix[ix][1] = q_2[ix];
+        q_matrix[ix][2] = q_3[ix];
+    }
+    
+
+    char filename_position[] = {"Saved_trajectory.csv"};
+    //char filename_velocity[] = {"Saved_velocity.csv"};
+    save_matrix_to_csv(q_matrix, n_particles, n_timesteps, filename_position);
+    //save_matrix_to_csv(v, n_particles, n_timesteps, filename_velocity);
+
+
     return 0;
 }
