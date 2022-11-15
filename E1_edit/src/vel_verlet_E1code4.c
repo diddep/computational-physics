@@ -86,13 +86,16 @@ void velocity_verlet(int n_timesteps, int n_particles, double *v, double *q_1,
 int main(int argc, char **argv)
 {
     // Setting standard variables
-    int n_timesteps = 1e3; int n_particles = 3; double dt = 1e-3; double kappa = 1; 
+    //int t_meas_duration = 0.25; // (ps)
+    double dt = 1e-3;
+    int n_timesteps = 250;
+    int n_particles = 3; double kappa = 1; 
     
     // Retrieving mass vector with carbon mass in asu with sizeof(n_particles)
     double carbon_amu = 12.01; double m_asu = 9649; // m_asu=eV*(ps)^2/Å^2 
     double carbon_asu = carbon_amu/m_asu;
     double *m = calloc(sizeof(double), n_particles);
-
+    
     for(int ix = 0; ix < n_particles; ix++)
     {
         m[ix] = carbon_asu;
@@ -115,9 +118,10 @@ int main(int argc, char **argv)
                     (double *) q_1, (double *) q_2, (double *) q_3, \
                     (double) dt, (double *) m, (double) kappa);
 
-    // Saving trajectory and velocity vectors to files
+    // Saving trajectory vectors to file
     double **q_matrix = NULL;
-    create_2D_array(&q_matrix, n_particles, n_timesteps);
+    //create_2D_array(&q_matrix, n_particles, n_timesteps);
+    create_2D_array(&q_matrix, n_timesteps, n_particles);
     for(int ix = 0; ix < n_timesteps; ix++)
     {
         q_matrix[ix][0] = q_1[ix];
@@ -125,12 +129,24 @@ int main(int argc, char **argv)
         q_matrix[ix][2] = q_3[ix];
     }
     
-
     char filename_position[] = {"Saved_trajectory.csv"};
-    //char filename_velocity[] = {"Saved_velocity.csv"};
     save_matrix_to_csv(q_matrix, n_particles, n_timesteps, filename_position);
-    //save_matrix_to_csv(v, n_particles, n_timesteps, filename_velocity);
 
+    double **v_matrix = NULL;
+    create_2D_array(&v_matrix, n_timesteps - 1, n_particles);
+
+    for(int ix = 0; ix < n_timesteps - 1; ix++)
+    {
+        for(int jx = 0; jx < n_particles; jx++)
+        {
+            v_matrix[ix][jx] = (q_matrix[ix+1][jx]-q_matrix[ix][jx])/dt;
+        }
+    }
+    print_vector(v, n_particles);
+    char filename_velocity[] = {"Saved_velocity.csv"};
+    save_matrix_to_csv(v_matrix, n_particles, n_timesteps-1, filename_velocity);
+    
+    destroy_2D_array(q_matrix); destroy_2D_array(v_matrix);
 
     return 0;
 }

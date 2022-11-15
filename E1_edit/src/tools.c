@@ -253,7 +253,13 @@ int save_matrix_to_csv(
 	{
 		for(int jx = 0; jx<ncols; jx++)
 		{
-			fprintf(fp1, "%10.5f, ", matrix[jx][ix]);
+			if(jx == ncols - 1)
+			{
+				fprintf(fp1, "%10.5f", matrix[jx][ix]);
+			} else {
+				fprintf(fp1, "%10.5f, ", matrix[jx][ix]);
+			}
+			
 		}
 	fprintf(fp1,"\n");
 	}
