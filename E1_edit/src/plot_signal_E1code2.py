@@ -20,15 +20,15 @@ ax.grid()
 fig.savefig('signal.pdf')
 
 
-array_pow = np.genfromtxt('../powerspectrum.csv', delimiter=',', skip_header=1)
+array_pow = np.genfromtxt('../powerspectrum_shift.csv', delimiter=',', skip_header=1)
 print(array_pow)
 
 fig_pow, ax_pow = plt.subplots()
 
 
 ax_pow.plot(array_pow[:,1], array_pow[:,0])
-ax.set_xlabel('frequency (arb.unit)')
-ax.set_ylabel('intensity (arb.unit)')
-fig_pow.savefig('pow_spectrum.pdf')
-
+ax_pow.set_xlabel('frequency (arb.unit)')
+ax_pow.set_ylabel('intensity (arb.unit)')
+fig_pow.savefig('pow_spectrum_shift.pdf')
+plt.show()
 

@@ -1,0 +1,1 @@
+shifting the frequency and centering it around is nicer because we can view
