@@ -76,7 +76,7 @@ void write_to_file(char *fname, double *time_array,
 int main()
 {
     int N = 250; double dt = 0.1;
-    double a = 1; double f = 1; double phi = PI/2; //C: f:2->1, phi: 0->pi/2
+    double a = 1; double f = 2; double phi = 0;
     double time_array[N];
     arange(time_array, 0, N, dt);
     

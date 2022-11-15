@@ -18,3 +18,17 @@ ax.set_ylabel('signal (arb.unit)')
 ax.grid()
 
 fig.savefig('signal.pdf')
+
+
+array_pow = np.genfromtxt('../powerspectrum.csv', delimiter=',', skip_header=1)
+print(array_pow)
+
+fig_pow, ax_pow = plt.subplots()
+
+
+ax_pow.plot(array_pow[:,1], array_pow[:,0])
+ax.set_xlabel('frequency (arb.unit)')
+ax.set_ylabel('intensity (arb.unit)')
+fig_pow.savefig('pow_spectrum.pdf')
+
+

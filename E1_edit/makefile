@@ -14,7 +14,7 @@ CFLAGS_OPT = \
 LIB = \
 	  -lm \
 	  -lgsl \
-      -lgslcblas \
+      -lgslcblas
 
 OBJ = \
       obj/tools.o
