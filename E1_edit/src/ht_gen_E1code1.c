@@ -38,7 +38,7 @@ double *generate_signal(double *signal, double *t, uint64_t len_t, double a,
 			double f, double phi)
 {
     for(int i = 0; i < len_t; i++){
-	signal[i] = a * cos(2 * PI * f * t[i] + phi) ;
+	signal[i] = a * cos(2 * PI * f * t[i] + phi)+a * cos(2 *3* PI * f * t[i] + phi);
     }
     return signal;
 }

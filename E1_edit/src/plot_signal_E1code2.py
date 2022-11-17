@@ -19,7 +19,7 @@ ax.set_ylabel('signal (arb.unit)')
 ax.set_title('N=')
 ax.grid()
 
-fig.savefig('signal253.pdf')
+fig.savefig('signalsuperpose1.pdf')
 
 
 array_pow = np.genfromtxt('../powerspectrum_shift.csv', delimiter=',', skip_header=1)
@@ -32,7 +32,7 @@ ax_pow.plot(array_pow[:,1], array_pow[:,0])
 ax_pow.set_xlabel('frequency (arb.unit)')
 ax_pow.set_ylabel('intensity (arb.unit)')
 ax_pow.set_title('N=750')
-fig_pow.savefig('pow_spectrum_shift_superpos750.pdf')
+fig_pow.savefig('pow_spectrum_shift_superpos1.pdf')
 
 
 plt.show()
