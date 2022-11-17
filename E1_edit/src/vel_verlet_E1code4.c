@@ -46,7 +46,7 @@ void calc_acc(double *a, double *u, double *m, double kappa, int size_of_u)
  */
 void velocity_verlet(int n_timesteps, int n_particles, double *v, double *q_1,
 		     double *q_2, double *q_3, double dt, double *m,
-		     double kappa)
+		     double kappa, double **v_matrix)
 {
 
     double q[n_particles];
@@ -73,6 +73,7 @@ void velocity_verlet(int n_timesteps, int n_particles, double *v, double *q_1,
         /* v(t+dt) */
         for (int j = 0; j < n_particles; j++) {
             v[j] += dt * 0.5 * a[j];
+            v_matrix[i][j] = v[j];
         }
         
         /* Save the displacement of the three atoms */
@@ -116,10 +117,15 @@ int main(int argc, char **argv)
     // Setting initial conditions (Å)
     q_1[0] = 0.01; q_2[0] = 0; q_3[0] = 0; v[0] = 0; 
 
+    //Creating matrix for velocity
+    double **v_matrix = NULL;
+    //create_2D_array(&v_matrix, n_timesteps - 1, n_particles);
+    create_2D_array(&v_matrix, n_timesteps+1, n_particles);
+
     // Performing velocity verlet algorithm
     velocity_verlet((int) n_timesteps, (int) n_particles, (double *) v, \
                     (double *) q_1, (double *) q_2, (double *) q_3, \
-                    (double) dt, (double *) m, (double) kappa);
+                    (double) dt, (double *) m, (double) kappa, (double **) v_matrix);
 
     // Saving trajectory vectors to file
     double **q_matrix = NULL;
@@ -135,9 +141,8 @@ int main(int argc, char **argv)
     char filename_position[] = {"Saved_trajectory.csv"};
     save_matrix_to_csv(q_matrix, n_particles, n_timesteps, filename_position);
 
-    double **v_matrix = NULL;
-    create_2D_array(&v_matrix, n_timesteps - 1, n_particles);
-
+    
+    /*
     for(int ix = 0; ix < n_timesteps - 1; ix++)
     {
         for(int jx = 0; jx < n_particles; jx++)
@@ -145,9 +150,12 @@ int main(int argc, char **argv)
             v_matrix[ix][jx] = (q_matrix[ix+1][jx]-q_matrix[ix][jx])/dt;
         }
     }
+    */
     print_vector(v, n_particles);
+    
     char filename_velocity[] = {"Saved_velocity.csv"};
-    save_matrix_to_csv(v_matrix, n_particles, n_timesteps-1, filename_velocity);
+    save_matrix_to_csv(v_matrix, n_particles, n_timesteps+1, filename_velocity);
+    // save_matrix_to_csv(v_matrix, n_particles, n_timesteps-1, filename_velocity);
     
     destroy_2D_array(q_matrix); destroy_2D_array(v_matrix);
 
