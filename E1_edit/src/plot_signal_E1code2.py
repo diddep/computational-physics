@@ -12,12 +12,14 @@ array = np.genfromtxt('../signal.csv', delimiter=',', skip_header=1)
 
 fig, ax = plt.subplots()
 ax.plot(array[:, 0], array[:, 1])
+l_sig = len(array[:, 0])
 
 ax.set_xlabel('time (arb.unit)')
 ax.set_ylabel('signal (arb.unit)')
+ax.set_title('N=')
 ax.grid()
 
-fig.savefig('signal.pdf')
+fig.savefig('signal253.pdf')
 
 
 array_pow = np.genfromtxt('../powerspectrum_shift.csv', delimiter=',', skip_header=1)
@@ -29,6 +31,9 @@ fig_pow, ax_pow = plt.subplots()
 ax_pow.plot(array_pow[:,1], array_pow[:,0])
 ax_pow.set_xlabel('frequency (arb.unit)')
 ax_pow.set_ylabel('intensity (arb.unit)')
-fig_pow.savefig('pow_spectrum_shift.pdf')
+ax_pow.set_title('N=750')
+fig_pow.savefig('pow_spectrum_shift_superpos750.pdf')
+
+
 plt.show()
 
