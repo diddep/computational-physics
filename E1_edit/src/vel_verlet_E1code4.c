@@ -89,7 +89,7 @@ int main(int argc, char **argv)
     //int t_meas_duration = 0.25; // (ps)
     double dt = 1e-3;
     int n_timesteps = 250;
-    int n_particles = 3; double kappa = 1; 
+    int n_particles = 3; double kappa = 62.46; 
     
     // Retrieving mass vector with carbon mass in asu with sizeof(n_particles)
     double carbon_amu = 12.01; double m_asu = 9649; // m_asu=eV*(ps)^2/Å^2 
