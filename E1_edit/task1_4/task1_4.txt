@@ -1,1 +1,2 @@
 vikning
+seems like we need to make dt short to be able to sample the signal

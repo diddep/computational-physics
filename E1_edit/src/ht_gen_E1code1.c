@@ -82,7 +82,7 @@ are the original values
 
 int main()
 {
-    int N = 250; double dt = 0.1;
+    int N = 250; double dt = 0.1/6.0;
     double a = 1; double f = 2; double phi = 0;
     double time_array[N];
     arange(time_array, 0, N, dt);
