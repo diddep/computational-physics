@@ -88,10 +88,11 @@ int main(int argc, char **argv)
     // Setting standard variables
     //int t_meas_duration = 0.25; // (ps)7
     //convertions factor for N/m to asu is 1/16.0218
-    double dt = 1e-3;
+    double dt = 1e-3/2;
     double force_conv = 1.0/16.0218;
-    int n_timesteps = 250;
-    int n_particles = 3; double kappa = 1600./force_conv;
+    int n_timesteps = 250*4;
+    int n_particles = 3; double kappa = 1000 * force_conv;
+    printf("kappa: %f \n", kappa);
     
     // Retrieving mass vector with carbon mass in asu with sizeof(n_particles)
     double carbon_amu = 12.01; double m_asu = 9649; // m_asu=eV*(ps)^2/Å^2 
