@@ -1,1 +1,2 @@
-plots 
+
+Yes, we more or less conserved total energy

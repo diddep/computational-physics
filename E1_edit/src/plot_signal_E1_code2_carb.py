@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 # row in data.csv
 dt=1e-5; kappa = 1000 /16.0218; m=12.01/9649
 
-pos_array = np.genfromtxt('../Saved_trajectory_carb.csv', delimiter=',', skip_header=0)
-vel_array = np.genfromtxt('../Saved_velocity_carb.csv', delimiter=',', skip_header=0)
+pos_array = np.genfromtxt('../task1_5/Saved_trajectory_carb_small_dt.csv', delimiter=',', skip_header=0)
+vel_array = np.genfromtxt('../task1_5/Saved_velocity_carb_small_dt.csv', delimiter=',', skip_header=0)
 
 kinetic_energy = m*np.square(vel_array)/2
 
@@ -27,14 +27,15 @@ total_energy = np.sum( energy_cart, axis=1)
 
 fig, ax = plt.subplots(figsize=[12,6])
 t = np.arange(0,len(pos_array)*dt, dt)
+X_Lim = np.max(t)
 
 ax.plot(t, pos_array)
 
-ax.set_title(f"Trajectory with dt={dt}")
+ax.set_title(f"Trajectory with dt={dt}, carbon")
 ax.set_xlabel('time (arb.unit)')
 ax.set_ylabel('signal (arb.unit)')
 ax.grid()
-ax.set_xlim(0,np.max(t)/100)
+ax.set_xlim(0,X_Lim)
 ax.legend(["Particle 1","Particle 2","Particle 3"])
 plt.show()
 fig.savefig('Saved_trajectory_carb.pdf')
@@ -45,8 +46,8 @@ axenergy.plot(t, kinetic_energy[:-1,0]+ kinetic_energy[:-1,1]+ kinetic_energy[:-
 axenergy.plot(t, pot_e1+ pot_e2+ pot_e3, color='b', label='total potential energy')
 axenergy.plot(t, pot_e1+ pot_e2+ pot_e3+kinetic_energy[:-1,0]+ kinetic_energy[:-1,1]+ kinetic_energy[:-1,2], color='k', label=' total energy' )
 axenergy.legend()
-axenergy.set_title(f" Time dependence of energy with dt={dt}")
-axenergy.set_xlim(0,np.max(t)/100)
+axenergy.set_title(f" Time dependence of energy with dt={dt}, carbon")
+axenergy.set_xlim(0,X_Lim)
 
 plt.show()
 figenergy.savefig('energy_cons_carb.pdf')
