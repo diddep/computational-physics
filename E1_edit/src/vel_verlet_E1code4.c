@@ -89,9 +89,9 @@ int main(int argc, char **argv)
     // Setting standard variables
     //int t_meas_duration = 0.25; // (ps)7
     //convertions factor for N/m to asu is 1/16.0218
-    double dt = 1e-3/2;
+    double dt = 1e-5; // /2;
     double force_conv = 1.0/16.0218;
-    int n_timesteps = 250*4;
+    int n_timesteps = 250*100; //4;
     int n_particles = 3; double kappa = 1000 * force_conv;
     printf("kappa: %f \n", kappa);
     
@@ -115,7 +115,7 @@ int main(int argc, char **argv)
     double *q_3 = calloc(sizeof(double), n_timesteps+1);
 
     // Setting initial conditions (Å)
-    q_1[0] = 0.01; q_2[0] = 0; q_3[0] = 0; v[0] = 0; 
+    q_1[0] = 0.01; q_2[0] = 0.005; q_3[0] = -0.005; v[0] = 0;
 
     //Creating matrix for velocity
     double **v_matrix = NULL;
@@ -138,10 +138,17 @@ int main(int argc, char **argv)
         q_matrix[ix][2] = q_3[ix];
     }
     
-    char filename_position[] = {"Saved_trajectory.csv"};
+    char filename_position[] = {"Saved_trajectory2.csv"};
     save_matrix_to_csv(q_matrix, n_particles, n_timesteps, filename_position);
 
-    
+    char filename_position_p1[] = {"Saved_trajectory_particle1.csv"};
+    save_vector_to_csv(q_1, n_timesteps, filename_position_p1);
+    char filename_position_p2[] = {"Saved_trajectory_particle2.csv"};
+    save_vector_to_csv(q_2, n_timesteps, filename_position_p2);
+    char filename_position_p3[] = {"Saved_trajectory_particle3.csv"};
+    save_vector_to_csv(q_3, n_timesteps, filename_position_p3);
+
+
     /*
     for(int ix = 0; ix < n_timesteps - 1; ix++)
     {
@@ -153,7 +160,7 @@ int main(int argc, char **argv)
     */
     print_vector(v, n_particles);
     
-    char filename_velocity[] = {"Saved_velocity.csv"};
+    char filename_velocity[] = {"Saved_velocity2.csv"};
     save_matrix_to_csv(v_matrix, n_particles, n_timesteps+1, filename_velocity);
     // save_matrix_to_csv(v_matrix, n_particles, n_timesteps-1, filename_velocity);
     

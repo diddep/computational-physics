@@ -226,7 +226,11 @@ int save_vector_to_csv(
         printf("Error while opening the file.\n");
         return 1;
     }
-    fprintf(fp1, "%10.5f,%10.5f,%10.5f", vec[0], vec[1], vec[2]);
+    //fprintf(fp1, "%10.5f,%10.5f,%10.5f", vec[0], vec[1], vec[2]);
+    for(int i =0; i<ndims; ++i){
+        fprintf(fp1, "%10.5f", vec[i]);
+        fprintf(fp1, "\n");
+    }
 
     fprintf(fp1,"\n");
 

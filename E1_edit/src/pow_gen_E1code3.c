@@ -64,6 +64,36 @@ void read_data(char *fname, double *time_array, double *signal)
     fclose(fp);
 }
 
+void read_data_three_p(char *fname, double *time_array, double *signal)
+{
+    FILE *fp = fopen(fname, "r");
+
+    /* if file no found
+     * error out and exit code 1
+     */
+    if(fp == NULL){
+        perror("error:");
+        exit(1);
+    }
+
+    /* skip header */
+    fseek(fp, strlen("time, signal\n"), SEEK_SET);
+    char line[128] = {0};
+    char *token;
+    int i = 0;
+    while(fgets(line, sizeof(line), fp) != NULL){
+        token = strtok(line, ",");
+        time_array[i] = strtod(token, NULL);
+        token = strtok(NULL, ",");
+        signal[i] = strtod(token, NULL);
+        i++;
+        memset(line, 0, sizeof(line));
+        token = NULL;
+    }
+    fclose(fp);
+}
+
+
 /*
  * constructs time array
  * @fname - File name 
@@ -114,4 +144,7 @@ int main(int argc, char **argv)
      */
     write_to_file("powerspectrum_shift.csv", fftd_data, frequencies, N_POINTS);
     return 0;
+
+
 }
+
