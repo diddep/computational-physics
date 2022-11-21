@@ -1,0 +1,6 @@
+
+Yes, we more or less conserved total energy
+
+Plot trajectories for three particles. 
+With a small timestep we are relatively close to conserving energy.
+With bigger it is visuably fluctiating. 
