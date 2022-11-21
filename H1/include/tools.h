@@ -148,7 +148,8 @@ int
 save_vector_to_csv(
         double *vec,
         unsigned int ndims,
-        char *filename
+        char *filename,
+		bool is_empty
         );
 
 int 

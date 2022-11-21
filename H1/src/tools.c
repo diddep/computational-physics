@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdbool.h>
 
 #include "tools.h"
     
@@ -233,11 +234,17 @@ print_vector(
 int save_vector_to_csv(
         double *vec,  // Vector to save
         unsigned int ndims,  // Number of dimensions
-        char *filename // filename
+        char *filename, // filename
+		bool is_empty
         )
 {
     FILE *fp1;
-    fp1 = fopen(filename, "w"); // Create a file
+	if(is_empty == true){
+		fp1 = fopen(filename, "w"); // Create a file if is_empty == true
+	} else {
+		fp1 = fopen(filename, "a"); // Append if file if is_empty == false
+	}
+    
     if (fp1 == NULL)
     {
         printf("Error while opening the file.\n");
@@ -245,8 +252,11 @@ int save_vector_to_csv(
     }
     //fprintf(fp1, "%10.5f,%10.5f,%10.5f", vec[0], vec[1], vec[2]);
     for(int i =0; i<ndims; ++i){
-        fprintf(fp1, "%10.5f", vec[i]);
-        fprintf(fp1, "\n");
+		if(i!=ndims){
+			fprintf(fp1, "%10.5f, ", vec[i]);
+		} else {
+			fprintf(fp1, "%10.5f \n", vec[i]);
+		}
     }
 
     fprintf(fp1,"\n");
