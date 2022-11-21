@@ -146,7 +146,7 @@ save_vector_to_csv(
 int 
 save_matrix_to_csv(
         double **matrix,
-        unsigned int ncols,
-		unsigned int nrows,
+        unsigned int nrows,
+		unsigned int ncols,
         char *filename
         );

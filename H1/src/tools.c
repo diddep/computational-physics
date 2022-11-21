@@ -240,8 +240,8 @@ int save_vector_to_csv(
 
 int save_matrix_to_csv(
         double **matrix,  // Matrix to save
-        unsigned int ncols,  // Number of dimensions
-		unsigned int nrows,  // Number of dimensions
+        unsigned int nrows,  // Number of dimensions
+		unsigned int ncols,  // Number of dimensions
         char *filename // filename
         )
 {
