@@ -73,14 +73,22 @@ dot_product(
 void
 create_2D_array(
 		double ***array,
-		unsigned int column_size,
-		unsigned int row_size
+		unsigned int row_size,
+		unsigned int column_size
 	       );
 
 void
 destroy_2D_array(
 		 double **array
 	        );
+void
+print_2D_array(
+		double **array,
+		unsigned int row_size,
+		unsigned int column_size
+	       );
+
+
 /* **********************************************
  *
  * Calculate the matrix product between

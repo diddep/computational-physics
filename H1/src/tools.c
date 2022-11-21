@@ -68,8 +68,8 @@ create_2D_array(
 		unsigned int column_size // Carl: Changed place between row_size and column_size
 	       )
 {
-	double *asentries = (double*) malloc(row_size * column_size * sizeof(double)); // Use calloc ,sizeof(double)
-	*array = (double **) malloc(row_size * sizeof(double *));
+	double *asentries = (double*) calloc(row_size * column_size, sizeof(double)); // Use calloc ,sizeof(double)
+	*array = (double **) calloc(row_size, sizeof(double *));
 	
 	for(int row = 0; row < row_size; row++)
 	{
@@ -91,6 +91,23 @@ destroy_2D_array(
 		){
 	free(*array);
 	free(array);
+}
+
+void
+print_2D_array(
+		double **array,
+		unsigned int row_size,
+		unsigned int column_size // Carl: Changed place between row_size and column_size
+	       )
+{
+	for(int ix = 0; ix < row_size; ix++){
+			for(int jx = 0; jx < column_size; jx++){
+				if( ix % 1000 == 0){
+					printf("%f ", array[ix][jx]);
+				}
+			}
+			printf("\n");
+		}
 }
 
 void
