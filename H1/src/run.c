@@ -20,15 +20,14 @@ try_lattice_constants(double *lattice_params, int n_lattice_params, int N_atoms,
         double lattice_volume = pow(lattice_param, 3);
 
         // Retrieve fcc with already made function
-        init_fcc((double (*)[3]) pos_matrix, (int) N_atoms, (double) lattice_param);
+        init_fcc((double (*)[3]) pos_matrix, (int) 4, (double) lattice_param); // N-atoms
 
-        double cell_length = n_rows * lattice_param; // What should this be?
-    
         // Retrieve potential energy with ready made function
+        double cell_length = 4 * lattice_param; // 4-unit cells 
         E_pot = get_energy_AL((double (*)[3]) pos_matrix, (double) cell_length, (int) N_atoms);
         
-        // Scaling result and initializing result vector
-        double E_pot_per_unitcell = E_pot/lattice_param; // What should this be?
+        // Scaling result with number of unit cells and initializing result vector
+        double E_pot_per_unitcell = E_pot/pow(4,3);
         double result_vec[] = {ix, lattice_param, lattice_volume, E_pot, E_pot_per_unitcell};
 
         // Saving results to csv file "try_lattice_constants.csv"
@@ -39,7 +38,7 @@ try_lattice_constants(double *lattice_params, int n_lattice_params, int N_atoms,
         }
 
         //Printing results in terminal if print_book is set to true
-        bool print_bool = false;
+        bool print_bool = true;
         if(print_bool == true) { 
             printf("Lattice_volume: %f\n", lattice_volume);
             printf("E_pot: %f\n", E_pot);
@@ -61,7 +60,7 @@ run(
     // This makes it possible to test
     // 100% of you code
     
-    int N_atoms = 256; int n_rows = 4 * pow(N_atoms, 3); int n_cols = 3;
+    int N_atoms = 256; int n_rows = 4 * pow(N_atoms, 3); int n_cols = 3; // Antal unit cells in each direction
     int n_lattice_params = 8;
     double lattice_params[n_lattice_params]; double lattice_param_init = 4.05; // 4.0478; // Lattice_param, denoted a0 in document. Should be 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
     printf("n/2-ix, lattice_param \n");
