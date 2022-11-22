@@ -108,7 +108,7 @@ run(
     
     displace_fcc((double (*)[3]) pos_matrix, (int) 4, (double) lattice_param);
     
-    destroy_2D_array(pos_matrix);
+    //destroy_2D_array(pos_matrix);
     
     return 0;
 }
