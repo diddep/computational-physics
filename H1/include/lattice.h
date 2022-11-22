@@ -12,3 +12,5 @@
  *
  * ****************************************************************************/
 void init_fcc(double[][3], int, double);
+
+void displace_fcc(double[][3], int, double);
