@@ -254,7 +254,7 @@ void carbon_dioxide()
     double *q_3 = calloc(sizeof(double), n_timesteps+1);
 
     // Setting initial conditions (Å)
-    q_1[0] = 0.01; q_2[0] = 0.005; q_3[0] = -0.005; v[0] = 0;
+    q_1[0] = 0.0; q_2[0] = 0.0; q_3[0] = -0.2; v[0] = 0;
 
     //Creating matrix for velocity
     double **v_matrix = NULL;
@@ -277,19 +277,19 @@ void carbon_dioxide()
         q_matrix[ix][2] = q_3[ix];
     }
     
-    char filename_position[] = {"Saved_trajectory_co2_small_dt.csv"};
+    char filename_position[] = {"Saved_trajectory_co2_small_dt_assym.csv"};
     save_matrix_to_csv(q_matrix, n_particles, n_timesteps, filename_position);
 
-    char filename_position_p1[] = {"Saved_trajectory_particle1_co2_small_dt.csv"};
+    char filename_position_p1[] = {"Saved_trajectory_particle1_co2_small_dt_assym.csv"};
     save_vector_to_csv(q_1, n_timesteps, filename_position_p1);
-    char filename_position_p2[] = {"Saved_trajectory_particle2_co2_small_dt.csv"};
+    char filename_position_p2[] = {"Saved_trajectory_particle2_co2_small_dt_assym.csv"};
     save_vector_to_csv(q_2, n_timesteps, filename_position_p2);
-    char filename_position_p3[] = {"Saved_trajectory_particle3_co2_small_dt.csv"};
+    char filename_position_p3[] = {"Saved_trajectory_particle3_co2_small_dt_assym.csv"};
     save_vector_to_csv(q_3, n_timesteps, filename_position_p3);
 
     //print_vector(v, n_particles);
     
-    char filename_velocity[] = {"Saved_velocity_co2_small_dt.csv"};
+    char filename_velocity[] = {"Saved_velocity_co2_small_dt_assym.csv"};
     save_matrix_to_csv(v_matrix, n_particles, n_timesteps+1, filename_velocity);
     // save_matrix_to_csv(v_matrix, n_particles, n_timesteps-1, filename_velocity);
     

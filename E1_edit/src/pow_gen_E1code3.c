@@ -23,8 +23,8 @@
 /*************************************************************
  * Macro defines
  *************************************************************/
-#define N_POINTS 250 //original 250
-#define dt 0.1
+#define N_POINTS 1000 //original 250
+#define dt 0.001/4.0 //0.1/6.0
 
 /******************************************************************************
  * Helper functions
@@ -121,8 +121,10 @@ int main(int argc, char **argv)
 {
     double time_array[N_POINTS];
     double signal[N_POINTS];
-    read_data("signal.csv", time_array, signal);
-    
+    //read_data("signal.csv", time_array, signal);
+
+    read_data("co2_p3_time_1000.csv", time_array, signal);
+
     /*
      * Construct array with frequencies
      */ 
@@ -142,7 +144,7 @@ int main(int argc, char **argv)
     /*
      * Dump fft and frequencies to file
      */
-    write_to_file("powerspectrum_shift.csv", fftd_data, frequencies, N_POINTS);
+    write_to_file("powerspectrum_shift_p3.csv", fftd_data, frequencies, N_POINTS);
     return 0;
 
 
