@@ -16,7 +16,7 @@ ax.set_ylabel('Volume Å^3', fontsize = 15)
 ax.set_xlabel('Energy (eV/unit cell)', fontsize = 15)
 plt.legend(fontsize=10)
 plt.tight_layout()
-plt.savefig('task1_plot')
+plt.savefig('task1_plot.pdf')
 
 
 plt.show()
