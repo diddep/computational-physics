@@ -53,9 +53,18 @@ displace_fcc(double positions[][3], int N, double lattice_param)
 	    //double u = gsl_rng_uniform(r);
         double displacement_factor = gsl_ran_flat(r, -abs_displacement, abs_displacement);
 	    printf ("%.5f\n", displacement_factor);
-    }
-    */
+    }*/
     
+    double displacement_factor = gsl_ran_flat(r, -abs_displacement, abs_displacement);
+
+    double disp; srand(42);
+    for(int ix = 0; ix <10; ix++){
+        //disp = (2 * (rand() / RAND_MAX) - 1);// * 0.065;
+        disp = (2*rand()/RAND_MAX- 1) * 0.065;
+        printf("%f\n", disp);
+    }
+    
+
     for (i = 0; i < 2 * N; i++){
         for (j = 0; j < 2 * N; j++){
             for (k = 0; k < N; k++){
@@ -65,11 +74,34 @@ displace_fcc(double positions[][3], int N, double lattice_param)
                 else {
                     xor_value = 1;
                 }
-                double displacement_factor = gsl_ran_flat(r, -abs_displacement, abs_displacement);
-                positions[i * N * 2 * N + j * N + k][0] *= 1; //displacement_factor;
-                positions[i * N * 2 * N + j * N + k][1] *= 1; //displacement_factor;
-                positions[i * N * 2 * N + j * N + k][2] *= 1; //displacement_factor;
-            printf ("%.5f\n", displacement_factor);
+                displacement_factor = gsl_ran_flat(r, -abs_displacement, abs_displacement);
+                positions[i * N * 2 * N + j * N + k][0] = lattice_param * (0.5 * xor_value + k) + 0.;// displacement_factor * lattice_param;
+                //positions[i * N * 2 * N + j * N + k][0] += displacement_factor * lattice_param;
+
+                displacement_factor = gsl_ran_flat(r, -abs_displacement, abs_displacement);
+                positions[i * N * 2 * N + j * N + k][1] = lattice_param * (j * 0.5) + 0.; //displacement_factor * lattice_param;
+                //positions[i * N * 2 * N + j * N + k][1] += displacement_factor * lattice_param;
+
+                displacement_factor = gsl_ran_flat(r, -abs_displacement, abs_displacement);
+                positions[i * N * 2 * N + j * N + k][2] = lattice_param * (i * 0.5) + 0.; // displacement_factor * lattice_param;
+                //positions[i * N * 2 * N + j * N + k][2] += displacement_factor * lattice_param;
+                //printf ("%.5f\n", displacement_factor);
+                
+                /*for(int kx = 0; kx <3; kx++){
+                    displacement_factor = gsl_ran_flat(r, -abs_displacement, abs_displacement);
+                    positions[i * N * 2 * N + j * N + k][kx] += displacement_factor * lattice_param;
+                    printf ("%.5f\n", displacement_factor);
+                }*/
+                
+                //positions[i * N * 2 * N + j * N + k][0] += displacement_factor * positions[i * N * 2 * N + j * N + k][0];
+                //positions[i * N * 2 * N + j * N + k][1] *= 1; //displacement_factor;
+                //positions[i * N * 2 * N + j * N + k][2] *= 1; //displacement_factor;
+
+                
+                //double displacement_factor = gsl_ran_flat(r, -abs_displacement, abs_displacement);
+                //positions[i * N * 2 * N + j * N + k][1] += displacement_factor * lattice_param;
+                //positions[i * N * 2 * N + j * N + k][2] += displacement_factor * lattice_param;
+            
             }
         }
     }
