@@ -60,7 +60,7 @@ displace_fcc(double positions[][3], int N, double lattice_param)
     double disp; srand(42);
     for(int ix = 0; ix <10; ix++){
         //disp = (2 * (rand() / RAND_MAX) - 1);// * 0.065;
-        disp = (2*rand()/RAND_MAX- 1) * 0.065;
+        disp = (double)0.065*(rand() % 2000- 1000)/1000.0; //(2*rand()/RAND_MAX- 1) * 0.065;
         printf("%f\n", disp);
     }
     
