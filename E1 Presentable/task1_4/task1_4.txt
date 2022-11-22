@@ -1,0 +1,6 @@
+vikning
+seems like we need to make dt short to be able to sample the signal
+
+C: If sampling rate is such that the two signals have the same amplitude at the sampled points,
+one can't tell the difference between the signals. It is fixed by setting sample rate
+such that it follows a different period than the two signals. 

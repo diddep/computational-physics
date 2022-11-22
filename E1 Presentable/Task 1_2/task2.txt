@@ -1,0 +1,3 @@
+we see that the spectrum is very similar to fig 27
+this isnt surprising as we are using the same frequencies for the the signal, we see the frequency 2 in the spectrum and
+the frequency 8,

@@ -1,0 +1,2 @@
+shifting the frequency and centering it around is nicer because we can view, the nyquist frequency should be f_c = 5
+we see that by increasing n we get sharper peaks because of longer time averaging
