@@ -70,7 +70,13 @@ dot_product(
  * Allocate the memory to a 2D array
  *
  * **********************************************/
-
+void
+create_2D_array_old(
+		double ***array,
+		unsigned int row_size,
+		unsigned int column_size
+	       );
+		   
 double**
 create_2D_array(
 		unsigned int row_size,
@@ -78,16 +84,15 @@ create_2D_array(
 	       );
 
 void
-destroy_2D_array_pointers(
-		 double **array
-	        );
-
-void
-destroy_2D_arrays(
+destroy_2D_array_rows(
 		 double **array,
 		 int n_rows
 		);
-		
+
+void
+destroy_2D_array(
+		 double **array
+	        );
 void
 print_2D_array(
 		double **array,

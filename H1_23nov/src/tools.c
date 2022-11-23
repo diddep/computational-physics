@@ -62,7 +62,31 @@ dot_product(
 	return result;
 }
 
-//New from Elsa
+void
+create_2D_array_old(
+		double ***array,
+		unsigned int row_size,
+		unsigned int column_size // Carl: Changed place between row_size and column_size
+	       )
+{
+	double *asentries = (double*) malloc(row_size * column_size * sizeof(double)); // Use calloc ,sizeof(double)
+	*array = (double **) malloc(row_size* sizeof(double *));
+	
+	for(int row = 0; row < row_size; row++)
+	{
+		(*array)[row] = asentries + column_size * row;
+	}
+	
+	for(int row = 0; row < row_size; row++)
+	{
+		for(int col = 0; col < column_size; col++)
+			{
+				(*array)[row][col] = 0;
+				//printf("%i, %i \n", row, col);
+			}
+	}
+}
+
 double**
 create_2D_array(
 		unsigned int row_size,
@@ -78,7 +102,7 @@ create_2D_array(
 }
 
 void
-destroy_2D_array_pointers(
+destroy_2D_array(
 		 double **array
 		){
 	free(*array);
@@ -86,7 +110,7 @@ destroy_2D_array_pointers(
 }
 
 void
-destroy_2D_array(
+destroy_2D_array_rows(
 		 double **array,
 		 int n_rows
 		){
