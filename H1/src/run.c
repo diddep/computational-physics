@@ -20,8 +20,8 @@ try_lattice_constants(int N_atoms, int n_rows, int n_cols){
     
     // Set print_q=true if we want to print the lattice_parameters code is looping through.
     // Lattice params is an array around lattice_param_init with lattice_param_spacing
-    bool print_q=false; double lattice_param_spacing = 0.05;
-    if(print_q=true){
+    bool print_q = false; double lattice_param_spacing = 0.05;
+    if(print_q = true){
         printf("n/2-ix, lattice_param \n");
         for(int ix = 0; ix < n_lattice_params; ix++){
             printf("%i, ", n_lattice_params/2-ix);
@@ -29,7 +29,7 @@ try_lattice_constants(int N_atoms, int n_rows, int n_cols){
             printf("%f\n", lattice_params[ix]);
         }
         printf("\n");
-    } else {
+    } else{
         for(int ix = 0; ix < n_lattice_params; ix++){
             lattice_params[ix] = lattice_param_init - (n_lattice_params/2-ix)*lattice_param_spacing;
         }
@@ -40,7 +40,7 @@ try_lattice_constants(int N_atoms, int n_rows, int n_cols){
     // For loop to run over lattice parameters
     for(int ix = 0; ix < n_lattice_params; ix++){
         // Initialize matric and update values
-        double pos_matrix[4*256][3];
+        double pos_matrix[256][3];//double pos_matrix[4*256][3];
         double lattice_param = lattice_params[ix];
         double lattice_volume = pow(lattice_param, 3);
         
@@ -79,7 +79,6 @@ try_lattice_constants(int N_atoms, int n_rows, int n_cols){
     }
     
     return smallest_lattice_param;
-
 }
 
 gsl_rng *
@@ -112,21 +111,90 @@ displace_fcc(double positions[][3], int N, double lattice_param)
             for (k = 0; k < N; k++){
                 for(int lx = 0; lx < 3; lx++){
                     double random_number = gsl_ran_flat(r,-abs_displacement, abs_displacement);
+                    //printf("step: %i\n", i * N * 2 * N + j * N + k);
+                    //printf("position value b4: %f\n", positions[i * N * 2 * N + j * N + k][lx]);
+                    
                     positions[i * N * 2 * N + j * N + k][lx] += random_number*lattice_param;
+                    //printf("position value after: %f\n", positions[i * N * 2 * N + j * N + k][lx]);
+                    //printf("random number: %f\n", random_number*lattice_param);
+
                 }
             }
         }
-    }
+    };
     gsl_rng_free(r);
 }
 
+void velocity_verlet(int n_timesteps, int nbr_atoms, int n_cols, double **q, double **v, double dt, double m, double lattice_param)
+{
+    double cell_length = 4 * lattice_param;
+    for(int tx = 1; tx < n_timesteps + 1; tx++)
+    {   
+        // OBS!!!! Should get forces be row below or outside of tx for-loop?
+        // Calculate forces based on atom positions
+        //double f[nbr_atoms][n_cols];
+        //get_forces_AL((double (*)[3]) f, (double (*)[3]) q, (double) cell_length, (int) nbr_atoms);
+        /* v(t+dt/2) */
+        for(int ix = 0; ix < nbr_atoms; ix++)
+        {
+            for(int jx = 0; jx < n_cols; ix++)
+            {
+                //printf("%f\n", f[ix][jx]);
+                //v[ix][jx] += 0.5 * dt * f[ix][jx] / m;
+            }
+        }
+
+        /* q(t+dt) */
+        for(int ix = 0; ix < nbr_atoms; ix++)
+        {
+            for(int jx = 0; jx < n_cols; ix++)
+            {
+                //q[ix][jx] += dt * v[ix][jx];
+            }
+        }
+
+        // Calculate forces based on (new) atom positions
+        //get_forces_AL((double (*)[3]) f, (double (*)[3]) q, (double) cell_length, (int) nbr_atoms);
+
+        /* v(t+dt) */
+        for(int ix = 0; ix < nbr_atoms; ix++)
+        {
+            for(int jx = 0; jx < n_cols; ix++)
+            {
+                //v[ix][jx] += 0.5 * dt * f[ix][jx] / m;
+            }
+        }
+
+        // save positions - get interesting values for timestep / periodix boundary cond?
+        // get potenital kinetic and total energies
+        // Get temperature and pressure
+
+    }
+    
+}
 
 void
 sol_eq_of_motion(double positions[][3], double lattice_param, int n_rows, int n_cols, int nbr_atoms)
 {
+    // Initialize variables
     double cell_length = 4 * lattice_param; 
-    double forces[4*256][3];
-    get_forces_AL((double (*)[3]) forces, (double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
+    double aluminium_amu = 26.98; double m_asu = 9649;
+    double aluminium_asu = aluminium_amu/m_asu;
+    
+    double q[nbr_atoms][n_cols];
+    double v[nbr_atoms][n_cols];
+    
+    for(int ix = 0; ix < nbr_atoms; ix++){
+        for(int jx = 0; jx < n_cols; jx++){
+            q[ix][jx] = positions[ix][jx];
+            v[ix][jx] = 0;
+        }
+    }
+    int n_timesteps = 1e3; double dt=1e-2;
+    velocity_verlet((int) n_timesteps, (int) nbr_atoms, (int) n_cols, (double **) q, (double **) v, (double) dt, (double) aluminium_asu, (double) lattice_param);
+
+    
+    
 }
 
 int
@@ -147,7 +215,7 @@ run(
     
     double lattice_param = 4.05; // True is around 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
 
-    double position[4*256][3];
+    double position[nbr_atoms][n_cols];
     init_fcc((double (*)[3]) position, (int) n_unitcells, (double) lattice_param); // 4 unit cells in each direction
     
     displace_fcc((double (*)[3]) position, (int) n_unitcells, (double) lattice_param);
