@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-array = np.genfromtxt('../try_lattice_constants.csv', delimiter=',').reshape(-1,5)
+array = np.genfromtxt('../csv/try_lattice_constants.csv', delimiter=',').reshape(-1,5)
 
 
 fig_vol_en , ax = plt.subplots(1,1)

@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-array = np.genfromtxt('../eq_of_motion.csv', delimiter=',')#.reshape(-1,7)
+array = np.genfromtxt('../csv/eq_of_motion.csv', delimiter=',')#.reshape(-1,7)
 
 t = array[:,0]
 e_pot = array[:,2]
