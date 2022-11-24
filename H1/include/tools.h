@@ -83,7 +83,7 @@ destroy_2D_array_pointers(
 	        );
 
 void
-destroy_2D_arrays(
+destroy_2D_array(
 		 double **array,
 		 int n_rows
 		);

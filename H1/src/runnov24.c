@@ -197,115 +197,30 @@ void
 sol_eq_of_motion(double positions[][3], double lattice_param, int n_rows, int n_cols, int nbr_atoms)
 {
     // Initialize variables
-    double cell_length = 4 * lattice_param; double lattice_volume = pow(lattice_param, 3);
+    double cell_length = 4 * lattice_param; 
     double aluminium_amu = 26.98; double m_asu = 9649;
     double aluminium_asu = aluminium_amu/m_asu;
 
-    double E_kinetic = 0; double E_kinetic_per_unitcell = 0;
-    double E_potential = 0; double E_potential_per_unitcell = 0;
-    double E_total_per_unitcell = 0;
-
-    double virial = 0; double virial_per_unitcell = 0;
-    double temp_inst = 0; double temp_inst_per_unitcell = 0;
-    double press_inst = 0; double press_inst_per_unitcell = 0;
-    double kB = 8.61733 * 1e-5; // Boltzzmann constant in eV/K
-    
-    char filename_result[] = {"eq_of_motion.csv"};
-    
-    //double q[nbr_atoms][n_cols];
-    double v[nbr_atoms][n_cols];
-    double f[nbr_atoms][n_cols];
-
+    double **q = create_2D_array((int) nbr_atoms, n_cols);
+    double **v = create_2D_array((int) nbr_atoms, n_cols);
     
     for(int ix = 0; ix < nbr_atoms; ix++){
         for(int jx = 0; jx < n_cols; jx++){
-            //q[ix][jx] = positions[ix][jx];
+            q[ix][jx] = positions[ix][jx];
             v[ix][jx] = 0;
-            f[ix][jx] = 0;
+            //printf("q[%i][%i]: %f\n", ix, jx, q[ix][jx]);
         }
     }
-    double end_time = 10; double dt = 1e-2;
-    int n_timesteps = end_time / dt; 
+    int n_timesteps = 10; double dt=1e-5;
 
-    double alpha_T = 1; double alpha_P = 1;
-    double temp_eq = 500; double press_eq = 1*1e-4; // 1 bar = 1e-4 GPa
-    bool temp_scaling = true; bool press_scaling = true;
+    //double f[nbr_atoms][n_cols];
+    //get_forces_AL((double (*)[3]) f, (double (*)[3]) q, (double) cell_length, (int) nbr_atoms);
 
-    get_forces_AL((double (*)[3]) f, (double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
-    for(int tx = 1; tx < n_timesteps + 1; tx++)
-    {
-        /* v(t+dt/2) */
-        for(int ix = 0; ix < nbr_atoms; ix++)
-        {
-            for(int jx = 0; jx < n_cols; jx++)
-            {
-                v[ix][jx] += 0.5 * dt * f[ix][jx] / aluminium_asu;
-                //printf("v[%i][%i] %f\n",ix, jx, v[ix][jx]);
-            }
-        }
-        
-        /* q(t+dt) */
-        for(int ix = 0; ix < nbr_atoms; ix++)
-        {
-            for(int jx = 0; jx < n_cols; jx++)
-            {
-                positions[ix][jx] += dt * v[ix][jx] * pow(alpha_P, 1/3);
-                //printf("v[%i][%i] %f\n",ix, jx, v[ix][jx]);
-            }
-        }
-
-        /* a(t+dt) */
-        get_forces_AL((double (*)[3]) f, (double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
-
-        /* v(t+dt) */
-        E_kinetic = 0;
-        for(int ix = 0; ix < nbr_atoms; ix++)
-        {
-            for(int jx = 0; jx < n_cols; jx++)
-            {
-                v[ix][jx] += 0.5 * dt * f[ix][jx] / aluminium_asu * sqrt(alpha_T); // alpha_T for scaling. If temp_scaling==false this is 1.
-                E_kinetic += 0.5 * aluminium_asu * v[ix][jx] * v[ix][jx];
-                //printf("v[%i][%i] %f\n",ix, jx, v[ix][jx]);
-                
-            }
-        }
-        // save positions - get interesting values for timestep / periodix boundary cond?
-        // get potenital kinetic and total energies
-        
-        // Get temperature and pressure
-        
-        E_potential = get_energy_AL((double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
-        E_potential_per_unitcell = E_potential / pow(4,3);
-        E_kinetic_per_unitcell = E_kinetic / pow(4,3);
-        E_total_per_unitcell = E_potential_per_unitcell + E_kinetic_per_unitcell;
-
-        virial = get_virial_AL((double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
-        virial_per_unitcell = virial / pow(4,3);
-
-        temp_inst_per_unitcell = 2 / (3 * 4 * kB) * E_kinetic_per_unitcell; // 4 atoms in an Fcc unit cell and kB in eV/K
-        if(temp_scaling == true){
-            double tau_T = 50; // What should this be // Åtminstone några hundra tidssteg, typ 50/Viktor
-            alpha_T = 1 + 2*dt/tau_T * (temp_eq - temp_inst_per_unitcell)/temp_inst_per_unitcell;
-        }
-         // ev/Å^3 to SI gger konstant för asu to SI, Pascale är Joule per kubikmeter
-        press_inst_per_unitcell = ((4 * kB * temp_inst_per_unitcell) + virial_per_unitcell) / lattice_volume;
-        if(press_scaling == true){
-            double tau_P = 50; // What should this be // Åtminstone några hundra tidssteg, typ något mer än 100 /Viktor
-            double kappa_T = 0.01385; // isothermal compressability for aluminium in Gpa^-1
-            alpha_P = 1 - kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
-        }
-        
-        double result_vec[] = {tx*dt, lattice_param, E_potential_per_unitcell, E_kinetic_per_unitcell, E_total_per_unitcell, temp_inst_per_unitcell, press_inst_per_unitcell, alpha_T, alpha_P};
-
-        // Saving results to csv file "try_lattice_constants.csv"
-        if(tx == 1){
-            save_vector_to_csv(result_vec, 9, filename_result, true); // true -> fopen with "w"
-        } else {
-            save_vector_to_csv(result_vec, 9, filename_result, false); // false -> fopen with "a"
-        }
-
-        printf("Inst. Temp at t = [%i]: %f\n", tx, temp_inst_per_unitcell);
-    }
+    velocity_verlet((int) n_timesteps, (int) nbr_atoms, (int) n_cols, (double (*)[3]) positions,(double (*)[3]) v, (double) dt, (double) aluminium_asu, (double) lattice_param);
+    
+    
+    destroy_2D_array(q, nbr_atoms);
+    destroy_2D_array(v, nbr_atoms);
 }
 
 int
