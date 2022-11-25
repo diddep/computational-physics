@@ -123,9 +123,7 @@ void
 velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_cols, int nbr_atoms)
 {
     // Initialize variables
-    double cell_length = 4 * lattice_param;
-    double cell_volume = pow(cell_length, 3);
-    double lattice_volume = pow(lattice_param, 3);
+    double cell_length = 4 * lattice_param; double lattice_volume = pow(lattice_param, 3);
     double aluminium_amu = 26.98; double m_asu = 9649;
     double aluminium_asu = aluminium_amu/m_asu; //Mass in atomic simulation units
 
@@ -136,7 +134,7 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
     double virial = 0; double virial_per_unitcell = 0;
     double temp_inst = 0; double temp_inst_per_unitcell = 0;
     double press_inst = 0; double press_inst_per_unitcell = 0;
-    double kB = 8.61733 * 1e-5; // Boltzmann constant in eV/K
+    double kB = 8.61733 * 1e-5; // Boltzzmann constant in eV/K
     
     char filename_result[] = {"eq_of_motion.csv"};
     char filename_pos[] = {"position_track.csv"};
@@ -159,8 +157,8 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
     //Scaling variables, if temp/press_scaling = false scaling is turned off and alpha_T/P just remains 1
     double alpha_T = 1; double alpha_P = 1; 
     double temp_eq = 500; // OBS! should eventually be 773,15 
-    double press_eq = 1*1e-4; // 1 bar = 1e-4 GPa /// Borde denna delas på unit cell också?
-    bool temp_scaling = false; bool press_scaling = true;
+    double press_eq = 1*1e-4; // 1 bar = 1e-4 GPa
+    bool temp_scaling = true; bool press_scaling = true;
 
     //Velocity verlet algorithm as in E1
     get_forces_AL((double (*)[3]) f, (double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
@@ -182,15 +180,12 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
             for(int jx = 0; jx < n_cols; jx++)
             {
                 // alpha_P for scaling. If press_scaling==false this is 1.
-                positions[ix][jx] += dt * v[ix][jx];
-                positions[ix][jx] *= pow(alpha_P, 1/3);
+                positions[ix][jx] += dt * v[ix][jx] * pow(alpha_P, 1/3);
             }
         }
 
         // After scaling positions lattice_parameter is scaled to change pressure
-        //lattice_param *= pow(alpha_P, 1/3); lattice_volume = pow(lattice_param, 3);
-        cell_length *= pow(alpha_P, 1/3); cell_volume = pow(cell_length, 3);
-        
+        lattice_param *= pow(alpha_P, 1/3);
 
         /* a(t+dt) */
         get_forces_AL((double (*)[3]) f, (double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
@@ -204,8 +199,7 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
             for(int jx = 0; jx < n_cols; jx++)
             {   
                 // alpha_T for scaling. If temp_scaling==false this is 1.
-                v[ix][jx] += 0.5 * dt * f[ix][jx] / aluminium_asu;
-                v[ix][jx] *= sqrt(alpha_T);
+                v[ix][jx] += 0.5 * dt * f[ix][jx] / aluminium_asu * sqrt(alpha_T);
                 E_kinetic += 0.5 * aluminium_asu * v[ix][jx] * v[ix][jx];
             }
         }
@@ -235,7 +229,7 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
         }
 
          // Calculate pressure in eV/Å^3
-        press_inst_per_unitcell = ((4 * kB * temp_inst_per_unitcell) + virial_per_unitcell) / cell_volume; //lattice_volume;
+        press_inst_per_unitcell = ((4 * kB * temp_inst_per_unitcell) + virial_per_unitcell) / lattice_volume;
         press_inst_per_unitcell *= 1.60219*1e2; // 1eV/Å^3 = 160.2 gPA
         
         // Changing scaling parameter for pressure
@@ -245,11 +239,11 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
             double tau_P = 5*dt;
 
             // isothermal compressability for aluminium in Gpa^-1
-            double kappa_T = - 0.01385; // Neg eller pos?
+            double kappa_T = 0.01385;
 
             // Unsure if plus or minus. Scaling with "correct" sign seams to change pressure in wrong direction
-            //alpha_P = 1 - kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
-            alpha_P = 1 + kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
+            alpha_P = 1 - kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
+            //alpha_P = 1 + kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
         }
         
         // Creating vectors so to save results in csv files. Can be plotted with python files plot_energy.py and plot_position_track.py
@@ -269,7 +263,7 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
         }
 
         // Printing temperature for each timestep to keep track during longer measurements
-        printf("Inst. Temp, Press at t = [%i]: %f,   %f\n", tx, temp_inst_per_unitcell, press_inst_per_unitcell);
+        printf("Inst. Temp at t = [%i]: %f\n", tx, temp_inst_per_unitcell);
     }
 }
 
