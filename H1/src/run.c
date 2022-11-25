@@ -120,7 +120,7 @@ displace_fcc(double positions[][3], int N, double lattice_param)
 }
 
 void
-velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_cols, int nbr_atoms)
+velocity_verlet(double positions[][3], double lattice_param, int end_time, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, double temp_eq, double press_eq)
 {
     // Initialize variables
     double cell_length = 4 * lattice_param;
@@ -140,6 +140,7 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
     
     char filename_result[] = {"eq_of_motion.csv"};
     char filename_pos[] = {"position_track.csv"};
+    char filename_param[] = {"parameters.csv"};
     
     //Creating empty arrays
     double v[nbr_atoms][n_cols];
@@ -153,14 +154,12 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
     }
     
     // Variables for duration of measurement
-    double end_time = 50; double dt = 1e-2;
+    //double end_time = 10; 
+    double dt = 1e-2;
     int n_timesteps = end_time / dt; 
 
-    //Scaling variables, if temp/press_scaling = false scaling is turned off and alpha_T/P just remains 1
+    // Declaring scaling variables, if temp/press_scaling = false scaling is turned off and alpha_T/P just remains 1
     double alpha_T = 1; double alpha_P = 1; 
-    double temp_eq = 773.15; // OBS! should eventually be 773,15 
-    double press_eq = 1;//*1e-4; // 1 bar = 1e-4 GPa /// Borde denna delas på unit cell också?
-    bool temp_scaling = true; bool press_scaling = true;
 
     //Velocity verlet algorithm as in E1
     get_forces_AL((double (*)[3]) f, (double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
@@ -253,7 +252,8 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
         }
         
         // Creating vectors so to save results in csv files. Can be plotted with python files plot_energy.py and plot_position_track.py
-        double result_vec[] = {tx*dt, lattice_param, E_potential_per_unitcell, E_kinetic_per_unitcell, E_total_per_unitcell, temp_inst_per_unitcell, press_inst_per_unitcell, alpha_T, alpha_P};
+        double parameter_vec[] = {end_time, dt, lattice_param, temp_scaling, press_scaling, temp_eq, press_eq};
+        double result_vec[] = {tx*dt, cell_length, E_potential_per_unitcell, E_kinetic_per_unitcell, E_total_per_unitcell, temp_inst_per_unitcell, press_inst_per_unitcell, alpha_T, alpha_P};
         double position_track_vec[] = {tx*dt,positions[0][0], positions[0][1], positions[0][2],\
                                              positions[100][0], positions[100][1], positions[100][2],\
                                              positions[200][0], positions[200][1], positions[200][2],\
@@ -266,6 +266,9 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
         } else {
             save_vector_to_csv(result_vec, 9, filename_result, false);
             save_vector_to_csv(result_vec, 10, filename_pos, false); // false -> fopen with "a"
+        }
+        if(tx == n_timesteps){
+            save_vector_to_csv(parameter_vec, 7, filename_param, true);
         }
 
         // Printing temperature for each timestep to keep track during longer measurements
@@ -296,7 +299,14 @@ run(
     
     displace_fcc((double (*)[3]) position, (int) n_unitcells, (double) lattice_param);
     
-    velocity_verlet((double (*)[3]) position, (double) lattice_param, (int) n_rows, (int) n_cols, (int) nbr_atoms);
+    //velocity_verlet((double (*)[3]) position, (double) lattice_param, (int) n_rows, (int) n_cols, (int) nbr_atoms);
+    int end_time = 10; 
     
+    // If temp/press_scaling = false scaling is turned off and alpha_T/P just remains 1
+    bool temp_scaling = true, press_scaling = true;
+    double temp_eq = 773.15, press_eq = 1;
+    velocity_verlet((double (*)[3]) position, (double) lattice_param, (int) end_time, (int) n_cols, (int) nbr_atoms, \
+                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq);
+
     return 0;
 }
