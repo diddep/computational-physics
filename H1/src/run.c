@@ -159,7 +159,7 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
     //Scaling variables, if temp/press_scaling = false scaling is turned off and alpha_T/P just remains 1
     double alpha_T = 1; double alpha_P = 1; 
     double temp_eq = 500; // OBS! should eventually be 773,15 
-    double press_eq = 1*1e-4; // 1 bar = 1e-4 GPa /// Borde denna delas på unit cell också?
+    double press_eq = 1;//*1e-4; // 1 bar = 1e-4 GPa /// Borde denna delas på unit cell också?
     bool temp_scaling = false; bool press_scaling = true;
 
     //Velocity verlet algorithm as in E1
@@ -236,20 +236,20 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
 
          // Calculate pressure in eV/Å^3
         press_inst_per_unitcell = ((4 * kB * temp_inst_per_unitcell) + virial_per_unitcell) / cell_volume; //lattice_volume;
-        press_inst_per_unitcell *= 1.60219*1e2; // 1eV/Å^3 = 160.2 gPA
+        press_inst_per_unitcell *= 1.60219*1e2*1e4; // 1eV/Å^3 = 160.2 gPA
         
         // Changing scaling parameter for pressure
         if(press_scaling == true){
 
             // Value of tau_P is uncertain, and unsure if we should mult. by dt. Have heard slightly more than 50.
-            double tau_P = 5*dt;
+            double tau_P = 0.5*dt;
 
             // isothermal compressability for aluminium in Gpa^-1
-            double kappa_T = - 0.01385; // Neg eller pos?
+            double kappa_T = 0.01385/1e4; // Neg eller pos?
 
             // Unsure if plus or minus. Scaling with "correct" sign seams to change pressure in wrong direction
-            //alpha_P = 1 - kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
-            alpha_P = 1 + kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
+            alpha_P = 1 - kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
+            //alpha_P = 1 + kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
         }
         
         // Creating vectors so to save results in csv files. Can be plotted with python files plot_energy.py and plot_position_track.py
