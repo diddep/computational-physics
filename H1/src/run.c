@@ -119,11 +119,10 @@ displace_fcc(double positions[][3], int N, double lattice_param)
     gsl_rng_free(r);
 }
 
-void
-velocity_verlet(double positions[][3], double lattice_param, int end_time, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, double temp_eq, double press_eq)
+double
+velocity_verlet(double positions[][3], double v[][3], double lattice_param, double cell_length, int end_time, double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, double temp_eq, double press_eq)
 {
     // Initialize variables
-    double cell_length = 4 * lattice_param;
     double cell_volume = pow(cell_length, 3);
     double lattice_volume = pow(lattice_param, 3);
     double aluminium_amu = 26.98; double m_asu = 9649;
@@ -137,25 +136,29 @@ velocity_verlet(double positions[][3], double lattice_param, int end_time, int n
     double temp_inst = 0; double temp_inst_per_unitcell = 0;
     double press_inst = 0; double press_inst_per_unitcell = 0;
     double kB = 8.61733 * 1e-5; // Boltzmann constant in eV/K
+    double tau_T, tau_P;
     
-    char filename_result[] = {"eq_of_motion.csv"};
-    char filename_pos[] = {"position_track.csv"};
-    char filename_param[] = {"parameters.csv"};
+    //char *filename_result, *filename_pos, *filename_param;
+    char filename_result[] = {"vel_verlet_eq.csv"};
+    char filename_pos[] = {"position_track_eq.csv"};
+    char filename_param[] = {"parameters_eq.csv"};
+
+    char filename_result_prod[] = {"vel_verlet_prod.csv"};
+    char filename_pos_prod[] = {"position_track_prod.csv"};
+    char filename_param_prod[] = {"parameters_prod.csv"};
     
     //Creating empty arrays
-    double v[nbr_atoms][n_cols];
+    //double v[nbr_atoms][n_cols];
     double f[nbr_atoms][n_cols];
 
     for(int ix = 0; ix < nbr_atoms; ix++){
         for(int jx = 0; jx < n_cols; jx++){
-            v[ix][jx] = 0;
+            //v[ix][jx] = 0;
             f[ix][jx] = 0;
         }
     }
     
     // Variables for duration of measurement
-    //double end_time = 10; 
-    double dt = 1e-2;
     int n_timesteps = end_time / dt; 
 
     // Declaring scaling variables, if temp/press_scaling = false scaling is turned off and alpha_T/P just remains 1
@@ -187,7 +190,6 @@ velocity_verlet(double positions[][3], double lattice_param, int end_time, int n
         }
 
         // After scaling positions lattice_parameter is scaled to change pressure
-        //lattice_param *= pow(alpha_P, 1/3); lattice_volume = pow(lattice_param, 3);
         cell_length *= pow(alpha_P, (double) 1/3); cell_volume = pow(cell_length, 3);
         
 
@@ -226,7 +228,7 @@ velocity_verlet(double positions[][3], double lattice_param, int end_time, int n
         if(temp_scaling == true){
 
             // Value of tau_T is uncertain, and unsure if we should mult. by dt. Have heard approx 50.
-            double tau_T = 5*dt;
+            tau_T = 5*dt;
 
             // Unsure if plus or minus. Scaling with "correct" sign seams to change temp in wrong direction
             alpha_T = 1 + 2 * dt / tau_T * (temp_eq - temp_inst_per_unitcell)/temp_inst_per_unitcell;
@@ -241,7 +243,7 @@ velocity_verlet(double positions[][3], double lattice_param, int end_time, int n
         if(press_scaling == true){
 
             // Value of tau_P is uncertain, and unsure if we should mult. by dt. Have heard slightly more than 50.
-            double tau_P = 5 * dt;
+            tau_P = 5 * dt;
 
             // isothermal compressability for aluminium in Gpa^-1
             double kappa_T = 0.01385*1e-4; // Neg eller pos?
@@ -252,7 +254,7 @@ velocity_verlet(double positions[][3], double lattice_param, int end_time, int n
         }
         
         // Creating vectors so to save results in csv files. Can be plotted with python files plot_energy.py and plot_position_track.py
-        double parameter_vec[] = {end_time, dt, lattice_param, temp_scaling, press_scaling, temp_eq, press_eq};
+        double parameter_vec[] = {end_time, dt, lattice_param, temp_scaling, press_scaling, temp_eq, press_eq, tau_T, tau_P};
         double result_vec[] = {tx*dt, cell_length, E_potential_per_unitcell, E_kinetic_per_unitcell, E_total_per_unitcell, temp_inst_per_unitcell, press_inst_per_unitcell, alpha_T, alpha_P};
         double position_track_vec[] = {tx*dt,positions[0][0], positions[0][1], positions[0][2],\
                                              positions[100][0], positions[100][1], positions[100][2],\
@@ -260,20 +262,34 @@ velocity_verlet(double positions[][3], double lattice_param, int end_time, int n
                                              temp_inst_per_unitcell};
 
         // Saving results to csv files
-        if(tx == 1){
-            save_vector_to_csv(result_vec, 9, filename_result, true);
-            save_vector_to_csv(result_vec, 10, filename_pos, true); // true -> fopen with "w"
+        if(temp_scaling == true && press_scaling == true)
+        {
+            if(tx == 1){
+                save_vector_to_csv(result_vec, 9, filename_result, true);
+                save_vector_to_csv(result_vec, 10, filename_pos, true); // true -> fopen with "w"
+            } else {
+                save_vector_to_csv(result_vec, 9, filename_result, false);
+                save_vector_to_csv(result_vec, 10, filename_pos, false); // false -> fopen with "a"
+            }
+            if(tx == n_timesteps){
+                save_vector_to_csv(parameter_vec, 9, filename_param, true);
+            }
         } else {
-            save_vector_to_csv(result_vec, 9, filename_result, false);
-            save_vector_to_csv(result_vec, 10, filename_pos, false); // false -> fopen with "a"
+            if(tx == 1){
+                save_vector_to_csv(result_vec, 9, filename_result_prod, true);
+                save_vector_to_csv(result_vec, 10, filename_pos_prod, true); // true -> fopen with "w"
+            } else {
+                save_vector_to_csv(result_vec, 9, filename_result_prod, false);
+                save_vector_to_csv(result_vec, 10, filename_pos_prod, false); // false -> fopen with "a"
+            }
+            if(tx == n_timesteps){
+                save_vector_to_csv(parameter_vec, 9, filename_param_prod, true);
+            }
         }
-        if(tx == n_timesteps){
-            save_vector_to_csv(parameter_vec, 7, filename_param, true);
-        }
-
         // Printing temperature for each timestep to keep track during longer measurements
         printf("Inst. Temp, Press at t = [%i]: %f,   %f\n", tx, temp_inst_per_unitcell, press_inst_per_unitcell);
     }
+    return cell_length;
 }
 
 int
@@ -284,6 +300,7 @@ run(
 {
     int nbr_atoms = 256; int n_rows = nbr_atoms; int n_cols = 3; int n_unitcells = 4;
     
+    // Testing lattice parameters
     bool get_small_lattice_param = false;
     if(get_small_lattice_param == true){
     double smallest_lattice_param = 0;
@@ -291,21 +308,45 @@ run(
     printf("%f\n", smallest_lattice_param);
     }
 
-    
-    double lattice_param = 4.05; // True is around 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
-    
+    // Initialising position and velocity arrrays
     double position[nbr_atoms][n_cols];
+    double velocity[nbr_atoms][n_cols];
+    for(int ix = 0; ix < nbr_atoms; ix++){
+        for(int jx = 0; jx < n_cols; jx++){
+            velocity[ix][jx] = 0;
+        }
+    }
+
+    // Choosing lattice param
+    double lattice_param = 4.05; // True is around 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
+    double cell_length = 4 * lattice_param;
+    
+    // Initialice and displace fcc
     init_fcc((double (*)[3]) position, (int) n_unitcells, (double) lattice_param); // 4 unit cells in each direction
     
     displace_fcc((double (*)[3]) position, (int) n_unitcells, (double) lattice_param);
     
-    //velocity_verlet((double (*)[3]) position, (double) lattice_param, (int) n_rows, (int) n_cols, (int) nbr_atoms);
-    int end_time = 10; 
-    
-    // If temp/press_scaling = false scaling is turned off and alpha_T/P just remains 1
-    bool temp_scaling = true, press_scaling = true;
-    double temp_eq = 773.15, press_eq = 1;
-    velocity_verlet((double (*)[3]) position, (double) lattice_param, (int) end_time, (int) n_cols, (int) nbr_atoms, \
+    // Declaring parameters for velocity verlet. 
+    // If temp/press_scaling = false scaling is turned off and scaling factors remains = 1
+    int end_time; double dt;
+    bool temp_scaling, press_scaling;
+    double temp_eq, press_eq;
+
+
+    // Equalibration run
+    end_time = 10; dt = 1e-2;
+    temp_scaling = true; press_scaling = true;
+    temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
+
+    cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
+                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq);
+
+
+    // Production run
+    end_time = 10; dt = 1e-2;
+    temp_scaling = false, press_scaling = false;
+    temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
+    cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
                     (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq);
 
     return 0;
