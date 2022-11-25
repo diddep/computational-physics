@@ -153,14 +153,14 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
     }
     
     // Variables for duration of measurement
-    double end_time = 10; double dt = 1e-2;
+    double end_time = 50; double dt = 1e-2;
     int n_timesteps = end_time / dt; 
 
     //Scaling variables, if temp/press_scaling = false scaling is turned off and alpha_T/P just remains 1
     double alpha_T = 1; double alpha_P = 1; 
-    double temp_eq = 500; // OBS! should eventually be 773,15 
+    double temp_eq = 773.15; // OBS! should eventually be 773,15 
     double press_eq = 1;//*1e-4; // 1 bar = 1e-4 GPa /// Borde denna delas på unit cell också?
-    bool temp_scaling = false; bool press_scaling = true;
+    bool temp_scaling = true; bool press_scaling = true;
 
     //Velocity verlet algorithm as in E1
     get_forces_AL((double (*)[3]) f, (double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
@@ -183,13 +183,13 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
             {
                 // alpha_P for scaling. If press_scaling==false this is 1.
                 positions[ix][jx] += dt * v[ix][jx];
-                positions[ix][jx] *= pow(alpha_P, 1/3);
+                positions[ix][jx] *= pow(alpha_P, (double) 1/3);
             }
         }
 
         // After scaling positions lattice_parameter is scaled to change pressure
         //lattice_param *= pow(alpha_P, 1/3); lattice_volume = pow(lattice_param, 3);
-        cell_length *= pow(alpha_P, 1/3); cell_volume = pow(cell_length, 3);
+        cell_length *= pow(alpha_P, (double) 1/3); cell_volume = pow(cell_length, 3);
         
 
         /* a(t+dt) */
@@ -242,10 +242,10 @@ velocity_verlet(double positions[][3], double lattice_param, int n_rows, int n_c
         if(press_scaling == true){
 
             // Value of tau_P is uncertain, and unsure if we should mult. by dt. Have heard slightly more than 50.
-            double tau_P = 0.5*dt;
+            double tau_P = 5 * dt;
 
             // isothermal compressability for aluminium in Gpa^-1
-            double kappa_T = 0.01385/1e4; // Neg eller pos?
+            double kappa_T = 0.01385*1e-4; // Neg eller pos?
 
             // Unsure if plus or minus. Scaling with "correct" sign seams to change pressure in wrong direction
             alpha_P = 1 - kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
