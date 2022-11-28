@@ -2,7 +2,11 @@
 // Created by didri on 2022-11-28.
 //
 
-#ifndef H2_ENERGY_CALC_H
-#define H2_ENERGY_CALC_H
-
-#endif //H2_ENERGY_CALC_H
+void
+Energy(
+        double *E_L,
+        double alpha,
+        int N,
+        double **R1,
+        double **R2
+        );
