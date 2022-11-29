@@ -47,7 +47,7 @@ void transform_to_normal_modes(double trans_matrix[N_PARTICLES][N_PARTICLES],
     }
 }
 
-int main()
+int run()
 {
     double trans_matrix[N_PARTICLES][N_PARTICLES];
     double q[N_PARTICLES];
