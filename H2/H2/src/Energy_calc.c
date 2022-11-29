@@ -1,8 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdbool.h>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include <time.h>
 
-#include "tools.c"
+
+#include "tools.h"
 
 
 //easier to use R1, R2 as matrices or input x1,x2,y1,y2,z1,z2?

@@ -9,8 +9,7 @@ CFLAGS_OPT = \
 	     -march=native
 
 CFLAGS_SANITIZE = \
-		 - O2 \
-	     -march=native\
+		 -march=native\
 	 	 -Werror \
 		 -Wall \
 	 	 -pedantic \
