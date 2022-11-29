@@ -12,10 +12,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="db2c1020-a495-425d-bcee-beb98ad359c2" name="Changes" comment="det var destroy 2d array som gjorde segmentation fault">
-      <change beforePath="$PROJECT_DIR$/.idea/H1.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/H1.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="db2c1020-a495-425d-bcee-beb98ad359c2" name="Changes" comment="tst">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../H2/H2/include/distribution.c.h" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/include/distribution.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../H2/H2/src/Energy_calc.c" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/src/Energy_calc.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../H2/H2/src/distribution.c" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/src/distribution.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../H2/H2/src/run.c" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/src/run.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -142,7 +144,7 @@
       <option name="presentableId" value="Default" />
       <updated>1669108229647</updated>
       <workItem from="1669108231188" duration="38977000" />
-      <workItem from="1669713169243" duration="72000" />
+      <workItem from="1669713169243" duration="2272000" />
     </task>
     <task id="LOCAL-00001" summary="plot">
       <created>1669111314423</created>
@@ -172,7 +174,14 @@
       <option name="project" value="LOCAL" />
       <updated>1669115998792</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="tst">
+      <created>1669713410384</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1669713410384</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -193,6 +202,7 @@
     <MESSAGE value="plot" />
     <MESSAGE value="kom på ett sätt att generera random nummer mellan 0.65 och-0.65" />
     <MESSAGE value="det var destroy 2d array som gjorde segmentation fault" />
-    <option name="LAST_COMMIT_MESSAGE" value="det var destroy 2d array som gjorde segmentation fault" />
+    <MESSAGE value="tst" />
+    <option name="LAST_COMMIT_MESSAGE" value="tst" />
   </component>
 </project>

@@ -166,3 +166,6 @@ save_matrix_to_csv(
         unsigned int ncols,
         char *filename
 );
+
+gsl_rng *
+init_random_num_generator();
