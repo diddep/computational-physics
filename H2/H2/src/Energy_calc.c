@@ -13,7 +13,7 @@
 //easier to use R1, R2 as matrices or input x1,x2,y1,y2,z1,z2?
 
 //R1, R2 on form [[x1,y1,z1],...,[xN,yN,zN]]
-int Energy(double *E_L, double alpha, int N, double **R1, double **R2){
+void Energy(double *E_L, double alpha, int N, double **R1, double **R2){
 
     double r12;
     double *r1_nrm = malloc(sizeof(double)*3);

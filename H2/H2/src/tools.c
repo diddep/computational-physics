@@ -256,8 +256,9 @@ int save_vector_to_csv(
         return 1;
     }
     //fprintf(fp1, "%10.5f,%10.5f,%10.5f", vec[0], vec[1], vec[2]);
+    //tror det ska ndims-1 men var ndism förut på if
     for(int i =0; i<ndims; ++i){
-        if(i!=ndims){
+        if(i!=ndims-1){
             fprintf(fp1, "%10.5f, ", vec[i]);
         } else {
             fprintf(fp1, "%10.5f \n", vec[i]);

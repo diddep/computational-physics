@@ -19,16 +19,19 @@ run(
 {
     int N = 10000;
     double alpha = 0.1;
-    double d = 1.0;
+    double d = 0.10;
     int acceptance =0;
     double** R1 = create_2D_array(N,3);
     double** R2 = create_2D_array(N,3);
+    double* E_L = malloc(sizeof(double)*N);
+
     double R1_test[3];
     double R2_test[3];
     double random_number1 =0;
     double random_number2 =0;
     char filename_R1[] = {"R1.csv"};
     char filename_R2[] = {"R2.csv"};
+    char filename_energy[] = {"E_L.csv"};
 
     printf("first \n");
 
@@ -92,9 +95,12 @@ run(
     save_matrix_to_csv(R1, N, 3, filename_R1);
     save_matrix_to_csv(R2, N, 3, filename_R2);
     printf("acceptance =%d \n", acceptance);
+    Energy(E_L,alpha,N,R1,R2);
+    save_vector_to_csv(E_L,N,filename_energy,true);
 
     destroy_2D_array(R1,N);
     destroy_2D_array(R2,N);
+    free(E_L);
     gsl_rng_free(r);
 
     return 0;

@@ -13,8 +13,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="db2c1020-a495-425d-bcee-beb98ad359c2" name="Changes" comment="tst">
+      <change afterPath="$PROJECT_DIR$/../H2/H2/python/Plot_task1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-11-22_10_22_[Changes]/ht_gen" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-11-22_10_22_[Changes]/pow_gen" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-11-22_10_22_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-11-22_10_22_[Changes]/vel_verlet" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-11-22_10_22__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../H2/H2/.idea/H2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/.idea/H2.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../H2/H2/src/Energy_calc.c" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/src/Energy_calc.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../H2/H2/src/run.c" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/src/run.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../H2/H2/src/tools.c" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/src/tools.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,23 +52,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "last_opened_file_path": "//wsl$/Ubuntu/home/didrikp/computational-physics/H1",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;//wsl$/Ubuntu/home/didrikp/computational-physics/H1&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Python.plot_position_track">
     <configuration name="plot_energy" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="H1" />
@@ -141,7 +150,8 @@
       <option name="presentableId" value="Default" />
       <updated>1669108229647</updated>
       <workItem from="1669108231188" duration="38977000" />
-      <workItem from="1669713169243" duration="4814000" />
+      <workItem from="1669713169243" duration="6934000" />
+      <workItem from="1669733460873" duration="1257000" />
     </task>
     <task id="LOCAL-00001" summary="plot">
       <created>1669111314423</created>
