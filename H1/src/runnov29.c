@@ -120,8 +120,7 @@ displace_fcc(double positions[][3], int N, double lattice_param)
 }
 
 double
-velocity_verlet(double positions[][3], double v[][3], double lattice_param, double cell_length, int end_time, \
-double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, double temp_eq, double press_eq, bool write_not_append)
+velocity_verlet(double positions[][3], double v[][3], double lattice_param, double cell_length, int end_time, double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, double temp_eq, double press_eq)
 {
     // Initialize variables
     double cell_volume = pow(cell_length, 3);
@@ -229,7 +228,7 @@ double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, dou
         if(temp_scaling == true){
 
             // Value of tau_T is uncertain, and unsure if we should mult. by dt. Have heard approx 50.
-            tau_T = 200*dt;
+            tau_T = 5*dt;
 
             // Unsure if plus or minus. Scaling with "correct" sign seams to change temp in wrong direction
             alpha_T = 1 + 2 * dt / tau_T * (temp_eq - temp_inst_per_unitcell)/temp_inst_per_unitcell;
@@ -244,7 +243,7 @@ double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, dou
         if(press_scaling == true){
 
             // Value of tau_P is uncertain, and unsure if we should mult. by dt. Have heard slightly more than 50.
-            tau_P = 25 * dt;
+            tau_P = 5 * dt;
 
             // isothermal compressability for aluminium in Gpa^-1
             double kappa_T = 0.01385*1e-4; // Neg eller pos?
@@ -257,87 +256,57 @@ double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, dou
         // Creating vectors so to save results in csv files. Can be plotted with python files plot_energy.py and plot_position_track.py
         double parameter_vec[] = {end_time, dt, lattice_param, temp_scaling, press_scaling, temp_eq, press_eq, tau_T, tau_P};
         double result_vec[] = {tx*dt, cell_length, E_potential_per_unitcell, E_kinetic_per_unitcell, E_total_per_unitcell, temp_inst_per_unitcell, press_inst_per_unitcell, alpha_T, alpha_P};
-        double position_track_vec[] = {tx*dt,positions[23][0], positions[23][1], positions[23][2],\
-                                             positions[135][0], positions[135][1], positions[135][2],\
-                                             positions[189][0], positions[189][1], positions[189][2],\
+        double position_track_vec[] = {tx*dt,positions[0][0], positions[0][1], positions[0][2],\
+                                             positions[100][0], positions[100][1], positions[100][2],\
+                                             positions[200][0], positions[200][1], positions[200][2],\
                                              temp_inst_per_unitcell};
 
         // Saving results to csv files
-        if(temp_scaling == true || press_scaling == true)
-        {   save_vector_to_csv(result_vec, 9, filename_result, write_not_append); // true -> fopen with "w"
-            save_vector_to_csv(position_track_vec, 10, filename_pos, write_not_append); // false -> fopen with "a"
-            if(tx == n_timesteps){
-                save_vector_to_csv(parameter_vec, 9, filename_param, write_not_append);
+        if(temp_scaling == true && press_scaling == true)
+        {
+            if(tx == 1){
+                save_vector_to_csv(result_vec, 9, filename_result, true);
+                save_vector_to_csv(result_vec, 10, filename_pos, true); // true -> fopen with "w"
+            } else {
+                save_vector_to_csv(result_vec, 9, filename_result, false);
+                save_vector_to_csv(result_vec, 10, filename_pos, false); // false -> fopen with "a"
             }
-            printf("Calibration: Inst. Temp, Press at t = [%i]: %f,   %f\n", tx, temp_inst_per_unitcell, press_inst_per_unitcell);
+            if(tx == n_timesteps){
+                save_vector_to_csv(parameter_vec, 9, filename_param, true);
+            }
         } else {
-            save_vector_to_csv(result_vec, 9, filename_result_prod, write_not_append); // true -> fopen with "w"
-            save_vector_to_csv(position_track_vec, 10, filename_pos_prod, write_not_append); // false -> fopen with "a"
-
-            if(tx == n_timesteps){
-                save_vector_to_csv(parameter_vec, 9, filename_param_prod, write_not_append);
+            if(tx == 1){
+                save_vector_to_csv(result_vec, 9, filename_result_prod, true);
+                save_vector_to_csv(result_vec, 10, filename_pos_prod, true); // true -> fopen with "w"
+            } else {
+                save_vector_to_csv(result_vec, 9, filename_result_prod, false);
+                save_vector_to_csv(result_vec, 10, filename_pos_prod, false); // false -> fopen with "a"
             }
-            printf("Production: Inst. Temp, Press at t = [%i]: %f,   %f\n", tx, temp_inst_per_unitcell, press_inst_per_unitcell);
+            if(tx == n_timesteps){
+                save_vector_to_csv(parameter_vec, 9, filename_param_prod, true);
+            }
         }
         // Printing temperature for each timestep to keep track during longer measurements
-        //printf("Inst. Temp, Press at t = [%i]: %f,   %f\n", tx, temp_inst_per_unitcell, press_inst_per_unitcell);
+        printf("Inst. Temp, Press at t = [%i]: %f,   %f\n", tx, temp_inst_per_unitcell, press_inst_per_unitcell);
     }
     return cell_length;
 }
-/*
-void 
-H1_task1()
+
+int
+run(
+    int argc,
+    char *argv[]
+   )
 {
-     int nbr_atoms = 256; int n_rows = nbr_atoms; int n_cols = 3; int n_unitcells = 4;
+    int nbr_atoms = 256; int n_rows = nbr_atoms; int n_cols = 3; int n_unitcells = 4;
     
     // Testing lattice parameters
-    bool get_small_lattice_param = true;
+    bool get_small_lattice_param = false;
     if(get_small_lattice_param == true){
     double smallest_lattice_param = 0;
     smallest_lattice_param = try_lattice_constants((int) nbr_atoms, (int) n_rows, (int) n_cols);
     printf("%f\n", smallest_lattice_param);
     }
-}
-
-void 
-H1_task2()
-{
-     int nbr_atoms = 256; int n_rows = nbr_atoms; int n_cols = 3; int n_unitcells = 4;
-
-    // Initialising position and velocity arrrays
-    double position[nbr_atoms][n_cols];
-    double velocity[nbr_atoms][n_cols];
-    for(int ix = 0; ix < nbr_atoms; ix++){
-        for(int jx = 0; jx < n_cols; jx++){
-            velocity[ix][jx] = 0;
-        }
-    }
-
-    // Choosing lattice param
-    double lattice_param = 4.05; // True is around 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
-    double cell_length = 4 * lattice_param;
-    
-    // Initialice and displace fcc
-    init_fcc((double (*)[3]) position, (int) n_unitcells, (double) lattice_param); // 4 unit cells in each direction
-    
-    // Declaring parameters for velocity verlet. 
-    // If temp/press_scaling = false scaling is turned off and scaling factors remains = 1
-    int end_time; double dt;
-    bool temp_scaling, press_scaling;
-    double temp_eq, press_eq;
-
-    // Production run
-    end_time = 10; dt = 1e-2;
-    temp_scaling = false, press_scaling = false;
-    temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
-    cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
-                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq);
-}
-
-void 
-H1_task3()
-{
-    int nbr_atoms = 256; int n_rows = nbr_atoms; int n_cols = 3; int n_unitcells = 4;
 
     // Initialising position and velocity arrrays
     double position[nbr_atoms][n_cols];
@@ -379,80 +348,6 @@ H1_task3()
     temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
                     (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq);
-
-}
-*/
-void 
-H1_task4()
-{
-    int nbr_atoms = 256; int n_rows = nbr_atoms; int n_cols = 3; int n_unitcells = 4;
-
-    // Initialising position and velocity arrrays
-    double position[nbr_atoms][n_cols];
-    double velocity[nbr_atoms][n_cols];
-    for(int ix = 0; ix < nbr_atoms; ix++){
-        for(int jx = 0; jx < n_cols; jx++){
-            velocity[ix][jx] = 0;
-        }
-    }
-
-    // Choosing lattice param
-    double lattice_param = 4.05; // True is around 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
-    double cell_length = 4 * lattice_param;
-    
-    // Initialice and displace fcc
-    init_fcc((double (*)[3]) position, (int) n_unitcells, (double) lattice_param); // 4 unit cells in each direction
-    
-    displace_fcc((double (*)[3]) position, (int) n_unitcells, (double) lattice_param);
-    
-    // Declaring parameters for velocity verlet. 
-    // If temp/press_scaling = false scaling is turned off and scaling factors remains = 1
-    int end_time; double dt;
-    bool temp_scaling, press_scaling, write_not_append;
-    double temp_eq, press_eq;
-
-
-    // Melting run
-    end_time = 10; dt = 1e-2;
-    temp_scaling = true; press_scaling = true;
-    temp_eq = 3000; press_eq = 1; //773.15 K och 1 Bar
-    write_not_append = true;
-
-    cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
-                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append);
-
-    // Cooling run
-    end_time = 10; dt = 1e-2;
-    temp_scaling = true; press_scaling = true;
-    temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
-    write_not_append = false;
-
-    cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
-                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append);
-
-
-    // Production run
-    end_time = 10; dt = 1e-2;
-    temp_scaling = false, press_scaling = false;
-    temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
-    write_not_append = false;
-
-    cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
-                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append);
-
-}
-
-int
-run(
-    int argc,
-    char *argv[]
-   )
-{
-    // H1_task1();
-    //H1_task2();
-    //H1_task3();
-    //H1_task3();
-    H1_task4();
 
     return 0;
 }
