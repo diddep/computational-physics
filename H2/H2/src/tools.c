@@ -300,3 +300,16 @@ int save_matrix_to_csv(
     fclose(fp1);
     return 0;
 }
+
+gsl_rng *
+init_random_num_generator()
+{
+    int seed = 42;
+    const gsl_rng_type * T;
+    gsl_rng * r;
+    gsl_rng_env_setup();
+    T = gsl_rng_default;
+    r = gsl_rng_alloc(T);
+    gsl_rng_set(r, seed);
+    return r;
+}

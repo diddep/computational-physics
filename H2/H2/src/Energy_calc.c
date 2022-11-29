@@ -25,22 +25,23 @@ int Energy(double *E_L, double alpha, int N, double **R1, double **R2){
             r2_nrm[dim] = R2[i][dim];
         }
 
-        normalize_vector(r1_nrm);
-        normalize_vector(r2_nrm);
-        r12 = distance_between_vectors(R1, R2, 3);
+        normalize_vector(r1_nrm, 3);
+        normalize_vector(r2_nrm,3);
+        r12 = distance_between_vectors(R1[i], R2[i], 3);
         elementwise_subtraction( diff_vec, R1[i], R2[i], 3);
         elementwise_subtraction( diff_nrm, r1_nrm, r2_nrm, 3);
-        prod = dot_product(diff_vec, diff_nrm);
-        div = (1. +alpha*r12)
+        prod = dot_product(diff_vec, diff_nrm,3);
+        div = (1. +alpha*r12);
 
         E_L[i]=-4.0 + prod/(r12 * pow(div,2.0)) -1.0/(r12* pow(div,3.0)) - 1/(4.0* pow(div,4.0))+ 1/r12;
 
     }
-    r12 = NULL;
-    prod = NULL;
-    div = NULL;
+    //r12 = NULL;
+    //prod = NULL;
+    //div = NULL;
     free(r1_nrm);
     free(r2_nrm);
-    free(diff_nrm)
+    free(diff_nrm);
     free(diff_vec);
 }
+
