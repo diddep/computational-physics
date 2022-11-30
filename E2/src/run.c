@@ -49,7 +49,7 @@ void transform_to_normal_modes(double trans_matrix[N_PARTICLES][N_PARTICLES],
 	Q[i] = sum;
     }
 }
-
+/* Calculating the acceleration for array of positions*/
 void calc_acc(double *a, double *u, double *m, double kappa, double alpha , int size_of_u)
 {
   
@@ -67,6 +67,7 @@ void calc_acc(double *a, double *u, double *m, double kappa, double alpha , int 
     }
 }
 
+/* Set initial conditions of input arrays, particles start at zero, velocities so all energy is in mode 1. All masses is 1.*/
 void set_initial_condition(double *v, double *q, double *m)
 {   
     double E0 = N_PARTICLES;
@@ -81,7 +82,7 @@ void set_initial_condition(double *v, double *q, double *m)
        
     }
 }
-
+/* Take a velocity verlet timestep such that states go from t -> t + dt*/
 void velocity_verlet_timestep(double dt, double *v, double *q, double *a, double *m, double kappa, double alpha, int n_particles)
 {
     // v(t+dt/2)
@@ -106,6 +107,7 @@ void velocity_verlet_timestep(double dt, double *v, double *q, double *a, double
     }
 }
 
+/* Function to run full velocity verlet simulation */
 void velocity_verlet(int n_timesteps, int timestep_interval, double dt, double *v, double *q, \
  double *m, double kappa, double alpha)
 {
@@ -193,6 +195,7 @@ void velocity_verlet(int n_timesteps, int timestep_interval, double dt, double *
     save_vector_to_csv(param_vec, 2, filename_param, true);
 }
 
+/* "Main function" of program*/
 int run()
 {
     // Initiating arrays
