@@ -45,35 +45,27 @@ fig_energy.savefig('energy_r1.pdf')
 def theta(R1,R2):
     n,d = np.shape(R1)
     arg = np.zeros(n)
-    arg1 = np.zeros(n)
 
     for st in range(0,n):
 
         r1 = R1[st,:]; r2 = R1[st,:]
-        #print(np.dot(r1,r2))
-        arg[st] = np.dot(r1,r2) #/(np.linalg.norm(r1)*np.linalg.norm(r2))
-        arg1[st] = (np.linalg.norm(r1)*np.linalg.norm(r2))
+        #print(np.dot(r1,r2)/ (np.linalg.norm(r1)* np.linalg.norm(r2)))
+        arg[st] = np.dot(r1,r2) / (np.linalg.norm(r1)* np.linalg.norm(r2))
 
-    return arg, arg1
+    return arg
 
-thtup, thtlow = theta(arr_R1, arr_R2)
-print(thtup.shape)
+x= theta(arr_R1, arr_R2)
 
-for l in thtup:
-    print('tht=',l)
+for X in x:
+    print(X)
 
 fig_theta, ax_theta = plt.subplots(1,1)
-counts_theta, bins_theta = np.histogram(thtup, bins = 100, density = True)
-counts_theta2, bins_theta2 = np.histogram(thtlow, bins = 100, density = True)
+#counts_theta, bins_theta = np.histogram(x, bins = 10, density = True)
+#ax_theta.stairs(counts_theta, bins_theta)
 
+ax_theta.scatter(np.arange(0,len(x)) ,np.log(x))
 
-ax_theta.stairs(counts_theta, bins_theta)
-
-ax_theta.stairs(counts_theta2, bins_theta2)
-fig_theta.savefig('theta.pdf')
-
-
-
+fig_theta.savefig('x_distribution.pdf')
 
 
 

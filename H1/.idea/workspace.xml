@@ -13,17 +13,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="db2c1020-a495-425d-bcee-beb98ad359c2" name="Changes" comment="tst">
-      <change afterPath="$PROJECT_DIR$/../H2/H2/python/Plot_task1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-11-22_10_22_[Changes]/ht_gen" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-11-22_10_22_[Changes]/pow_gen" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-11-22_10_22_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-11-22_10_22_[Changes]/vel_verlet" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_2022-11-22_10_22__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/.idea/H2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/.idea/H2.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/src/Energy_calc.c" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/src/Energy_calc.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/src/run.c" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/src/run.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/src/tools.c" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/src/tools.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../H2/H2/python/Plot_task1.py" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/python/Plot_task1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
