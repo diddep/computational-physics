@@ -11,97 +11,93 @@
 #include "distribution.h"
 #include "Energy_calc.h"
 
+// Function running the markov-chain
 int
 run(
     int argc,
     char *argv[]
    )
 {
-    int N = 10000;
-    double alpha = 0.1;
-    double d = 0.10;
-    int acceptance =0;
-    double** R1 = create_2D_array(N,3);
-    double** R2 = create_2D_array(N,3);
-    double* E_L = malloc(sizeof(double)*N);
+    // N number of steps, acceptan
+    int N = 1e5, accept_count = 0;
+    double alpha = 0.1, d = 0.1; 
+    double **R1 = create_2D_array(N,3), **R2 = create_2D_array(N,3);
+    double *E_L = malloc(sizeof(double) * N);
 
-    double R1_test[3];
-    double R2_test[3];
-    double random_number1 =0;
-    double random_number2 =0;
-    char filename_R1[] = {"R1.csv"};
-    char filename_R2[] = {"R2.csv"};
-    char filename_energy[] = {"E_L.csv"};
-
-    printf("first \n");
+    double R1_test[3], R2_test[3];
+    double random_number1 = 0, random_number2 = 0;
+    char filename_R1[] = {"R1.csv"}, filename_R2[] = {"R2.csv"}, filename_energy[] = {"E_L.csv"};
 
     gsl_rng * r;
     r = init_random_num_generator();
 
-
-    for (int kx=0; kx<3; ++kx)
+    // Initializing random starting values for all particles
+    printf("Initializing random positions:\n");
+    for (int kx = 0; kx < 3; kx++)
     {
-        random_number1 = gsl_ran_flat(r,-0.5,0.5);
-        random_number2 = gsl_ran_flat(r,-0.5,0.5);
+        // -0.5 to 0.5 because it's length 1 and symmetric around zero
+        random_number1 = gsl_ran_flat(r, -0.5, 0.5);
+        random_number2 = gsl_ran_flat(r, -0.5, 0.5);
 
-        R1[0][kx] = d * random_number1; //(((double) rand()% 1000)- 500.0)/1000.0;
-        R2[0][kx] = d * random_number2; //(((double) rand()% 1000)- 500.0)/1000.0;
-        printf("initvalue: %f,   %f\n", R1[0][kx], R2[0][kx]);
+        R1[0][kx] = d * random_number1;
+        R2[0][kx] = d * random_number2;
+        printf("R1[0][%d]: %f, R2[0][%d]: %f\n", kx, R1[0][kx], kx, R2[0][kx]);
     }
 
-    for(int i=0; i<N-1; ++i)
+    for(int i = 0; i < N - 1; ++i)
     {
-
-
-        for (int kx=0; kx<3; ++kx)
+        // Get proposal position, d step size
+        for (int kx = 0; kx < 3; ++kx)
         {
             random_number1 = gsl_ran_flat(r,-0.5,0.5);
             random_number2 = gsl_ran_flat(r,-0.5,0.5);
 
-            R1_test[kx] = R1[i][kx] + d * random_number1;//(((double) rand()% 1000)- 500.0)/1000.0;
-            R2_test[kx] = R2[i][kx] + d * random_number2;//((double) rand(1000)- 500.0)/1000.0;
-            //printf("testvals: %f,   %f\n", R1_test[kx], R2_test[kx]);
+            R1_test[kx] = R1[i][kx] + d * random_number1;
+            R2_test[kx] = R2[i][kx] + d * random_number2;
         }
 
+        // Probability for particle occupying new and old positions
         double prob_test = distribution(R1_test, R2_test, alpha);
         double prob_old = distribution(R1[i], R2[i], alpha);
-        //printf("probabilities: %f,   %f\n", prob_test, prob_old);
 
-        if(prob_test>prob_old|| prob_test/prob_old > gsl_ran_flat(r,0.0,1.0))
+        // If new prob > old, make step OR take exploration step
+        if(prob_test > prob_old || prob_test / prob_old > gsl_ran_flat(r,0.0,1.0))
         {
-            //printf("accept\n");
-            acceptance = acceptance +1;
+            // Counter for how many accepts
+            accept_count = accept_count + 1;
 
-            //printf("%d \n", acceptance);
+            // If accepted, save new position in next row.
             for (int kx=0; kx<3; ++kx)
             {
-                //printf("hej");
                 R1[i+1][kx] = R1_test[kx];
                 R2[i+1][kx] = R2_test[kx];
                 //printf("new value: %f,   %f\n", R1[i+1][kx], R2[i+1][kx]);
             }
         }
+        // If not accepted save old position in next row
         else{
             for (int kx=0; kx<3; ++kx)
             {
-                //printf("samma");
                 R1[i+1][kx] = R1[i][kx];
                 R2[i+1][kx] = R2[i][kx];
-                //printf("new value: %f,   %f\n", R1[i+1][kx], R2[i+1][kx]);
             }
         }
     }
 
-    save_matrix_to_csv(R1, N, 3, filename_R1);
-    save_matrix_to_csv(R2, N, 3, filename_R2);
-    printf("acceptance =%d \n", acceptance);
-    Energy(E_L,alpha,N,R1,R2);
-    save_vector_to_csv(E_L,N,filename_energy,true);
+    // Calculate energies of all positions in chain
+    Energy(E_L, alpha, N, R1, R2);
+    printf("Accept_count = %d \n", accept_count);
+    
+    // Save in csv:s
+    save_matrix_to_csv( R1, N, 3, filename_R1);
+    save_matrix_to_csv( R2, N, 3, filename_R2);
 
-    destroy_2D_array(R1,N);
-    destroy_2D_array(R2,N);
-    free(E_L);
-    gsl_rng_free(r);
+    bool open_with_write = true;
+    save_vector_to_csv(E_L, N, filename_energy, open_with_write);
+
+    // Destroy and free arrays
+    destroy_2D_array(R1,N); destroy_2D_array(R2,N);
+    gsl_rng_free(r); free(E_L);
 
     return 0;
 }
