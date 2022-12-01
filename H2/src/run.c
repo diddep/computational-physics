@@ -9,7 +9,7 @@
 
 #include "tools.h"
 #include "distribution.h"
-#include "Energy_calc.h"
+#include "MCMC_chain_operations.h"
 
 #define NDIM 3
 

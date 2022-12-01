@@ -25,7 +25,7 @@ LIB = \
 
 OBJ = \
       obj/distribution.o \
-      obj/Energy_calc.o \
+      obj/MCMC_chain_operations.o \
       obj/run.o \
       obj/tools.o
 MAIN = \
