@@ -41,8 +41,8 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
     // Filenames for saving in csv
     char filename_R1[] = {"R1.csv"}, filename_R2[] = {"R2.csv"};
     char filename_energy[] = {"E_local.csv"}, filename_xdist[] = {"x_distribution.csv"}, filename_theta[] = {"theta.csv"};
-    char filename_results[] = {"MCMC_results.csv"};
-    bool open_with_write;
+    char filename_results[] = {"MCMC_results.csv"}, filename_phi_k ={"phi_k.csv"};
+        bool open_with_write;
     
      // Initializing arrays
     double *E_local = malloc(sizeof(double) * N_steps);
@@ -104,7 +104,9 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
     Energy(E_local, alpha, N_steps, R1, R2);
     theta_fun(theta_chain, N_steps, R1, R2);
     x_distribution(x_chain, N_steps, R1,R2);
+    double statistical_inefficiency = correlation_function(Phi_k_vec, E_local,N_steps, M_C);
     printf("Accept_count = %d \n", accept_count);
+    printf("statistical inefficiency = %f\n", statistical_inefficiency);
     
     // Save in csv:s
     save_matrix_to_csv(R1, N_steps, NDIM, filename_R1);
@@ -113,6 +115,7 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
     open_with_write = true;
     save_vector_to_csv(E_local, N_steps, filename_energy, open_with_write);
     save_vector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
+    save_vector_to_csv(Phi_k_vec, 2*M_C, filename_phi_k, open_with_write);
 
     // Destroy and free arrays
     free(E_local), free(x_chain), free(theta_chain);
