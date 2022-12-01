@@ -43,12 +43,14 @@ plt.tight_layout()
 plt.savefig(f'plots/energy_plot_{str}.png')
 
 figea , axea = plt.subplots(1,1)
-energy_labels = [f"E_average({i})" for i in range(5)]
+#energy_labels = [f"E_average({i})" for i in range()]
 
-axea.plot(t, energy_average_array[:,0:5], label = energy_labels)
+axea.plot(t[1:], energy_average_array[1:,:])
 axea.set_xlabel('Time (arb. unit)', fontsize = 15)
 axea.set_ylabel('Energy (arb. unit)', fontsize = 15)
 axea.set_title(f'Time averaged energy with alpha = {alpha}, dt={dt}', fontsize = 15)
-plt.legend(fontsize=10)
+plt.yscale('log')
+plt.xscale('log')
+#plt.legend(fontsize=10)
 plt.tight_layout()
 plt.savefig(f'plots/energy_average_plot_{str}.png')
