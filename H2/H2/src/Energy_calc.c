@@ -48,3 +48,25 @@ void Energy(double *E_L, double alpha, int N, double **R1, double **R2){
     free(diff_vec);
 }
 
+/*function calculating distribution of x from two position mcmc chains
+ * args:
+ *      x_chain = array of length N to save distribution in
+ *      N = number of steps in mcmc chain
+ *      R1_chain = mcmc chain for particle 1, NX3 matrix
+ *      R2_chain = mcmc chain for particle 1, NX3 matrix
+ */
+void x_distribution(double *x_chain int N, double **R1_chain, double **R2_chain){
+
+    // initializing values used to calculate instance of x
+    double length_r1=0, length_r2=0, dot_product=0;
+
+    // stepping through mcmc chain calculating x at every step and saving in x_chain
+    for(int step=0; step<N; ++step)
+    {
+        length_r1 = vector_norm(R1_chain[step], 3);
+        length_r2 = vector_norm(R2_chain[step], 3);
+        dot_product = dot_product(R1_chain[step], R1_chain[step], 3);
+        x_chain[step] = dot_product/(length_r2*length_r1);
+    }
+}
+

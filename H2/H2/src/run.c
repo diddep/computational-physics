@@ -59,6 +59,10 @@ run(
         // Probability for particle occupying new and old positions
         double prob_test = distribution(R1_test, R2_test, alpha);
         double prob_old = distribution(R1[i], R2[i], alpha);
+        //printf("prob old= %f\n", prob_old);
+        //printf("prob test= %f\n", prob_test);
+        //printf("prob kvot= %f\n", prob_test/prob_old);
+
 
         // If new prob > old, make step OR take exploration step
         if(prob_test > prob_old || prob_test / prob_old > gsl_ran_flat(r,0.0,1.0))
