@@ -13,6 +13,7 @@ arr_R2 =np.genfromtxt("../R2.csv", delimiter=',')
 #print(arr_R2.shape)
 arr_E_L = np.genfromtxt("../E_L.csv", delimiter=',')
 arr_xdist = np.genfromtxt("../x_distribution.csv", delimiter=',')
+print(np.max(arr_xdist),'xd')
 
 arr_r1 = np.square(arr_R1)
 arr_r1 = np.sqrt(np.sum(arr_r1, axis=1))
