@@ -265,7 +265,7 @@ int save_vector_to_csv(
         }
     }
 
-    fprintf(fp1,"\n");
+    //fprintf(fp1,"\n");
 
     fclose(fp1);
     return 0;

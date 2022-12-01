@@ -16,4 +16,6 @@ x_distribution(
         double *x_chain, int N, double **R1_chain, double **R2_chain
 );
 
-double theta_fun(double *R1, double *R2);
+void theta_fun(double *theta_chain, int N_steps, double **R1_chain, double **R2_chain);
+
+double theta_fun_vec(double *R1, double *R2);

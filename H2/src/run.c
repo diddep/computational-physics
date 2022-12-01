@@ -27,12 +27,13 @@ run(
 
     // Filenames for saving in csv
     char filename_R1[] = {"R1.csv"}, filename_R2[] = {"R2.csv"};
-    char filename_energy[] = {"E_L.csv"}, filename_xdist[] = {"x_distribution.csv"};
+    char filename_energy[] = {"E_L.csv"}, filename_xdist[] = {"x_distribution.csv"}, filename_theta[] = {"theta.csv"};
     char filename_results[] = {"MCMC_results.csv"}, filename_params[] = {"MCMC_params.csv"};
-
+    bool open_with_write;
      // Initializing arrays
     double **R1 = create_2D_array(N_steps,NDIM), **R2 = create_2D_array(N_steps,NDIM);
     double *E_L = malloc(sizeof(double) * N_steps);
+    double *theta_chain = malloc(sizeof(double) * N_steps);
     double *x_chain = malloc(sizeof(double) * N_steps);
 
     double R1_test[NDIM], R2_test[NDIM];
@@ -91,10 +92,16 @@ run(
                 R2[ix+1][kx] = R2[ix][kx];
             }
         }
+        double theta_ix = theta_fun_vec(R1[ix], R2[ix]);
+        double x_cos = cos(theta_ix);
+        double result_vec[] = {ix, x_cos};
+        if(ix == 0){ open_with_write = true; } else { open_with_write = false; }
+        save_vector_to_csv(result_vec, 2, filename_theta, open_with_write);
     }
 
     // Calculate energies of all positions in chain
     Energy(E_L, alpha, N_steps, R1, R2);
+    theta_fun(theta_chain, N_steps, R1, R2);
     x_distribution(x_chain, N_steps, R1,R2);
     printf("Accept_count = %d \n", accept_count);
     
@@ -102,15 +109,16 @@ run(
     save_matrix_to_csv( R1, N_steps, NDIM, filename_R1);
     save_matrix_to_csv( R2, N_steps, NDIM, filename_R2);
 
-    bool open_with_write = true;
+    open_with_write = true;
     double param_vector[] = {N_steps, alpha, d_displacement};
     save_vector_to_csv(param_vector, 3, filename_params, true);
     save_vector_to_csv(E_L, N_steps, filename_energy, open_with_write);
     save_vector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
+    //save_vector_to_csv(theta_chain, N_steps, filename_theta, open_with_write);
 
     // Destroy and free arrays
     destroy_2D_array(R1,N_steps); destroy_2D_array(R2,N_steps);
-    gsl_rng_free(r); free(E_L), free(x_chain);
+    gsl_rng_free(r); free(E_L), free(x_chain), free(theta_chain);
 
     return 0;
 }

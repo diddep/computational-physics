@@ -72,8 +72,21 @@ void x_distribution(double *x_chain, int N_steps, double **R1_chain, double **R2
     }
 }
 
+void theta_fun(double *theta_chain, int N_steps, double **R1_chain, double **R2_chain)
+{
+    // initializing values used to calculate instance of x
+    double length_R1=0, length_R2=0, dot_prod=0;
+    for(int step = 0; step < N_steps; ++step)
+    {  
+        length_R1 = vector_norm(R1_chain[step], NDIM);
+        length_R2 = vector_norm(R2_chain[step], NDIM);
+        dot_prod = dot_product(R1_chain[step], R1_chain[step], NDIM);
+        theta_chain[step] = acos( dot_prod / (length_R1 * length_R2));
+    }
+}
+
 /*theta(*R1, *R2) =  arccos( dot(R1,R2) / (|R1|*|R2|)*/
-double theta_fun(double *R1, double *R2)
+double theta_fun_vec(double *R1, double *R2)
 {
     double R1_abs = vector_norm(R1,NDIM);
     double R2_abs = vector_norm(R2,NDIM);
