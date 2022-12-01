@@ -23,10 +23,11 @@ run(
     double alpha = 0.1, d = 0.1; 
     double **R1 = create_2D_array(N,3), **R2 = create_2D_array(N,3);
     double *E_L = malloc(sizeof(double) * N);
+    double *x_distribution = malloc(sizeof(double) * N);
 
     double R1_test[3], R2_test[3];
     double random_number1 = 0, random_number2 = 0;
-    char filename_R1[] = {"R1.csv"}, filename_R2[] = {"R2.csv"}, filename_energy[] = {"E_L.csv"};
+    char filename_R1[] = {"R1.csv"}, filename_R2[] = {"R2.csv"}, filename_energy[] = {"E_L.csv"}, filename_xdist[] = {"x_distribution.csv"};
 
     gsl_rng * r;
     r = init_random_num_generator();
@@ -90,6 +91,7 @@ run(
 
     // Calculate energies of all positions in chain
     Energy(E_L, alpha, N, R1, R2);
+    x_distribution(x_distribution, N, R1,R2);
     printf("Accept_count = %d \n", accept_count);
     
     // Save in csv:s
@@ -98,10 +100,11 @@ run(
 
     bool open_with_write = true;
     save_vector_to_csv(E_L, N, filename_energy, open_with_write);
+    save_vector_to_csv(x_distribution, N, filename_xdist, open_with_write);
 
     // Destroy and free arrays
     destroy_2D_array(R1,N); destroy_2D_array(R2,N);
-    gsl_rng_free(r); free(E_L);
+    gsl_rng_free(r); free(E_L), free(x_distribution);
 
     return 0;
 }
