@@ -133,9 +133,9 @@ run(
     // MCMC Parameters
     // N_steps is number of steps in loop, alpha --- , d_displacement offsets particle positions
     int N_steps = 1e5; int N_discarded_steps = 1e4; double alpha = 0.1, d_displacement = 0.1; 
-    double gamma = 0.1;
+    
 
-    double **R1 = create_2D_array(N_steps,NDIM), **R2 = create_2D_array(N_steps,NDIM);
+    double **R1 = create_2D_array(N_steps, NDIM), **R2 = create_2D_array(N_steps,NDIM);
     double E_PD_average;
 
     initialize_positions((double **) R1, (double **) R2, (double) d_displacement);
@@ -143,17 +143,23 @@ run(
     MCMC(N_discarded_steps, alpha, d_displacement, R1, R2);
     E_PD_average = partialEnergyDerivative(alpha, N_discarded_steps, R1, R2);
     printf("E_PD during discard: %f\n", E_PD_average);
-    
-    MCMC(N_steps, alpha, d_displacement, R1, R2);
 
-    E_PD_average = partialEnergyDerivative(alpha, N_steps, R1, R2);
-    printf("E_PD rest: %f\n", E_PD_average);
+    int n_alpha_steps = 10;
+    double A = 1., beta = 0.5; // beta from 0.5 to 1
 
-    printf("alpha b4 update: %f \n", alpha);
-    alpha -= gamma * E_PD_average;
-    printf("alpha after update: %f \n", alpha);
+    for(int ix = 1; ix < n_alpha_steps + 1; ix++)
+    {
+        double gamma = A*pow(ix, (double) - beta);
+        printf("gamma of iteration %d : %f\n", ix, gamma);
+        MCMC(N_steps, alpha, d_displacement, R1, R2);
 
-    
+        E_PD_average = partialEnergyDerivative(alpha, N_steps, R1, R2);
+        printf("E_PD of iteration %d: %f\n", ix, E_PD_average);
+
+        alpha -= gamma * E_PD_average;
+        printf("alpha after iteration %d: %f \n", ix, alpha);
+        printf("\n");
+    }
 
     char filename_params[] = {"MCMC_params.csv"};
     double param_vector[] = {N_steps, alpha, d_displacement};
