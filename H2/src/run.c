@@ -36,13 +36,60 @@ void initialize_positions(double **R1, double **R2, double d_displacement)
     gsl_rng_free(r);
 }
 
-void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double **R2)
+void MCMC_burn_in(int N_steps, double alpha, double d_displacement, double **R1, double **R2)
+{
+    double R1_test[NDIM], R2_test[NDIM];
+    
+    gsl_rng * r;
+    r = init_random_num_generator();
+    double random_number = 0;
+
+    int accept_count = 0;
+    for(int ix = 0; ix < N_steps - 1; ++ix)
+    {
+        // get proposal positons
+        for (int kx = 0; kx < NDIM; ++kx)
+        {
+            random_number = gsl_ran_flat(r, -0.5,0.5);
+            R1_test[kx] = R1[ix][kx] + d_displacement * random_number;
+            random_number = gsl_ran_flat(r,-0.5,0.5);
+            R2_test[kx] = R2[ix][kx] + d_displacement * random_number;
+        }
+        
+        // Probability for particle occupying new and old positions
+        double prob_test = distribution(R1_test, R2_test, alpha);
+        double prob_old = distribution(R1[ix], R2[ix], alpha);
+
+        // If new prob > old, make step OR take exploration step
+        if(prob_test > prob_old || prob_test / prob_old > gsl_ran_flat(r, 0.0, 1.0))
+        {
+            // If accepted, save new position in next row.
+            for (int kx=0; kx < NDIM; ++kx)
+            {
+                R1[ix+1][kx] = R1_test[kx];
+                R2[ix+1][kx] = R2_test[kx];
+            }
+            
+            accept_count = accept_count + 1;
+        } else {
+            // If not accepted save old position in next row
+            for (int kx=0; kx < NDIM; ++kx)
+            {
+                R1[ix+1][kx] = R1[ix][kx];
+                R2[ix+1][kx] = R2[ix][kx];
+            }
+        }
+    }
+    gsl_rng_free(r);
+}
+
+double MCMC(int N_steps, double alpha, double d_displacement, double **R1, double **R2)
 {
     // Filenames for saving in csv
     char filename_R1[] = {"R1.csv"}, filename_R2[] = {"R2.csv"};
     char filename_energy[] = {"E_local.csv"}, filename_xdist[] = {"x_distribution.csv"}, filename_theta[] = {"theta.csv"};
     char filename_results[] = {"MCMC_results.csv"}, filename_phi_k[] ={"phi_k.csv"};
-        bool open_with_write;
+    bool open_with_write;
     
      // Initializing arrays
     int n_phi_rows = 2*M_C+10;
@@ -64,7 +111,7 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
         // get proposal positons
         for (int kx = 0; kx < NDIM; ++kx)
         {
-            random_number = gsl_ran_flat(r,-0.5,0.5);
+            random_number = gsl_ran_flat(r, -0.5,0.5);
             R1_test[kx] = R1[ix][kx] + d_displacement * random_number;
             random_number = gsl_ran_flat(r,-0.5,0.5);
             R2_test[kx] = R2[ix][kx] + d_displacement * random_number;
@@ -97,16 +144,24 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
         double theta_ix = theta_fun_vec(R1[ix], R2[ix]);
         double x_cos = cos(theta_ix);
 
-        double result_vec[] = {ix, x_cos};
-        if(ix == 0){ open_with_write = true; } else { open_with_write = false; }
-        save_vector_to_csv(result_vec, 2, filename_theta, open_with_write);
+        //double result_vec[] = {ix, x_cos};
+        //if(ix == 0){ open_with_write = true; } else { open_with_write = false; }
+        //save_vector_to_csv(result_vec, 2, filename_theta, open_with_write);
+        //printf("MCMC step: %d\n", ix);
     }
 
     // Calculate energies of all positions in chain
-    Energy(E_local, alpha, N_steps, R1, R2);
+    Energy(E_local, alpha, N_steps, R1, R2); 
+
+    double average_E_local = 0;
+    for(int ix = 0; ix < N_steps - 1; ++ix)
+    {
+        average_E_local += E_local[ix]/N_steps;
+    }
+
     theta_fun(theta_chain, N_steps, R1, R2);
     x_distribution(x_chain, N_steps, R1,R2);
-    double statistical_inefficiency = correlation_function(Phi_k_vec, E_local,N_steps, M_C);
+    double statistical_inefficiency = correlation_function(Phi_k_vec, E_local, N_steps, M_C);
     //printf("Accept_count = %d \n", accept_count);
     //printf("statistical inefficiency = %f\n", statistical_inefficiency);
     
@@ -122,6 +177,8 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
     // Destroy and free arrays
     free(E_local), free(x_chain), free(theta_chain), free(Phi_k_vec);
     gsl_rng_free(r);
+
+    return average_E_local;
 }
 
 int
@@ -135,35 +192,36 @@ run(
     int N_steps = 1e5; int N_discarded_steps = 1e4; double alpha = 0.1, d_displacement = 0.1; 
     
 
-    double **R1 = create_2D_array(N_steps, NDIM), **R2 = create_2D_array(N_steps,NDIM);
-    double E_PD_average;
+    double **R1 = create_2D_array(N_steps, NDIM), **R2 = create_2D_array(N_steps,NDIM), E_PD_average;
+    char filename_alpha_results[] = {"alpha_results.csv"}, filename_alpha_params[] = {"alpha_params.csv"};
+    bool open_with_write;
 
     initialize_positions((double **) R1, (double **) R2, (double) d_displacement);
-
-    MCMC(N_discarded_steps, alpha, d_displacement, R1, R2);
-    E_PD_average = partialEnergyDerivative(alpha, N_discarded_steps, R1, R2);
-    printf("E_PD during discard: %f\n", E_PD_average);
+    
+    MCMC_burn_in(N_discarded_steps, alpha, d_displacement, R1, R2);
 
     int n_alpha_steps = 50;
     double A = 1., beta = 0.5; // beta from 0.5 to 1
+    double E_average = 0;
 
     for(int ix = 1; ix < n_alpha_steps + 1; ix++)
     {
         double gamma = A*pow(ix, (double) - beta);
-        //printf("gamma of iteration %d : %f\n", ix, gamma);
-        MCMC(N_steps, alpha, d_displacement, R1, R2);
+
+        E_average = MCMC(N_steps, alpha, d_displacement, R1, R2);
 
         E_PD_average = partialEnergyDerivative(alpha, N_steps, R1, R2);
-        //printf("E_PD of iteration %d: %f\n", ix, E_PD_average);
 
         alpha -= gamma * E_PD_average;
-        printf("alpha[%d]: %f \n", ix, alpha);
-        printf("\n");
+
+        double alpha_result_vector[] = {ix, E_average, alpha, gamma, E_PD_average};
+        if(ix == 0){ open_with_write = true; } else { open_with_write = false; }
+        save_vector_to_csv(alpha_result_vector, 5, filename_alpha_results, open_with_write);
+        printf("Iteration: %d\n", ix);
     }
 
-    char filename_params[] = {"MCMC_params.csv"};
-    double param_vector[] = {N_steps, alpha, d_displacement};
-    save_vector_to_csv(param_vector, 3, filename_params, true);
+    double alpha_param_vector[] = {n_alpha_steps, A, beta, N_steps, d_displacement};
+    save_vector_to_csv(alpha_param_vector, 5, filename_alpha_params, true);
 
     destroy_2D_array(R1, N_steps); destroy_2D_array(R2, N_steps);
 
