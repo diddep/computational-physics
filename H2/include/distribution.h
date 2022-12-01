@@ -8,3 +8,4 @@ double
 distribution(
         double *R1, double *R2, double alpha
         );
+
