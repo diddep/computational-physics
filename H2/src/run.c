@@ -38,12 +38,12 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
 {
     // Filenames for saving in csv
     char filename_R1[] = {"R1.csv"}, filename_R2[] = {"R2.csv"};
-    char filename_energy[] = {"E_L.csv"}, filename_xdist[] = {"x_distribution.csv"}, filename_theta[] = {"theta.csv"};
+    char filename_energy[] = {"E_local.csv"}, filename_xdist[] = {"x_distribution.csv"}, filename_theta[] = {"theta.csv"};
     char filename_results[] = {"MCMC_results.csv"};
     bool open_with_write;
     
      // Initializing arrays
-    double *E_L = malloc(sizeof(double) * N_steps);
+    double *E_local = malloc(sizeof(double) * N_steps);
     double *theta_chain = malloc(sizeof(double) * N_steps);
     double *x_chain = malloc(sizeof(double) * N_steps);
 
@@ -98,7 +98,7 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
     }
 
     // Calculate energies of all positions in chain
-    Energy(E_L, alpha, N_steps, R1, R2);
+    Energy(E_local, alpha, N_steps, R1, R2);
     theta_fun(theta_chain, N_steps, R1, R2);
     x_distribution(x_chain, N_steps, R1,R2);
     printf("Accept_count = %d \n", accept_count);
@@ -108,11 +108,11 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
     save_matrix_to_csv(R2, N_steps, NDIM, filename_R2);
 
     open_with_write = true;
-    save_vector_to_csv(E_L, N_steps, filename_energy, open_with_write);
+    save_vector_to_csv(E_local, N_steps, filename_energy, open_with_write);
     save_vector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
 
     // Destroy and free arrays
-    free(E_L), free(x_chain), free(theta_chain);
+    free(E_local), free(x_chain), free(theta_chain);
     gsl_rng_free(r);
 }
 
@@ -127,6 +127,7 @@ run(
     int N_steps = 1e5; int N_discarded_steps = 1e4; double alpha = 0.1, d_displacement = 0.1; 
 
     double **R1 = create_2D_array(N_steps,NDIM), **R2 = create_2D_array(N_steps,NDIM);
+
     initialize_positions((double **) R1, (double **) R2, (double) d_displacement);
 
     MCMC(N_discarded_steps, alpha, d_displacement, R1, R2);
@@ -138,5 +139,6 @@ run(
     save_vector_to_csv(param_vector, 3, filename_params, true);
 
     destroy_2D_array(R1, N_steps); destroy_2D_array(R2, N_steps);
+
     return 0;
 }

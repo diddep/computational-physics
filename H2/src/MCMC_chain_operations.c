@@ -15,7 +15,7 @@
 //easier to use R1, R2 as matrices or input x1,x2,y1,y2,z1,z2?
 
 //R1, R2 on form [[x1,y1,z1],...,[xN,yN,zN]]
-void Energy(double *E_L, double alpha, int N_steps, double **R1, double **R2){
+void Energy(double *E_local, double alpha, int N_steps, double **R1, double **R2){
 
     double r12;
     double *r1_nrm = malloc(sizeof(double) * NDIM), *r2_nrm = malloc(sizeof(double) * NDIM);
@@ -37,17 +37,55 @@ void Energy(double *E_L, double alpha, int N_steps, double **R1, double **R2){
         prod = dot_product(diff_vec, diff_nrm,NDIM);
         div = (1. + alpha * r12);
 
-        E_L[i] = - 4.0 + prod/(r12 * pow(div, 2.0)) -1.0/(r12* pow(div, NDIM))\
-                 - 1./(4.0* pow(div,4.0))+ 1. / r12;
+        E_local[i] = - 4.0 \
+                     + prod/(r12 * pow(div, 2.0)) \
+                     - 1.0/(r12* pow(div, 3.0)) \
+                     - 1./(4.0* pow(div,4.0)) \
+                     + 1. / r12;
 
     }
-    //r12 = NULL;
-    //prod = NULL;
-    //div = NULL;
-    free(r1_nrm);
-    free(r2_nrm);
-    free(diff_nrm);
-    free(diff_vec);
+    free(r1_nrm), free(r2_nrm), free(diff_nrm), free(diff_vec);
+}
+
+void partialEnergyDerivative(double alpha, int N_steps, double **R1, double **R2){
+
+    double r12;
+    double *r1_nrm = malloc(sizeof(double) * NDIM), *r2_nrm = malloc(sizeof(double) * NDIM);
+    double *diff_vec = malloc(sizeof(double) * NDIM), *diff_nrm = malloc(sizeof(double) * NDIM);
+    double *E_local = malloc(sizeof(double) * N_steps);
+    double *E_local_derivative = malloc(sizeof(double) * N_steps);
+    double prod = 0., div = 0.;
+
+    for (int i = 0; i < N_steps; ++i){
+        for (int dim=0; dim<NDIM; ++dim){
+            r1_nrm[dim] = R1[i][dim];
+            r2_nrm[dim] = R2[i][dim];
+        }
+
+        normalize_vector(r1_nrm, NDIM);
+        normalize_vector(r2_nrm, NDIM);
+        r12 = distance_between_vectors(R1[i], R2[i], NDIM);
+
+        elementwise_subtraction(diff_vec, R1[i], R2[i], NDIM);
+        elementwise_subtraction(diff_nrm, r1_nrm, r2_nrm, NDIM);
+        prod = dot_product(diff_vec, diff_nrm,NDIM);
+        div = (1. + alpha * r12);
+
+        E_local[i] = - 4.0 \
+                     + prod/(r12 * pow(div, 2.0)) \
+                     - 1.0/(r12* pow(div, 3.0)) \
+                     - 1./(4.0* pow(div,4.0)) \
+                     + 1. / r12;
+
+        E_local_derivative[i] = - 0.0 \
+                                - 2 * r12 * prod/(r12 * pow(div, 3.0)) \
+                                + 3 * r12 * 1.0/(r12* pow(div, 4.0)) \
+                                + 4 * r12 * 1./(4.0* pow(div, 5.0)) 
+                                + 0.0;
+
+    }
+    free(r1_nrm), free(r2_nrm), free(diff_nrm), free(diff_vec), free(E_local), free(E_local_derivative);
+    
 }
 
 /*function calculating distribution of x from two position mcmc chains
