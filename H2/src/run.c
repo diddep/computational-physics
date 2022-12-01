@@ -13,7 +13,7 @@
 #include "statistical_ineff.h"
 
 #define NDIM 3
-#define M_C 1000
+#define M_C 100
 
 // Function running the markov-chain
 void initialize_positions(double **R1, double **R2, double d_displacement)
