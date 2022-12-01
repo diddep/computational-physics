@@ -20,7 +20,7 @@ double correlation_function(double *Phi_k_vec ,double *E_local_vec, int N_steps,
     for(int step=0; step<N_steps;++step)
     {
         average_E_local += E_local_vec[step] /N_steps;
-        printf("avg energy = %f\n" , average_E_local);
+        
         average_squared_E_local += pow(E_local_vec[step],2) /N_steps;
     }
     printf("avg energy = %f\n" , pow(average_E_local,2)-average_squared_E_local);
