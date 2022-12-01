@@ -107,8 +107,8 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
     theta_fun(theta_chain, N_steps, R1, R2);
     x_distribution(x_chain, N_steps, R1,R2);
     double statistical_inefficiency = correlation_function(Phi_k_vec, E_local,N_steps, M_C);
-    printf("Accept_count = %d \n", accept_count);
-    printf("statistical inefficiency = %f\n", statistical_inefficiency);
+    //printf("Accept_count = %d \n", accept_count);
+    //printf("statistical inefficiency = %f\n", statistical_inefficiency);
     
     // Save in csv:s
     save_matrix_to_csv(R1, N_steps, NDIM, filename_R1);
@@ -144,20 +144,20 @@ run(
     E_PD_average = partialEnergyDerivative(alpha, N_discarded_steps, R1, R2);
     printf("E_PD during discard: %f\n", E_PD_average);
 
-    int n_alpha_steps = 10;
+    int n_alpha_steps = 50;
     double A = 1., beta = 0.5; // beta from 0.5 to 1
 
     for(int ix = 1; ix < n_alpha_steps + 1; ix++)
     {
         double gamma = A*pow(ix, (double) - beta);
-        printf("gamma of iteration %d : %f\n", ix, gamma);
+        //printf("gamma of iteration %d : %f\n", ix, gamma);
         MCMC(N_steps, alpha, d_displacement, R1, R2);
 
         E_PD_average = partialEnergyDerivative(alpha, N_steps, R1, R2);
-        printf("E_PD of iteration %d: %f\n", ix, E_PD_average);
+        //printf("E_PD of iteration %d: %f\n", ix, E_PD_average);
 
         alpha -= gamma * E_PD_average;
-        printf("alpha after iteration %d: %f \n", ix, alpha);
+        printf("alpha[%d]: %f \n", ix, alpha);
         printf("\n");
     }
 
