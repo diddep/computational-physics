@@ -49,7 +49,7 @@ void transform_to_normal_modes(double trans_matrix[N_PARTICLES][N_PARTICLES],
 	Q[i] = sum;
     }
 }
-/* Calculating the acceleration for array of positions*/
+
 void calc_acc(double *a, double *u, double *m, double kappa, double alpha , int size_of_u)
 {
   
@@ -67,7 +67,6 @@ void calc_acc(double *a, double *u, double *m, double kappa, double alpha , int 
     }
 }
 
-/* Set initial conditions of input arrays, particles start at zero, velocities so all energy is in mode 1. All masses is 1.*/
 void set_initial_condition(double *v, double *q, double *m)
 {   
     double E0 = N_PARTICLES;
@@ -82,7 +81,7 @@ void set_initial_condition(double *v, double *q, double *m)
        
     }
 }
-/* Take a velocity verlet timestep such that states go from t -> t + dt*/
+
 void velocity_verlet_timestep(double dt, double *v, double *q, double *a, double *m, double kappa, double alpha, int n_particles)
 {
     // v(t+dt/2)
@@ -99,7 +98,6 @@ void velocity_verlet_timestep(double dt, double *v, double *q, double *a, double
 
     // a(t+dt)
     calc_acc((double*) a, (double*) q, (double*) m, (double) kappa, (double) alpha , (int) n_particles);
-    
     // v(t+dt)
     for(int ix = 0; ix < n_particles; ix++)
     {
@@ -107,116 +105,144 @@ void velocity_verlet_timestep(double dt, double *v, double *q, double *a, double
     }
 }
 
-/* Function to run full velocity verlet simulation */
 void velocity_verlet(int n_timesteps, int timestep_interval, double dt, double *v, double *q, \
  double *m, double kappa, double alpha)
 {
-    // Initiate file names
     char filename_result[] = {"verlet_results.csv"};
     char filename_positions[] = {"verlet_positions.csv"};
     char filename_velocities[] = {"verlet_velocities.csv"};
-    char filename_param[] = {"verlet_params.csv"};
     char filename_energies[] = {"verlet_energies.csv"};
+    char filename_param[] = {"verlet_params.csv"};
     char filename_energy_average[] = {"verlet_energy_averages.csv"};
     bool is_write;
      
-    // Initiate arrays
-    double T = 1;
-    double a[N_PARTICLES];
+    
+    double trans_matrix[N_PARTICLES][N_PARTICLES];
     double E[N_PARTICLES];
     double Q[N_PARTICLES];
     double P[N_PARTICLES];
     double omega[N_PARTICLES];
-    double E_tot_dt[N_PARTICLES];
-    double E_time_average[N_PARTICLES];
+    double E_tot[N_PARTICLES];
     
-    // Set constants, time will increase when the current timestep modulo timestep_interval is zero
+    
     int n_time_rows = n_timesteps/timestep_interval*dt;
+    double **E_time_average = create_2D_array(n_time_rows, N_PARTICLES);
+    printf("no rows: %d\n", n_time_rows);
     int count = 0;
     
-    // Setting energies to zero and eigenfrequencies for each particle according to formula
+
     for(int ix = 0; ix < N_PARTICLES; ix++)
-    {
+    {   
         omega[ix] = 2 * sqrt( kappa / m[ix] ) * sin( (ix + 1) * PI / (2 * (N_PARTICLES + 1) ) );
-        E_tot_dt[ix] = 0; E_time_average[ix] = 0;
+        E_tot[ix] = 0;
+        for(int txx = 0; txx < n_time_rows; txx++)
+        {
+            E_time_average[txx][ix] = 0;
+        }
     }
 
-    // Initiate transformation matrix
-    double trans_matrix[N_PARTICLES][N_PARTICLES];
     construct_transformation_matrix((double (*)[N_PARTICLES]) trans_matrix, (int) N_PARTICLES);
 
-    // Get acceleration
+    double a[N_PARTICLES];
     calc_acc((double*) a, (double*) q, (double*) m, (double) kappa, (double) alpha , (int) N_PARTICLES);
      
     for(int tx = 1; tx < n_timesteps + 1; tx++)
     {
-        // t -> t + dt
         velocity_verlet_timestep((double) dt, (double*) v, (double*) q, (double*) a, (double*) m, (double) kappa, (double) alpha, (int) N_PARTICLES);
 
         if(tx % timestep_interval == 0 || tx == 1)
         {
-            //Tranform to normal modes
             transform_to_normal_modes((double (*)[N_PARTICLES]) trans_matrix, (int) N_PARTICLES, q, Q);
             transform_to_normal_modes((double (*)[N_PARTICLES]) trans_matrix, (int) N_PARTICLES, v, P);
 
-            // Calculate current and time-averaged energy 
+            double T = ( count * timestep_interval * dt);
             for(int ix = 0; ix < N_PARTICLES; ix++)
             {
                 E[ix] = 0.5 * ( pow(P[ix], 2) + pow(omega[ix], 2) * pow(Q[ix], 2) );
 
                 if( count != 0)
-                {   
-                    // Get current time-factor for time-averaged energy
-                    T = ( count * timestep_interval * dt);
-
-                    // Get current time-factor for time-averaged energy
-                    E_tot_dt[ix] +=  E[ix] * dt;
+                {
+                    E_tot[ix] +=  E[ix] * dt;
                 }
-                // Set time-averaged energy
-                E_time_average[ix] = E_tot_dt[ix]/T;
+                E_time_average[count][ix] == E_tot[ix]/T;
+                
+                printf("E[%d]: %f\n", ix, E[ix]);
+                printf("E_tot[%d]: %f\n", ix,  E_tot[ix]);
+                printf("E_tot[%d]/T: %f\n", ix, E_tot[ix]/T);
+                printf("E[%d][%d]: %f\n", count, ix, E_time_average[count][ix]);
             }
-            // Setting bool to true to open csv files with write, false to open with append
-            if (tx == 1) { is_write = true; } else { is_write = false; }
-            
-            // Saving values to csv files.
+
+            if(tx == 1)
+            {
+                is_write = true;
+            } else {
+                is_write = false;
+            }
+            /*
+            if(count != 0)
+            {   
+                double T = ( count * timestep_interval * dt);
+                for(int ixx = 0; ixx < N_PARTICLES; ixx++)
+                {
+                    E_tot[ixx] +=  E[ixx] * dt;
+                    E_time_average[count][ixx] *= E_tot[ixx]/T;
+                    if(count == 1)
+                    {
+                        E_time_average[count][ixx] = E[ixx] * dt;
+                    } else 
+                    {
+                        for(int txx = 0; txx < count; txx++)
+                        {
+                            E_time_average[count][ixx] += E_time_average[txx][ixx] * dt;;
+                        }
+
+                        E_time_average[count][ixx] += E[ixx] * dt;
+                        E_time_average[count][ixx] *= 1/T;
+                    }   
+                                   
+                }
+            }
+            */
+            //printf("count: %d\n", count);
+            //printf("E[%d][0]: %f\n",count, E_time_average[count][0]);
+            count++;
+
             double result_vec[] = {tx * dt};
-            save_vector_to_csv(result_vec, 1, filename_result, is_write);
+
+            save_vector_to_csv(result_vec, 2, filename_result, is_write);
             save_vector_to_csv(q, N_PARTICLES, filename_positions, is_write);
             save_vector_to_csv(v, N_PARTICLES, filename_velocities, is_write);
             save_vector_to_csv(E, N_PARTICLES, filename_energies, is_write);
-            save_vector_to_csv(E_time_average, N_PARTICLES, filename_energy_average, is_write);
-
-            // Incrementing counter
-            count++;
+            
         }
     }
-    // Save simulation parameters dt and alpha in vector
     double param_vec[] = {dt, alpha};
     save_vector_to_csv(param_vec, 2, filename_param, true);
+    save_matrix_to_csv(E_time_average, n_time_rows, N_PARTICLES, filename_energy_average);
+    destroy_2D_array(E_time_average, n_timesteps/timestep_interval);
 }
 
-/* "Main function" of program*/
 int run()
 {
-    // Initiating arrays
+    
     double q[N_PARTICLES];
+    
     double v[N_PARTICLES];
     double m[N_PARTICLES];
+    double kappa = 1, alpha = 0.1;
 
-    // Setting constants
-    double kappa = 1, alpha = 0.01;
-
-    // Set initial conditions for v, q and m (mass is just one)
     set_initial_condition((double*) v, (double*) q, (double*) m);
     
-    // Simulation parameters. timestep_interval governs interval spacing between calculating energies and saving to csv.
     int end_time = 1e6; double dt = 1e-1;
     int n_timesteps = end_time / dt;
     int timestep_interval = 1e3;
 
-    // Running the velocity verlet function
     velocity_verlet((int) n_timesteps, (int) timestep_interval, (double) dt, (double*) v, (double*) q, \
-                    (double*) m, (double) kappa, (double) alpha);
+    (double*) m, (double) kappa, (double) alpha);
 
+
+    // Evolove system in time 
+
+    
     return 0;
 }
