@@ -13,6 +13,7 @@
 #include "statistical_ineff.h"
 
 #define NDIM 3
+#define M_C 3000
 
 // Function running the markov-chain
 void initialize_positions(double **R1, double **R2, double d_displacement)
@@ -45,6 +46,7 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
     
      // Initializing arrays
     double *E_local = malloc(sizeof(double) * N_steps);
+    double *Phi_k_vec = malloc(sizeof(double) *2* M_C);
     double *theta_chain = malloc(sizeof(double) * N_steps);
     double *x_chain = malloc(sizeof(double) * N_steps);
 
