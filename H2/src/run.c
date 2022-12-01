@@ -11,6 +11,8 @@
 #include "distribution.h"
 #include "Energy_calc.h"
 
+#define NDIM 3
+
 // Function running the markov-chain
 int
 run(
@@ -18,52 +20,55 @@ run(
     char *argv[]
    )
 {
-    // N number of steps, acceptan
-    int N = 1e5, accept_count = 0;
-    double alpha = 0.1, d = 0.1; 
-    double **R1 = create_2D_array(N,3), **R2 = create_2D_array(N,3);
-    double *E_L = malloc(sizeof(double) * N);
-    double *x_chain = malloc(sizeof(double) * N);
+    
+    // MCMC Parameters
+    // N_steps is number of steps in loop, alpha --- , d_displacement offsets particle positions
+    int N_steps = 1e5; double alpha = 0.1, d_displacement = 0.1; 
 
-    double R1_test[3], R2_test[3];
+    // Filenames for saving in csv
+    char filename_R1[] = {"R1.csv"}, filename_R2[] = {"R2.csv"};
+    char filename_energy[] = {"E_L.csv"}, filename_xdist[] = {"x_distribution.csv"};
+    char filename_results[] = {"MCMC_results.csv"}, filename_params[] = {"MCMC_params.csv"};
+
+     // Initializing arrays
+    double **R1 = create_2D_array(N_steps,NDIM), **R2 = create_2D_array(N_steps,NDIM);
+    double *E_L = malloc(sizeof(double) * N_steps);
+    double *x_chain = malloc(sizeof(double) * N_steps);
+
+    double R1_test[NDIM], R2_test[NDIM];
     double random_number1 = 0, random_number2 = 0;
-    char filename_R1[] = {"R1.csv"}, filename_R2[] = {"R2.csv"}, filename_energy[] = {"E_L.csv"}, filename_xdist[] = {"x_distribution.csv"};
-
     gsl_rng * r;
     r = init_random_num_generator();
 
     // Initializing random starting values for all particles
     printf("Initializing random positions:\n");
-    for (int kx = 0; kx < 3; kx++)
+    for (int kx = 0; kx < NDIM; kx++)
     {
         // -0.5 to 0.5 because it's length 1 and symmetric around zero
         random_number1 = gsl_ran_flat(r, -0.5, 0.5);
         random_number2 = gsl_ran_flat(r, -0.5, 0.5);
 
-        R1[0][kx] = d * random_number1;
-        R2[0][kx] = d * random_number2;
+        R1[0][kx] = d_displacement * random_number1;
+        R2[0][kx] = d_displacement * random_number2;
         printf("R1[0][%d]: %f, R2[0][%d]: %f\n", kx, R1[0][kx], kx, R2[0][kx]);
     }
 
-    for(int i = 0; i < N - 1; ++i)
+    int accept_count = 0;
+    for(int ix = 0; ix < N_steps - 1; ++ix)
     {
-        // Get proposal position, d step size
-        for (int kx = 0; kx < 3; ++kx)
+        // Get proposal position, d_displacement step size
+        for (int kx = 0; kx < NDIM; ++kx)
         {
             random_number1 = gsl_ran_flat(r,-0.5,0.5);
             random_number2 = gsl_ran_flat(r,-0.5,0.5);
 
-            R1_test[kx] = R1[i][kx] + d * random_number1;
-            R2_test[kx] = R2[i][kx] + d * random_number2;
+            R1_test[kx] = R1[ix][kx] + d_displacement * random_number1;
+            R2_test[kx] = R2[ix][kx] + d_displacement * random_number2;
         }
 
         // Probability for particle occupying new and old positions
         double prob_test = distribution(R1_test, R2_test, alpha);
-        double prob_old = distribution(R1[i], R2[i], alpha);
-        //printf("prob old= %f\n", prob_old);
-        //printf("prob test= %f\n", prob_test);
-        //printf("prob kvot= %f\n", prob_test/prob_old);
-
+        double prob_old = distribution(R1[ix], R2[ix], alpha);
 
         // If new prob > old, make step OR take exploration step
         if(prob_test > prob_old || prob_test / prob_old > gsl_ran_flat(r,0.0,1.0))
@@ -72,38 +77,39 @@ run(
             accept_count = accept_count + 1;
 
             // If accepted, save new position in next row.
-            for (int kx=0; kx<3; ++kx)
+            for (int kx=0; kx<NDIM; ++kx)
             {
-                R1[i+1][kx] = R1_test[kx];
-                R2[i+1][kx] = R2_test[kx];
-                //printf("new value: %f,   %f\n", R1[i+1][kx], R2[i+1][kx]);
+                R1[ix+1][kx] = R1_test[kx];
+                R2[ix+1][kx] = R2_test[kx];
             }
         }
         // If not accepted save old position in next row
         else{
-            for (int kx=0; kx<3; ++kx)
+            for (int kx=0; kx<NDIM; ++kx)
             {
-                R1[i+1][kx] = R1[i][kx];
-                R2[i+1][kx] = R2[i][kx];
+                R1[ix+1][kx] = R1[ix][kx];
+                R2[ix+1][kx] = R2[ix][kx];
             }
         }
     }
 
     // Calculate energies of all positions in chain
-    Energy(E_L, alpha, N, R1, R2);
-    x_distribution(x_chain, N, R1,R2);
+    Energy(E_L, alpha, N_steps, R1, R2);
+    x_distribution(x_chain, N_steps, R1,R2);
     printf("Accept_count = %d \n", accept_count);
     
     // Save in csv:s
-    save_matrix_to_csv( R1, N, 3, filename_R1);
-    save_matrix_to_csv( R2, N, 3, filename_R2);
+    save_matrix_to_csv( R1, N_steps, NDIM, filename_R1);
+    save_matrix_to_csv( R2, N_steps, NDIM, filename_R2);
 
     bool open_with_write = true;
-    save_vector_to_csv(E_L, N, filename_energy, open_with_write);
-    save_vector_to_csv(x_chain, N, filename_xdist, open_with_write);
+    double param_vector[] = {N_steps, alpha, d_displacement};
+    save_vector_to_csv(param_vector, 3, filename_params, true);
+    save_vector_to_csv(E_L, N_steps, filename_energy, open_with_write);
+    save_vector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
 
     // Destroy and free arrays
-    destroy_2D_array(R1,N); destroy_2D_array(R2,N);
+    destroy_2D_array(R1,N_steps); destroy_2D_array(R2,N_steps);
     gsl_rng_free(r); free(E_L), free(x_chain);
 
     return 0;
