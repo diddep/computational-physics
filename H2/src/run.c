@@ -13,7 +13,7 @@
 #include "statistical_ineff.h"
 
 #define NDIM 3
-#define M_C 3000
+#define M_C 1000
 
 // Function running the markov-chain
 void initialize_positions(double **R1, double **R2, double d_displacement)
@@ -41,14 +41,16 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
     // Filenames for saving in csv
     char filename_R1[] = {"R1.csv"}, filename_R2[] = {"R2.csv"};
     char filename_energy[] = {"E_local.csv"}, filename_xdist[] = {"x_distribution.csv"}, filename_theta[] = {"theta.csv"};
-    char filename_results[] = {"MCMC_results.csv"}, filename_phi_k ={"phi_k.csv"};
+    char filename_results[] = {"MCMC_results.csv"}, filename_phi_k[] ={"phi_k.csv"};
         bool open_with_write;
     
      // Initializing arrays
+    int n_phi_rows = 2*M_C+10;
     double *E_local = malloc(sizeof(double) * N_steps);
-    double *Phi_k_vec = malloc(sizeof(double) *2* M_C);
+    double *Phi_k_vec = malloc(sizeof(double) *n_phi_rows);
     double *theta_chain = malloc(sizeof(double) * N_steps);
     double *x_chain = malloc(sizeof(double) * N_steps);
+    
 
     double R1_test[NDIM], R2_test[NDIM];
     
@@ -115,10 +117,10 @@ void MCMC(int N_steps, double alpha, double d_displacement, double **R1, double 
     open_with_write = true;
     save_vector_to_csv(E_local, N_steps, filename_energy, open_with_write);
     save_vector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
-    save_vector_to_csv(Phi_k_vec, 2*M_C, filename_phi_k, open_with_write);
+    save_vector_to_csv(Phi_k_vec, n_phi_rows, filename_phi_k, open_with_write);
 
     // Destroy and free arrays
-    free(E_local), free(x_chain), free(theta_chain);
+    free(E_local), free(x_chain), free(theta_chain), free(Phi_k_vec);
     gsl_rng_free(r);
 }
 
