@@ -14,15 +14,7 @@
   <component name="ChangeListManager">
     <list default="true" id="db2c1020-a495-425d-bcee-beb98ad359c2" name="Changes" comment="tst">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/H2" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/H2" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/obj/Energy_calc.o" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/obj/Energy_calc.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/obj/distribution.o" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/obj/distribution.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/obj/run.o" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/obj/run.o" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/python/energy_r1.png" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/python/energy_r1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/python/hist.png" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/python/hist.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/python/x_distribution.png" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/python/x_distribution.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/src/Energy_calc.c" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/src/Energy_calc.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../H2/H2/src/run.c" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/H2/src/run.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../H2/include/Energy_calc.h" beforeDir="false" afterPath="$PROJECT_DIR$/../H2/include/Energy_calc.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

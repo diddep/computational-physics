@@ -10,3 +10,8 @@ Energy(
         double **R1,
         double **R2
         );
+
+void
+x_distribution(
+        double *x_chain int N, double **R1_chain, double **R2_chain)
+        ;
