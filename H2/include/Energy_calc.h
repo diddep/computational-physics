@@ -13,5 +13,5 @@ Energy(
 
 void
 x_distribution(
-        double *x_chain int N, double **R1_chain, double **R2_chain)
-        ;
+        double *x_chain, int N, double **R1_chain, double **R2_chain
+);

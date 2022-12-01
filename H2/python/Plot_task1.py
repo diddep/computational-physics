@@ -12,6 +12,7 @@ arr_R2 =np.genfromtxt("../R2.csv", delimiter=',')
 
 #print(arr_R2.shape)
 arr_E_L = np.genfromtxt("../E_L.csv", delimiter=',')
+arr_xdist = np.genfromtxt("../x_distribution.csv", delimiter=',')
 
 arr_r1 = np.square(arr_R1)
 arr_r1 = np.sqrt(np.sum(arr_r1, axis=1))
@@ -57,18 +58,18 @@ fig_energy, ax_energy = plt.subplots(1,1)
 ax_energy.scatter(arr_r1, arr_E_L)
 fig_energy.savefig('energy_r1.png')
 
-x= theta(arr_R1, arr_R2)
 
 #for X in x:
 #    print(X)
 
-fig_theta, ax_theta = plt.subplots(1,1)
+fig_dist, ax_dist = plt.subplots(1,1)
 #counts_theta, bins_theta = np.histogram(x, bins = 10, density = True)
 #ax_theta.stairs(counts_theta, bins_theta)
+counts_xdist, bins_xdist = np.histogram(arr_xdist, bins = n_bins, density = True)
+ax_dist.stairs(counts_xdist, bins_xdist)
 
-ax_theta.scatter(np.arange(0,len(x)) ,np.log(x))
 
-fig_theta.savefig('x_distribution.png')
+fig_dist.savefig('x_distribution.png')
 
 
 
