@@ -23,6 +23,7 @@ double correlation_function(double *Phi_k_vec ,double *E_local_vec, int N_steps,
         printf("avg energy = %f\n" , average_E_local);
         average_squared_E_local += pow(E_local_vec[step],2) /N_steps;
     }
+    printf("avg energy = %f\n" , pow(average_E_local,2)-average_squared_E_local);
 
     //Looping over k for phi_k between -M_c<k<M_c
     for(int kx =-M_c; kx<M_c; ++kx)
