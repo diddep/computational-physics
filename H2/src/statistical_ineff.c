@@ -20,6 +20,7 @@ double correlation_function(double *Phi_k_vec ,double *E_local_vec, int N_steps,
     for(int step=0; step<N_steps;++step)
     {
         average_E_local += E_local_vec[step] /N_steps;
+        printf("avg energy = %f\n" , average_E_local);
         average_squared_E_local += pow(E_local_vec[step],2) /N_steps;
     }
 
@@ -30,6 +31,7 @@ double correlation_function(double *Phi_k_vec ,double *E_local_vec, int N_steps,
         for(int step=lower_buffer; step<buffer_upper; ++step)
         {
             phi_k = E_local_vec[step]*E_local_vec[step + kx] / (N_steps-2*M_c);
+            phi_k = (phi_k -pow(average_E_local,2)/(average_squared_E_local- pow(average_E_local,2)));
             statistial_inefficiency += phi_k;
         }
         //tricky indexing, should be array with 2M_c elements
