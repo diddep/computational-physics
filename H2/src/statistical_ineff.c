@@ -14,16 +14,16 @@
 double correlation_function(double *Phi_k_vec ,double *E_local_vec, int N_steps, int M_c)
 {
     double phi_k = 0, average_E_local = 0, average_squared_E_local=0, statistial_inefficiency=0;
-    int lower_buffer =M_c, buffer_upper =N_steps-M_c;
+    int lower_buffer =M_c, buffer_upper = N_steps-M_c;
 
     //Calculating the average over the chain, should maybe change to only bufferzone
-    for(int step=0; step<N_steps;++step)
+    for(int step=0; step < N_steps;++step)
     {
         average_E_local += E_local_vec[step] /N_steps;
         
         average_squared_E_local += pow(E_local_vec[step],2) /N_steps;
     }
-    printf("avg energy = %f\n" , (average_E_local));
+    //printf("avg energy = %f\n" , (average_E_local));
 
     //Looping over k for phi_k between -M_c<k<M_c
     for(int kx =-M_c; kx<M_c; ++kx)
