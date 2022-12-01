@@ -128,12 +128,19 @@ run(
     int N_steps = 1e5; int N_discarded_steps = 1e4; double alpha = 0.1, d_displacement = 0.1; 
 
     double **R1 = create_2D_array(N_steps,NDIM), **R2 = create_2D_array(N_steps,NDIM);
+    double E_PD_average;
 
     initialize_positions((double **) R1, (double **) R2, (double) d_displacement);
 
     MCMC(N_discarded_steps, alpha, d_displacement, R1, R2);
-    
+
+    E_PD_average = partialEnergyDerivative(alpha, N_discarded_steps, R1, R2);
+    printf("E_PD discarded: %f\n", E_PD_average);
+
     MCMC(N_steps, alpha, d_displacement, R1, R2);
+
+    E_PD_average = partialEnergyDerivative(alpha, N_steps, R1, R2);
+    printf("E_PD rest: %f\n", E_PD_average);
 
     char filename_params[] = {"MCMC_params.csv"};
     double param_vector[] = {N_steps, alpha, d_displacement};

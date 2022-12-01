@@ -11,7 +11,7 @@ Energy(
         double **R2
         );
         
-void
+double
 partialEnergyDerivative(
         double alpha,
         int N,
