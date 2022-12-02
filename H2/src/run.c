@@ -13,7 +13,7 @@
 #include "statistical_ineff.h"
 
 #define NDIM 3
-#define M_C 100
+#define M_C 1000
 
 // Function running the markov-chain
 void initialize_positions(double **R1, double **R2, double d_displacement)
@@ -163,7 +163,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     x_distribution(x_chain, N_steps, R1,R2);
     double statistical_inefficiency = correlation_function(Phi_k_vec, E_local, N_steps, M_C);
     //printf("Accept_count = %d \n", accept_count);
-    //printf("statistical inefficiency = %f\n", statistical_inefficiency);
+    printf("statistical inefficiency = %f\n", statistical_inefficiency);
     
     // Save in csv:s
     save_matrix_to_csv(R1, N_steps, NDIM, filename_R1);
