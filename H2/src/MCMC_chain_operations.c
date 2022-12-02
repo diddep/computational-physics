@@ -47,12 +47,12 @@ void Energy(double *E_local, double alpha, int N_steps, double **R1, double **R2
     free(r1_nrm), free(r2_nrm), free(diff_nrm), free(diff_vec);
 }
 
-double partialEnergyDerivative(double alpha, int N_steps, double **R1, double **R2){
+double partialEnergyDerivative(double *E_local_derivative, double alpha, int N_steps, double **R1, double **R2){
 
     double r12;
     double *r1_nrm = malloc(sizeof(double) * NDIM), *r2_nrm = malloc(sizeof(double) * NDIM);
     double *diff_vec = malloc(sizeof(double) * NDIM), *diff_nrm = malloc(sizeof(double) * NDIM);
-    double *E_local_derivative = malloc(sizeof(double) * N_steps);
+    //double *E_local_derivative;// = malloc(sizeof(double) * N_steps);
     double prod = 0., div = 0., E_derivative_sum = 0;
 
     for (int ix = 0; ix < N_steps; ++ix){
@@ -79,7 +79,7 @@ double partialEnergyDerivative(double alpha, int N_steps, double **R1, double **
         E_derivative_sum += E_local_derivative[ix];
     }
 
-    free(r1_nrm), free(r2_nrm), free(diff_nrm), free(diff_vec), free(E_local_derivative);
+    free(r1_nrm), free(r2_nrm), free(diff_nrm), free(diff_vec);
 
     return E_derivative_sum/N_steps;
 }

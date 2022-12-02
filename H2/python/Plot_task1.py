@@ -11,10 +11,24 @@ arr_R1 =np.genfromtxt("../R1.csv", delimiter=',')
 arr_R2 =np.genfromtxt("../R2.csv", delimiter=',')
 
 #print(arr_R2.shape)
-arr_E_L = np.genfromtxt("../E_L.csv", delimiter=',')
+arr_E_L = np.genfromtxt("../E_local.csv", delimiter=',')
+arr_E_L_Derivative = np.genfromtxt("../E_local_derivative.csv", delimiter=',')
 arr_xdist = np.genfromtxt("../x_distribution.csv", delimiter=',')
-arr_theta = np.genfromtxt("../theta.csv", delimiter=',')
-print(arr_theta.shape)
+arr_theta_csv = np.genfromtxt("../theta.csv", delimiter=',')
+arr_theta = arr_theta_csv[:,1]
+
+params = np.genfromtxt("../alpha_params.csv", delimiter=',')
+n_alpha_steps = int(params[0])
+n_timesteps = int(params[3])
+d_displacement = params[4]
+
+ix = np.linspace(0, n_timesteps, n_timesteps)
+
+
+arr_steps = arr_theta_csv[:,0]
+print(arr_E_L.shape)
+print(ix.shape)
+
 print(np.max(arr_xdist),'xd')
 
 arr_r1 = np.square(arr_R1)
@@ -54,7 +68,7 @@ fig_dist.savefig('plots_python/hist.png')
 
 
 fig_energy, ax_energy = plt.subplots(1,1)
-ax_energy.scatter(arr_r1, arr_E_L)
+ax_energy.scatter(ix, arr_E_L_Derivative)
 fig_energy.savefig('plots_python/energy_r1.png')
 
 
@@ -72,9 +86,9 @@ fig_dist.savefig('plots_python/x_distribution.png')
 fig_theta, ax_theta = plt.subplots(1,2)
 #counts_theta, bins_theta = np.histogram(x, bins = 10, density = True)
 #ax_theta.stairs(counts_theta, bins_theta)
-counts_x, bins_x = np.histogram(arr_theta[:,1], bins = n_bins, density = True)
+counts_x, bins_x = np.histogram(arr_theta, bins = n_bins, density = True)
 
-counts_theta, bins_theta = np.histogram(np.arccos(arr_theta[:,1]), bins = n_bins, density = True)
+counts_theta, bins_theta = np.histogram(np.arccos(arr_theta), bins = n_bins, density = True)
 ax_theta[0].stairs(counts_x, bins_x, fill = True)
 ax_theta[0].set_title('Distribution for x')
 ax_theta[0].set_xlabel('x')
@@ -87,6 +101,8 @@ ax_theta[1].set_xlabel(r'$\theta$ [rad]')
 ax_theta[1].set_ylabel('Density')
 plt.tight_layout()
 fig_theta.savefig('plots_python/theta.png')
+
+
 
 
 
