@@ -3,8 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-#import seaborn as sns
-#sns.set_theme()
+import seaborn as sns
+sns.set_theme()
 
 
 arr_R1 =np.genfromtxt("../R1.csv", delimiter=',')
@@ -81,7 +81,7 @@ ax_theta[0].set_xlabel('x')
 ax_theta[0].set_ylabel('Density')
 
 Fill = False
-ax_theta[1].stairs(counts_theta, bins_theta, fill = Fill, hatch='//')
+ax_theta[1].stairs(counts_theta, bins_theta, fill = Fill)
 ax_theta[1].set_title(r'Distribution for $\theta$')
 ax_theta[1].set_xlabel(r'$\theta$ [rad]')
 ax_theta[1].set_ylabel('Density')
