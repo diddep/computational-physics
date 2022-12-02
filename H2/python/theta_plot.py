@@ -60,6 +60,7 @@ def rho(rvec, z):
 # fig_xdist.savefig(f'plots_python/{task_str}/x_distribution_alpha{alpha}_nsteps{n_steps}.png')
 
 
+n_bins = 70
 
 ## Plot theta
 fig_theta, ax_theta = plt.subplots(1,2, figsize=(10,5))
