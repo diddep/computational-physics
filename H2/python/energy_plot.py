@@ -15,6 +15,7 @@ theta = theta_csv[:,1]
 Phi_k =np.genfromtxt("../phi_k.csv", delimiter=',')
 
 alpha_results = np.genfromtxt("../alpha_results.csv", delimiter=',')
+average_energy = alpha_results[1]
 
 
 params = np.genfromtxt("../alpha_params.csv", delimiter=',')
@@ -55,7 +56,7 @@ def rho(rvec, z):
 
 ## Calculate moving average of energy
 
-window_size = 10; i = 0; moving_averages = []
+window_size = 500; i = 0; moving_averages = []
 moving_average_length = len(Energy_local) - window_size + 1
 moving_average_linspace = np.linspace(0, moving_average_length, moving_average_length)
 while i < moving_average_length:
@@ -68,7 +69,9 @@ while i < moving_average_length:
 
 fig_energy, ax_energy = plt.subplots(1,1, figsize=(10,5))
 ax_energy.plot(steps, Energy_local, alpha = 0.5, label = "Measured energy")
-ax_energy.plot(moving_average_linspace, moving_averages, 'k--', label = "Moving average of energy")
+ax_energy.plot(moving_average_linspace, moving_averages, 'b--', label = "Moving average of energy")
+ax_energy.hlines(y=average_energy, xmin=0, xmax=n_steps, linewidth=2, color='r', linestyles='--', label = f"E_average = {average_energy}")
+#ax_energy.text(0, average_energy * (1-0.05), f"E_average = {average_energy}")
 ax_energy.set_xlabel("Steps [a.u.]", fontsize=15)
 ax_energy.set_ylabel("Energy [a.u.]", fontsize=15)
 ax_energy.set_title(f'Local energy, averaged with window of {window_size}, alpha = {alpha}', fontsize=15)
