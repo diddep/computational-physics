@@ -169,3 +169,9 @@ save_matrix_to_csv(
 
 gsl_rng *
 init_random_num_generator();
+
+double variance(
+        double *quantity_vec,
+        int number_of_elements
+        );
+

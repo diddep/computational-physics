@@ -317,3 +317,16 @@ init_random_num_generator()
     gsl_rng_set(r, seed);
     return r;
 }
+
+double variance(double *quantity_vec, int number_of_elements)
+{
+    double average=0, average_square=0, variance=0;
+
+    for(int element=0; element<number_of_elements; ++element)
+    {
+        average += quantity_vec[element] / number_of_elements;
+        average_square += pow(quantity_vec[element],2) / number_of_elements;
+    }
+    variance = average_square- pow(average,2);
+    return variance;
+}
