@@ -197,7 +197,7 @@ run(
     // alpha Parameters
     int n_alpha_steps; double A, beta, E_average;
 
-    bool is_task1 = true, is_task2 = false, is_task3 = false, is_task4 = false;
+    bool is_task1 = false, is_task2 = true, is_task3 = false, is_task4 = false;
 
     if(is_task1)
     {
@@ -206,7 +206,7 @@ run(
     }
     if(is_task2)
     {
-        N_steps = 2e3; N_discarded_steps = 0; alpha = 0.1, d_displacement = 5; 
+        N_steps = 1e4; N_discarded_steps = 0; alpha = 0.1, d_displacement = 5; 
         n_alpha_steps = 1; A = 0.; beta = 0.; 
     }
     if(is_task3)
@@ -249,8 +249,8 @@ run(
         printf("Iteration: %d\n", ix);
     }
 
-    double alpha_param_vector[] = {n_alpha_steps, A, beta, N_steps, d_displacement};
-    save_vector_to_csv(alpha_param_vector, 5, filename_alpha_params, true);
+    double alpha_param_vector[] = {n_alpha_steps, N_discarded_steps, alpha, A, beta, N_steps, d_displacement, is_task1, is_task2, is_task3, is_task4};
+    save_vector_to_csv(alpha_param_vector, 11, filename_alpha_params, true);
 
     destroy_2D_array(R1, N_steps); destroy_2D_array(R2, N_steps);
     free(E_local_derivative);
