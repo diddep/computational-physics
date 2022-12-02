@@ -204,7 +204,7 @@ int run()
     double m[N_PARTICLES];
 
     // Setting constants
-    double kappa = 1, alpha = 0.01;
+    double kappa = 1, alpha = 0.1;
 
     // Set initial conditions for v, q and m (mass is just one)
     set_initial_condition((double*) v, (double*) q, (double*) m);
