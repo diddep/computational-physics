@@ -215,7 +215,7 @@ run(
         alpha -= gamma * E_PD_average;
 
         double alpha_result_vector[] = {ix, E_average, alpha, gamma, E_PD_average};
-        if(ix == 0){ open_with_write = true; } else { open_with_write = false; }
+        if(ix == 1){ open_with_write = true; } else { open_with_write = false; }
         save_vector_to_csv(alpha_result_vector, 5, filename_alpha_results, open_with_write);
         printf("Iteration: %d\n", ix);
     }
