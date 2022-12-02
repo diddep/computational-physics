@@ -89,14 +89,16 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     char filename_R1[] = {"R1.csv"}, filename_R2[] = {"R2.csv"};
     char filename_energy[] = {"E_local.csv"}, filename_xdist[] = {"x_distribution.csv"}, filename_theta[] = {"theta.csv"};
     char filename_energy_derivative[] = {"E_local_derivative.csv"};
-    char filename_results[] = {"MCMC_results.csv"}, filename_phi_k[] ={"phi_k.csv"};
+    char filename_results[] = {"MCMC_results.csv"}, filename_phi_k[] ={"phi_k.csv"}, filename_block_avg[] ={"block_avg_vec.csv"};
     bool open_with_write;
     
      // Initializing arrays
     int n_phi_rows = 2*M_C+10;
+    int number_of_blocks = 3;
     double *E_local = malloc(sizeof(double) * N_steps);
     double *E_local_derivative = malloc(sizeof(double) * N_steps);
     double *Phi_k_vec = malloc(sizeof(double) *n_phi_rows);
+    double *block_average_vec = malloc(sizeof(double) *number_of_blocks);
     double *theta_chain = malloc(sizeof(double) * N_steps);
     double *x_chain = malloc(sizeof(double) * N_steps);
     
@@ -166,8 +168,12 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     theta_fun(theta_chain, N_steps, R1, R2);
     x_distribution(x_chain, N_steps, R1,R2);
     double statistical_inefficiency = correlation_function(Phi_k_vec, E_local, N_steps, M_C);
+    printf("statistical inefficiency from correlation function= %f\n", statistical_inefficiency);
+    statistical_inefficiency=0;
+    statistical_inefficiency = block_average(block_average_vec,E_local, N_steps, number_of_blocks);
+
     //printf("Accept_count = %d \n", accept_count);
-    printf("statistical inefficiency = %f\n", statistical_inefficiency);
+    printf("statistical inefficiency from block averaging= %f\n", statistical_inefficiency);
     
     // Save in csv:s
     save_matrix_to_csv(R1, N_steps, NDIM, filename_R1);
@@ -180,7 +186,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     save_vector_to_csv(Phi_k_vec, n_phi_rows, filename_phi_k, open_with_write);
 
     // Destroy and free arrays
-    free(E_local), free(E_local_derivative), free(x_chain), free(theta_chain), free(Phi_k_vec);
+    free(E_local), free(E_local_derivative), free(x_chain), free(theta_chain), free(Phi_k_vec), free(block_average_vec);
     gsl_rng_free(r);
 
     return average_E_local;
@@ -206,7 +212,7 @@ run(
     }
     if(is_task2)
     {
-        N_steps = 1e4; N_discarded_steps = 0; alpha = 0.1, d_displacement = 5; 
+        N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
         n_alpha_steps = 1; A = 0.; beta = 0.; 
     }
     if(is_task3)

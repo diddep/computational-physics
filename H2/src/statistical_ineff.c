@@ -57,13 +57,17 @@ double block_average(double *block_average_vec, double *E_local_vec, int N_steps
         for(int step=0; step<block_size; ++step)
         {
             //should maybe be [block*(block_size-1) +step]
-            average_i += E_local_vec[block*(block_size) +step] /number_of_blocks;
+            average_i += E_local_vec[block*(block_size) +step] /(block_size);
+            //printf("avava =%f\n", average_i);
         }
         block_average_vec[block] = average_i;
     }
 
     variance_block = variance(block_average_vec, number_of_blocks);
+    printf("block variance =%f\n",variance_block);
     variance_E_local = variance(E_local_vec, N_steps);
-    statistical_inneficiency = number_of_blocks* variance_block/variance_E_local;
+    printf("total variance =%f\n",variance_E_local);
+    statistical_inneficiency = (double) number_of_blocks* variance_block/variance_E_local;
+    printf("stateff = %f\n", statistical_inneficiency);
     return statistical_inneficiency;
 }
