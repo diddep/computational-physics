@@ -50,15 +50,18 @@ double correlation_function(double *Phi_k_vec ,double *E_local_vec, int N_steps,
 double block_average(double *block_average_vec, double *E_local_vec, int N_steps, int number_of_blocks)
 {
     int block_size = N_steps/number_of_blocks;
-    double average_i = 0; 
+    double average_i = 0, variance_block=0, variance_E_local=0; 
 
     for(int block=0; block< number_of_blocks; ++block)
     {
         for(int step=0; step<block_size; ++step)
         {
-            average_i += E_local_vec[block+step] /number_of_blocks;
+            //should maybe be [block*(block_size-1) +step]
+            average_i += E_local_vec[block*(block_size) +step] /number_of_blocks;
         }
         block_average_vec[block] = average_i;
     }
 
+    variance_block = variance(block_average_vec, number_of_blocks);
+    variance_E_local = variance(E_local_vec, N_steps);
 }
