@@ -198,11 +198,40 @@ run(
 
     initialize_positions((double **) R1, (double **) R2, (double) d_displacement);
     
-    MCMC_burn_in(N_discarded_steps, alpha, d_displacement, R1, R2);
+    int n_alpha_steps; double A, beta, E_average;
+    bool is_task1 = true, is_task2 = false, is_task3 = false, is_task4 = false;
+    
+    if(is_task1)
+    {
+        n_alpha_steps = 1;
+        A = 0., beta = 0.5;
+        E_average = 0;
+    }
+    if(is_task2)
+    {
+        n_alpha_steps = 1;
+        A = 0., beta = 0.5;
+        E_average = 0;
 
-    int n_alpha_steps = 50;
-    double A = 1., beta = 0.5; // beta from 0.5 to 1
-    double E_average = 0;
+        MCMC_burn_in(N_discarded_steps, alpha, d_displacement, R1, R2);
+    }
+    if(is_task3)
+    {
+        n_alpha_steps = 1;
+        A = 0., beta = 0.5;
+        E_average = 0;
+
+        MCMC_burn_in(N_discarded_steps, alpha, d_displacement, R1, R2);
+    }
+    if(is_task4)
+    {
+        n_alpha_steps = 50;
+        A = 1., beta = 0.5; // beta from 0.5 to 1
+        E_average = 0;
+
+        MCMC_burn_in(N_discarded_steps, alpha, d_displacement, R1, R2);
+    }
+
 
     for(int ix = 1; ix < n_alpha_steps + 1; ix++)
     {
