@@ -74,7 +74,7 @@ fig_theta, ax_theta = plt.subplots(1,2)
 #ax_theta.stairs(counts_theta, bins_theta)
 counts_x, bins_x = np.histogram(arr_theta[:,1], bins = n_bins, density = True)
 
-counts_theta, bins_theta = np.histogram(np.accos(arr_theta[:,1]), bins = n_bins, density = True)
+counts_theta, bins_theta = np.histogram(np.arccos(arr_theta[:,1]), bins = n_bins, density = True)
 ax_theta[0].stairs(counts_x, bins_x, fill = True)
 ax_theta[0].set_title('Distribution for x')
 ax_theta[0].set_xlabel('x')
