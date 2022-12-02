@@ -69,12 +69,22 @@ ax_dist.stairs(counts_xdist, bins_xdist)
 
 fig_dist.savefig('plots_python/x_distribution.png')
 
-fig_theta, ax_theta = plt.subplots(1,1)
+fig_theta, ax_theta = plt.subplots(1,2)
 #counts_theta, bins_theta = np.histogram(x, bins = 10, density = True)
 #ax_theta.stairs(counts_theta, bins_theta)
-counts_theta, bins_theta = np.histogram(arr_theta[:,1], bins = n_bins, density = True)
-ax_theta.stairs(counts_theta, bins_theta)
+counts_x, bins_x = np.histogram(arr_theta[:,1], bins = n_bins, density = True)
 
+counts_theta, bins_theta = np.histogram(np.cos(arr_theta[:,1]), bins = n_bins, density = True)
+ax_theta[0].stairs(counts_x, bins_x, fill = True)
+ax_theta[0].set_title('Distribution for x')
+ax_theta[0].set_xlabel('x')
+ax_theta[0].set_ylabel('Density')
+
+ax_theta[1].stairs(counts_theta, bins_theta, fill = True)
+ax_theta[1].set_title(r'Distribution for $\theta$')
+ax_theta[1].set_xlabel(r'$\theta$ [rad]')
+ax_theta[1].set_ylabel('Density')
+plt.tight_layout()
 fig_theta.savefig('plots_python/theta.png')
 
 
