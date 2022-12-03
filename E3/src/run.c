@@ -24,6 +24,7 @@ void get_points(double *array_of_points, int number_of_points, double lower_boun
 }
 
 // FIXME: Incorrect transform method (see page 9 in MC lecture notes)
+// TODO: Make three dimensional?
 void pdf_transformed_points_task2(double *array_of_points, int number_of_points)
 {
     for(int ix = 0; ix < number_of_points; ix++)
@@ -32,57 +33,92 @@ void pdf_transformed_points_task2(double *array_of_points, int number_of_points)
     }
 }
 
-double function_value_task1(double point_to_evaluate)
+// TODO: Update transform to relevant function
+//TODO: Make three dimensional
+void pdf_transformed_points_task3(double *array_of_points, int number_of_points)
 {
-    return point_to_evaluate * (1 - point_to_evaluate);
-}
-
-// TODO: Update with new 3d function
-double function_value_task3(double point_to_evaluate)
-{
-    return point_to_evaluate * (1 - point_to_evaluate);
-}
-
-double weight_function_task2(double point_to_evaluate)
-{
-    return sin(M_PI * point_to_evaluate);
-}
-
-// TODO: Update with new 3d function
-double weight_function_task3(double point_to_evaluate)
-{
-    return sin(M_PI * point_to_evaluate);
-}
-
-void evaluate_integral(double *array_of_points, int number_of_points, double *integral_results, bool is_integral_1, bool is_weighted)
-{
-    double integral_value = integral_results[0], integral_std = integral_results[1];
-    double variance = 0, function_value = 0, weight_function = 1; 
-
     for(int ix = 0; ix < number_of_points; ix++)
     {
+        array_of_points[ix] = acos(array_of_points[ix])/M_PI;
+    }
+}
 
-        if(is_integral_1)
+// TODO: Update and make loop through all steps
+// TODO: Return vector with length number_of_points
+double function_value_task1(double *point_to_evaluate)
+{
+    double x_coord = point_to_evaluate[0], y_coord = point_to_evaluate[1], z_coord = point_to_evaluate[2];
+    return x_coord * (1 - x_coord);
+}
+
+// TODO: Update and make loop through all steps
+// TODO: Return vector with length number_of_points
+double function_value_task3(double *point_to_evaluate)
+{
+    double x_coord = point_to_evaluate[0], y_coord = point_to_evaluate[1], z_coord = point_to_evaluate[2];
+    
+    double factor_1 = pow(M_PI,(double) -3./2.);
+    double factor_2 = pow(x_coord, 2.) + pow(x_coord * y_coord, 2.)  + pow(x_coord * y_coord * z_coord, 2.);
+    double factor_3 = exp(-(pow(x_coord, 2.) + pow(y_coord, 2.) +pow(z_coord, 2.)));
+    
+    return factor_1 * factor_2 * factor_3;
+}
+
+double weight_function_task2(double *point_to_evaluate)
+{
+    double x_coord = point_to_evaluate[0], y_coord = point_to_evaluate[1], z_coord = point_to_evaluate[2];
+
+    return sin(M_PI * x_coord);
+}
+
+double weight_function_task3(double *point_to_evaluate)
+{
+    double x_coord = point_to_evaluate[0], y_coord = point_to_evaluate[1], z_coord = point_to_evaluate[2];
+
+    double factor_1 = pow(M_PI,(double) -3./2.);
+    double factor_3 = exp(-(pow(x_coord, 2.) + pow(y_coord, 2.) +pow(z_coord, 2.)));
+    
+    return factor_1 * factor_3;
+}
+
+// TODO: Make array_of_points carry x, y and z coordinate
+void evaluate_integral(double **array_of_points, int number_of_points, double *integral_results, bool is_integral_1, bool is_weighted)
+{
+    double integral_value = integral_results[0], integral_std = integral_results[1];
+    double variance = 0, weight_function = 1; int ndim;
+    double *function_value = calloc(number_of_points, sizeof(double));
+
+    if(is_integral_1)
+    {
+        ndim = 1;
+        function_value = function_value_task1(array_of_points);
+        if(is_weighted)
         {
-            function_value = function_value_task1(array_of_points[ix]);
-            if(is_weighted)
+            weight_function = weight_function_task2(array_of_points);
+            for(int ix = 0; ix < number_of_points; ix++)
             {
-                weight_function = weight_function_task2(array_of_points[ix]);
-                function_value /= weight_function;
-            }
-        } 
-        else {
-            function_value = function_value_task3(array_of_points[ix]);
-            if(is_weighted)
-            {
-                weight_function = weight_function_task3(array_of_points[ix]);
-                function_value /= weight_function;
+                function_value[ix] /= weight_function;
             }
         }
+    } else {
+        ndim = 3;
+        function_value = function_value_task3(array_of_points);
+        if(is_weighted)
+        {
+            weight_function = weight_function_task3(array_of_points);
+            for(int ix = 0; ix < number_of_points; ix++)
+            {
+                function_value[ix] /= weight_function;
+            }
+        }
+    }
+    
+    for(int ix = 0; ix < number_of_points; ix++)
+    {
+        integral_value += function_value[ix] / number_of_points;
+        variance += pow(function_value[ix], 2.) / number_of_points \
+                    - pow(function_value[ix] / number_of_points, 2.); 
 
-        integral_value += function_value / number_of_points;
-        variance += pow(function_value, 2.) / number_of_points \
-                    - pow(function_value / number_of_points, 2.); 
     }
 
     integral_std = sqrt(variance / number_of_points);
@@ -101,16 +137,37 @@ void MCMC_integration(bool is_integral_1, bool is_weighted, int number_of_calcul
 
     for(int ix = 0; ix < number_of_calculations; ix++)
     {   
-        int number_of_points = pow((int) 10., (int) ix + 1);
-        double *array_of_points = calloc(number_of_points, sizeof(double));
-        double lower_bound = 0, upper_bound = 1;
-
-        get_points(array_of_points, number_of_points, lower_bound, upper_bound);
-        if(is_integral_1 && is_weighted)
+        double **array_of_points; int number_of_points, ndim;
+        if(is_integral_1)
         {
-            pdf_transformed_points_task2(array_of_points, number_of_points);
+            ndim = 1;
+            number_of_points = pow((int) 10., (int) ix + 1);
+            // TODO: dimension of array of points need to be flipped, make sync with other functions
+            array_of_points = create_2D_array(ndim, number_of_points);
+            double lower_bound = 0, upper_bound = 1;
+            get_points(array_of_points[0], number_of_points, lower_bound, upper_bound);
+
+            if(is_weighted)
+            {
+                pdf_transformed_points_task2(array_of_points[0], number_of_points);
+            }
+        } else {
+            ndim = 3;
+            number_of_points = 1e4;
+            array_of_points = create_2D_array(number_of_points, ndim);
+
+            // TODO: Update lower and upper bounds
+            double lower_bound = 0, upper_bound = 1;
+            for(int jx = 0; jx < ndim; jx++)
+            {
+                get_points(array_of_points[jx], number_of_points, lower_bound, upper_bound);
+            } 
+            if(is_weighted)
+                {
+                    pdf_transformed_points_task3(array_of_points, number_of_points);
+                }
         }
-        
+       
         double integral_value = 0, integral_std = 0;
         double integral_results[2]; integral_results[0] = integral_value;  integral_results[1] = integral_std;
 

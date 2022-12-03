@@ -75,7 +75,7 @@ create_2D_array(
 
     double** array = (double**)calloc(row_size, sizeof(double*));
     for (int i = 0; i < row_size; ++i) {
-        array[i] = malloc(column_size * sizeof(double));
+        array[i] = calloc(column_size, sizeof(double));
     }
     return array;
 }
