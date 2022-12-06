@@ -152,7 +152,7 @@ void evaluate_integral(double **array_of_points, int number_of_points, double *i
     integral_results[1] = integral_std; 
 }
 
-void MCMC_integration(bool is_integral_1, bool is_weighted, int number_of_calculations, int number_of_results)
+void MC_integration(bool is_integral_1, bool is_weighted, int number_of_calculations, int number_of_results)
 {
     double **calculation_results = create_2D_array(number_of_calculations, number_of_results);
     // TODO: When switching from task 1 to task3, change file-filder in name below
@@ -210,11 +210,95 @@ void MCMC_integration(bool is_integral_1, bool is_weighted, int number_of_calcul
     gsl_rng_free(r);
 }
 
+double probability_task_3(double *coordinate_vec)
+{
+    double probability =0;
+    double x= coordinate_vec[0];
+    double y = coordinate_vec[1];
+    double z = coordinate_vec[2];
+    double arg = -(x*x + y*y + z*z);
+
+    probability = exp(arg);
+    return probability;
+}
+
+double integrand_task_3(double** mcmc_chain, double *integrand_chain ,int N_samples)
+{
+    double integrand = 0, integrand_average=0;
+    double x=0, y=0,z=0; 
+    char filename_integrand[] = {"integrand_chain_task3.csv"};
+    double denominator = pow(M_PI, (double) 3/2);
+
+    
+    for(int step=0; step< N_samples; ++step)
+    {   
+        x = mcmc_chain[step][0], y = mcmc_chain[step][1], z =mcmc_chain[step][2];
+        integrand = (x*x +x*x*y*y+x*x*y*y*z*z)*exp(-(x*x + y*y + z*z));
+        integrand /= denominator; 
+        integrand_chain[step]= integrand;
+        integrand_average += integrand/N_samples;
+    }
+    bool open_with_write = true;
+    save_vector_to_csv(integrand_chain, N_samples, filename_integrand, open_with_write);
+
+    return integrand_average;
+}
+
+void markov_chain_monte_carlo(double **mcmc_chain, int N_samples, double step_size)
+{
+    gsl_rng *r;
+    r = init_random_num_generator();
+    int dimension=3, accepts=0;
+    double test_position[dimension], old_position[dimension];
+    double random_number = 0, probability_new=0, probability_old=0;
+    char filename_mcmc[] = {"mcmc_chain_task3.csv"};
+    for(int coordinate=0; coordinate<dimension; ++coordinate)
+    {
+        random_number = gsl_ran_flat(r, -0.5,0.5);
+        mcmc_chain[0][coordinate] = step_size*random_number;
+    }
+
+    for(int step=0; step< N_samples-1; ++step)
+    {
+        for(int coordinate=0; coordinate< dimension; ++coordinate)
+        {
+            old_position[coordinate] = mcmc_chain[step][coordinate];
+        }
+        for(int coordinate=0; coordinate< dimension; ++coordinate)
+        {
+            random_number = gsl_ran_flat(r, -0.5,0.5);
+            test_position[coordinate] = mcmc_chain[step][coordinate] + step_size*random_number;
+        }
+        probability_new =probability_task_3(test_position);
+        probability_old = probability_task_3(old_position);
+
+        if(probability_new> probability_old||probability_new/probability_old>gsl_ran_flat(r, 0.0, 1.0))
+        {
+            accepts+=1;
+
+            for(int coordinate=0; coordinate< dimension; ++coordinate)
+            {
+                mcmc_chain[step+1][coordinate] = test_position[coordinate];
+            }
+        }
+        else
+        {
+            for(int coordinate=0; coordinate< dimension; ++coordinate)
+            {
+                mcmc_chain[step+1][coordinate] = old_position[coordinate];
+            }
+        }
+    }
+    save_matrix_to_csv(mcmc_chain, N_samples, dimension, filename_mcmc);
+
+    gsl_rng_free(r);
+}
+
 void task1()
 {
     bool is_integral_1 = true, is_weighted = true;
     int number_of_calculations = 4, number_of_results = 2;
-    MCMC_integration(is_integral_1, is_weighted, number_of_calculations ,number_of_results);
+    MC_integration(is_integral_1, is_weighted, number_of_calculations ,number_of_results);
 
 }
 
@@ -222,12 +306,27 @@ void task3()
 {
     bool is_integral_1 = false, is_weighted = true;
     int number_of_calculations = 1, number_of_results = 2;
-    MCMC_integration(is_integral_1, is_weighted, number_of_calculations, number_of_results);
+    MC_integration(is_integral_1, is_weighted, number_of_calculations, number_of_results);
+}
+
+void task3_correct()
+{
+    int N_samples = 100000, dimension=3; 
+    double step_size = 0.5;
+    double **mcmc_chain = create_2D_array(N_samples, dimension);
+    double *integrand_chain= malloc(sizeof(double)*N_samples);
+    markov_chain_monte_carlo(mcmc_chain, N_samples,step_size);
+    double integral = integrand_task_3(mcmc_chain, integrand_chain, N_samples);
+
+    destroy_2D_array(mcmc_chain, N_samples);
+    free(integrand_chain);
+    printf("integral value = %f\n", integral);
 }
 
 int
 run(int argc, char *argv[])
 {
     //task1();
-    task3();
+    //task3();
+    task3_correct();
 }
