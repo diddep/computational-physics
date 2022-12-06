@@ -41,6 +41,7 @@ double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, dou
     char filename_result_prod[] = {"../csv/vel_verlet_prod.csv"};
     char filename_pos_prod[] = {"../csv/position_track_prod.csv"};
     char filename_param_prod[] = {"../csv/parameters_prod.csv"};
+    bool is_write;
     
     //Creating empty arrays
     //double v[nbr_atoms][n_cols];
@@ -140,7 +141,7 @@ double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, dou
             // Value of tau_P is uncertain, and unsure if we should mult. by dt. Have heard slightly more than 50.
             tau_P = 25 * dt;
 
-            // isothermal compressability for aluminium in Gpa^-1
+            // Isothermal compressability for aluminium in Gpa^-1
             double kappa_T = 0.01385*1e-4; // Neg eller pos?
 
             // Unsure if plus or minus. Scaling with "correct" sign seams to change pressure in wrong direction
@@ -157,19 +158,20 @@ double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, dou
                                              temp_inst_per_unitcell};
 
         // Saving results to csv files
+        if(tx==0){is_write = write_not_append;} else {is_write = false;};
         if(temp_scaling == true || press_scaling == true)
-        {   save_vector_to_csv(result_vec, 9, filename_result, write_not_append); // true -> fopen with "w"
-            save_vector_to_csv(position_track_vec, 10, filename_pos, write_not_append); // false -> fopen with "a"
+        {   save_vector_to_csv(result_vec, 9, filename_result, is_write); // true -> fopen with "w"
+            save_vector_to_csv(position_track_vec, 10, filename_pos, is_write); // false -> fopen with "a"
             if(tx == n_timesteps){
-                save_vector_to_csv(parameter_vec, 9, filename_param, write_not_append);
+                save_vector_to_csv(parameter_vec, 9, filename_param, is_write);
             }
             printf("Calibration: Inst. Temp, Press at t = [%i]: %f,   %f\n", tx, temp_inst_per_unitcell, press_inst_per_unitcell);
         } else {
-            save_vector_to_csv(result_vec, 9, filename_result_prod, write_not_append); // true -> fopen with "w"
-            save_vector_to_csv(position_track_vec, 10, filename_pos_prod, write_not_append); // false -> fopen with "a"
+            save_vector_to_csv(result_vec, 9, filename_result_prod, is_write); // true -> fopen with "w"
+            save_vector_to_csv(position_track_vec, 10, filename_pos_prod, is_write); // false -> fopen with "a"
 
             if(tx == n_timesteps){
-                save_vector_to_csv(parameter_vec, 9, filename_param_prod, write_not_append);
+                save_vector_to_csv(parameter_vec, 9, filename_param_prod, is_write);
             }
             printf("Production: Inst. Temp, Press at t = [%i]: %f,   %f\n", tx, temp_inst_per_unitcell, press_inst_per_unitcell);
         }

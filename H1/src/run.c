@@ -13,6 +13,23 @@
 #include <gsl/gsl_randist.h>
 #include <time.h>
 
+void H1_task1(), H1_task2(), H1_task3(), H1_task4();
+
+int
+run(
+    int argc,
+    char *argv[]
+   )
+{
+    //H1_task1();
+    //H1_task2();
+    H1_task3();
+    //H1_task3();
+    //H1_task4();
+
+    return 0;
+}
+
 void 
 H1_task1()
 {
@@ -42,13 +59,14 @@ H1_task2()
     }
 
     // Choosing lattice param
-    //TODO: update lattice param to true in all functions?
-    double lattice_param = 4.05; // True is around 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
+    double lattice_param = 4.03; // True is around 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
     double cell_length = 4 * lattice_param;
     
     // Initialice and displace fcc
     init_fcc((double (*)[3]) position, (int) n_unitcells, (double) lattice_param); // 4 unit cells in each direction
     
+    displace_fcc((double (*)[3]) position, (int) n_unitcells, (double) lattice_param);
+
     // Declaring parameters for velocity verlet. 
     // If temp/press_scaling = false scaling is turned off and scaling factors remains = 1
     int end_time; double dt;
@@ -60,7 +78,7 @@ H1_task2()
     temp_scaling = false, press_scaling = false;
     temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
     write_not_append = true;
-    velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
+    cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
                     (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append);
 }
 
@@ -79,7 +97,7 @@ H1_task3()
     }
 
     // Choosing lattice param
-    double lattice_param = 4.05; // True is around 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
+    double lattice_param = 4.03; // True is around 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
     double cell_length = 4 * lattice_param;
     
     // Initialice and displace fcc
@@ -128,7 +146,7 @@ H1_task4()
     }
 
     // Choosing lattice param
-    double lattice_param = 4.05; // True is around 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
+    double lattice_param = 4.03; // True is around 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
     double cell_length = 4 * lattice_param;
     
     // Initialice and displace fcc
@@ -173,17 +191,4 @@ H1_task4()
 
 }
 
-int
-run(
-    int argc,
-    char *argv[]
-   )
-{
-    H1_task1();
-    //H1_task2();
-    //H1_task3();
-    //H1_task3();
-    H1_task4();
 
-    return 0;
-}

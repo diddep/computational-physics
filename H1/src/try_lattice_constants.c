@@ -14,14 +14,14 @@
 double
 try_lattice_constants(int N_atoms, int n_rows, int n_cols){
     // Initializing values needed for task
-    double E_pot = 0; int n_lattice_params = 8;
+    double E_pot = 0; int n_lattice_params = 20;
     char filename_result[] = {"../csv/try_lattice_constants.csv"};
     char filename_params[] = {"../csv/try_lattice_constants_params.csv"};
-    double lattice_params[n_lattice_params]; double lattice_param_init = 4.05; // 4.0478; // Lattice_param, denoted a0 in document. Should be 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
+    double lattice_params[n_lattice_params]; double lattice_param_init = 4.03; // 4.0478; // Lattice_param, denoted a0 in document. Should be 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
     
     // Set print_q=true if we want to print the lattice_parameters code is looping through.
     // Lattice params is an array around lattice_param_init with lattice_param_spacing
-    bool print_q = false; double lattice_param_spacing = 0.05;
+    bool print_q = false; double lattice_param_spacing = 0.005;
     if(print_q = true){
         printf("n/2-ix, lattice_param \n");
         for(int ix = 0; ix < n_lattice_params; ix++){

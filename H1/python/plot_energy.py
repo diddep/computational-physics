@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 # set default figure size
 plt.rcParams["figure.figsize"] = [8, 6]
 
-str = "eq"
-#str = "prod"
+#str = "eq"
+str = "prod"
 
 # load data from file
-array = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',')
+array = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',', skip_header=1)
 parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
 
 end_time = parameters[-1,0]
@@ -22,12 +22,13 @@ tau_T = parameters[-1,7]
 tau_P = parameters[-1,8]
 
 # extract columns from array
-t = array[-1:,0]
-e_pot = array[-1:,2]
-e_kin = array[-1:,3]
-e_tot = array[-1:,4]
-temp = array[-1:,5]
-press = array[-1:,6]
+dt = array[0,0]
+t = dt * np.linspace(0,len(array[:,1]), len(array[:,1]))
+e_pot = array[:,2]
+e_kin = array[:,3]
+e_tot = array[:,4]
+temp = array[:,5]
+press = array[:,6]
 
 # create figure and axes for energy plot
 fig , ax = plt.subplots(1,1)
