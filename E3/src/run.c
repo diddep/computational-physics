@@ -12,19 +12,18 @@
 
 void get_points(double *array_of_points, int number_of_points, double lower_bound, double upper_bound, gsl_rng *r)
 {
-
     for(int ix = 0; ix < number_of_points; ix++)
     {
         array_of_points[ix] = gsl_ran_flat(r, lower_bound, upper_bound);
     }
 }
 
-// FIXME: Incorrect transform method (see page 9 in MC lecture notes)
+// FIXME: Mult. by pi in acos or not?
 void pdf_transformed_points_task2(double **array_of_points, int number_of_points)
 {
     for(int ix = 0; ix < number_of_points; ix++)
     {
-        array_of_points[0][ix] = acos(array_of_points[0][ix])/M_PI;
+        array_of_points[0][ix] = acos(-2.*array_of_points[0][ix] +1.) / M_PI;
     }
 }
 
@@ -54,7 +53,7 @@ void function_value_task1(double *function_value, double **array_of_points, int 
     }
 }
 
-void function_value_task3(double *function_value, double **array_of_points, int number_of_points)
+void function_value_task3_unweighted(double *function_value, double **array_of_points, int number_of_points)
 {
     for(int ix = 0; ix < number_of_points; ix++)
     {
@@ -67,12 +66,25 @@ void function_value_task3(double *function_value, double **array_of_points, int 
     }
 }
 
+void function_value_task3_weighted(double *function_value, double **array_of_points, int number_of_points)
+{
+    for(int ix = 0; ix < number_of_points; ix++)
+    {
+        double x_coord = array_of_points[0][ix], y_coord = array_of_points[1][ix], z_coord = array_of_points[2][ix];
+
+        double factor_1 = pow(M_PI,(double) -3./2.);
+        double factor_2 = pow(x_coord, 2.) + pow(x_coord * y_coord, 2.)  + pow(x_coord * y_coord * z_coord, 2.);
+        double factor_3 = exp(-(pow(x_coord, 2.) + pow(y_coord, 2.) +pow(z_coord, 2.)));
+        function_value[ix] = factor_2;
+    }
+}
+
 void weight_function_task2(double *weight_vector, double **array_of_points, int number_of_points)
 {
     for(int ix = 0; ix < number_of_points; ix++)
     {
         double x_coord = array_of_points[0][ix];
-        weight_vector[ix] = sin(M_PI * x_coord);
+        weight_vector[ix] = M_PI / 2. * sin(M_PI * x_coord);
     }
 }
 
@@ -114,9 +126,12 @@ void evaluate_integral(double **array_of_points, int number_of_points, double *i
         }
     } else {
         ndim = 3;
-        function_value_task3(function_value, array_of_points, number_of_points);
+        function_value_task3_unweighted(function_value, array_of_points, number_of_points);
+        
         if(is_weighted)
         {
+            //function_value_task3_weighted(function_value, array_of_points, number_of_points);
+        
             weight_function_task3(weight_function, array_of_points, number_of_points);
             for(int ix = 0; ix < number_of_points; ix++)
             {
