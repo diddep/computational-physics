@@ -7,13 +7,8 @@ plt.rcParams["figure.figsize"] = [8, 6]
 #str = "eq"
 str = "prod"
 
-<<<<<<< HEAD
 # load data from file
 array = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',', skip_header=1)
-=======
-# Load data from file
-array = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',')
->>>>>>> 7c70d814b9cd1ba92856c782a20ec01e79e0df20
 parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
 
 end_time = parameters[-1,0]
