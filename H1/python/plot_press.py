@@ -11,7 +11,6 @@ temp = array[:,5]
 press = array[:,6]
 
 dt = t[0]
-print(dt)
 
 fig3 , axP = plt.subplots(1,1)
 axP.plot(t, press, label='Pressure')
@@ -20,6 +19,6 @@ axP.set_ylabel('Pressure [Bar]', fontsize = 15)
 axP.set_title(f'Pressure over time with timestep dt={dt}, tau50', fontsize = 15)
 plt.legend(fontsize=10)
 plt.tight_layout()
-plt.savefig(f'../Press_plots/plot_P_dt{dt}_tau50.png')
+plt.savefig(f'plots/pressure.png')
 #plt.show()
 

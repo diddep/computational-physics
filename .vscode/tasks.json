@@ -31,6 +31,22 @@
                 "isDefault": true
             },
             "detail": "Carl: Custom task for building H2."
+        },
+        {
+            "type": "shell",
+            "label": "build H1",
+            "command": "make",
+            "args": [
+                "--directory=${workspaceFolder}/H1"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Carl: Custom task for building H1."
         }
     ],
     "version": "2.0.0"

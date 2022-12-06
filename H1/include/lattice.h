@@ -12,3 +12,6 @@
  *
  * ****************************************************************************/
 void init_fcc(double[][3], int, double);
+
+void
+displace_fcc(double positions[][3], int N, double lattice_param);

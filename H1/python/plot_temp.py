@@ -11,7 +11,6 @@ temp = array[:,5]
 press = array[:,6]
 
 dt = t[0]
-print(dt)
 
 fig2 , axT = plt.subplots(1,1)
 
@@ -24,4 +23,4 @@ axT.set_ylabel('Temperature [K]', fontsize = 15)
 axT.set_title(f'Temperature over time with timestep dt={dt}, tau=50', fontsize = 15)
 plt.legend(fontsize=10)
 plt.tight_layout()
-plt.savefig(f'../Temp_plots/plot_T_dt{dt}tau50.png')
+plt.savefig(f'plots/temperature.png')

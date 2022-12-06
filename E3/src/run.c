@@ -18,7 +18,6 @@ void get_points(double *array_of_points, int number_of_points, double lower_boun
     }
 }
 
-// FIXME: Mult. by pi in acos or not?
 void pdf_transformed_points_task2(double **array_of_points, int number_of_points)
 {
     for(int ix = 0; ix < number_of_points; ix++)
@@ -42,7 +41,6 @@ void pdf_transformed_points_task3(double **array_of_points, int number_of_points
     }
 }
 
-// TODO: Make functions into voids and take vectors as inputs
 void function_value_task1(double *function_value, double **array_of_points, int number_of_points)
 {
     double x_coord[number_of_points];
@@ -177,7 +175,6 @@ void MCMC_integration(bool is_integral_1, bool is_weighted, int number_of_calcul
 
             if(is_weighted)
             {
-                // TODO: pdf_transformed_points_task2 causes all points to become nan.
                 pdf_transformed_points_task2(array_of_points, number_of_points);
             }
         } else {

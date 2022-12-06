@@ -13,7 +13,6 @@ CFLAGS_SANITIZE = \
 		 -Wall \
 	 	 -pedantic \
 	 	 -g \
-	 	 -fsanitize=address \
 		 -fno-omit-frame-pointer \
 		 -Iinclude
 
@@ -26,7 +25,10 @@ OBJ = \
       obj/tools.o \
       obj/lattice.o \
       obj/potential.o \
-      obj/run.o
+      obj/run.o \
+	  obj/try_lattice_constants.o \
+	  obj/velocity_verlet.o
+
 MAIN = \
        obj/main.o
 
