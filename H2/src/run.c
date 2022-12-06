@@ -223,7 +223,7 @@ run(
     if(is_task4)
     {
         N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
-        n_alpha_steps = 50; A = 1.; beta = 0.5; // beta from 0.5 to 1
+        n_alpha_steps = 50; A = 1.; beta = 1.; // beta from 0.5 to 1
     }
 
     double **R1 = create_2D_array(N_steps, NDIM), **R2 = create_2D_array(N_steps,NDIM), E_PD_average;

@@ -1,0 +1,56 @@
+{
+    "configurations": [
+        
+        {
+            "name": "(gdb) Launch E3",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/E3/E3", //"${workspaceFolder}/E3/E3" runs E3, was "enter program name, for example ${workspaceFolder}/a.out"
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}", //was fileDirname
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "build E3"
+        },
+        {
+            "name": "(gdb) Launch H2",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/H2/H2", //"${workspaceFolder}/E3/E3" runs E3, was "enter program name, for example ${workspaceFolder}/a.out"
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}", //was fileDirname
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "build H2"
+        }
+    ],
+    "version": "2.0.0"
+}
