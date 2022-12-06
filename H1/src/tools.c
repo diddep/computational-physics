@@ -330,3 +330,4 @@ double variance(double *quantity_vec, int number_of_elements)
     variance = average_square- pow(average,2);
     return variance;
 }
+
