@@ -18,6 +18,6 @@ def invert_pdf_colors(filepath):
   writer = PdfWriter()
   writer.write(filepath + '_inverted.pdf', reader)
 
-arg ="test.pdf"
+arg ="book.pdf"
 
 invert_pdf_colors(arg)
