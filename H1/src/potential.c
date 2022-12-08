@@ -486,8 +486,9 @@ void get_radial_dist_AL(int number_of_bins, double *radial_histogram_vector, dou
 
       /*Add position into bin depending on radial size*/
       rij = sqrt( rij_sq );
-          
-      int bin = (int) floor( bin_length * rij - 0.5);
+      
+      int bin = (int) floor(  rij/bin_length + 0.5);
+      //printf("bin= %d\n", bin);
 
       radial_histogram_vector[bin] +=1;
 
