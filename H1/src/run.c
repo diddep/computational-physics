@@ -253,7 +253,7 @@ H1_task6()
     // Production run
     end_time = 50; dt = 1e-2;
     temp_scaling = false, press_scaling = false;
-    temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
+    temp_eq = 973.15; press_eq = 1; //773.15 K och 1 Bar
     write_not_append = false;
 
     int number_of_bins = 300;
