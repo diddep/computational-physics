@@ -42,4 +42,4 @@ double get_energy_AL(double[][3], double, int);
  * ****************************************************************************/
 double get_virial_AL(double[][3], double, int);
 
-void get_radial_dist_AL(double bin_length, double radial_histogram_vector[], double positions[][3], double cell_length, int nbr_atoms);
+void get_radial_dist_AL(int number_of_bins, double *radial_histogram_vector, double positions[][3], double cell_length, int nbr_atoms);
