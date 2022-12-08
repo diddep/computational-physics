@@ -3,10 +3,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set()
 
-#str = "eq"
-str = "prod"
+str = "eq"
+#str = "prod"
 
-array = np.genfromtxt(f'../position_track_{str}.csv', delimiter=',', skip_header=1)#.reshape(-1,7)
+# load data from file
+array = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',', skip_header=1)
+parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
+array_prod = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',', skip_header=1)
+parameters_prod = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
 
 q1x = array[:,1]
 q1y = array[:,2]
@@ -17,8 +21,6 @@ q2z = array[:,6]
 q3x = array[:,7]
 q3y = array[:,8]
 q3z = array[:,9]
-
-parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
 
 end_time = parameters[-1,0]
 dt = parameters[-1,1]

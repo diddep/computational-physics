@@ -6,12 +6,14 @@ sns.set()
 # set default figure size
 plt.rcParams["figure.figsize"] = [8, 6]
 
-# str = "eq"
-str = "prod"
+str = "eq"
+#str = "prod"
 
 # load data from file
 array = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',', skip_header=1)
 parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
+array_prod = np.genfromtxt(f'../csv/vel_verlet_prod.csv', delimiter=',', skip_header=1)
+parameters_prod = np.genfromtxt(f'../csv/parameters_prod.csv', delimiter=',')
 
 end_time = parameters[-1,0]
 dt = parameters[-1,1]
@@ -39,10 +41,11 @@ ax.plot(t, lattice_length, label='Lattice parameter')
 # set labels and title
 ax.set_xlabel('Time (ps)', fontsize = 15)
 ax.set_ylabel('Lattice parameter (Å)', fontsize = 15)
-if(str == "eq"):
-    ax.set_title(f'Lattice parameter, dt={dt}, $\tau_T$={tau_T}, $\tau_P$={tau_P}', fontsize = 15)
-else:
-    ax.set_title(f'Lattice parameter, dt={dt}', fontsize = 15)
+ax.set_title(f'Lattice parameter, dt={dt}', fontsize = 15)
+# if(str == "eq"):
+#     ax.set_title(f'Lattice parameter, dt={dt}, $tau_T$={tau_T}, $tau_P$={tau_P}', fontsize = 15)
+# else:
+#     ax.set_title(f'Lattice parameter, dt={dt}', fontsize = 15)
 plt.legend(fontsize=10)
 plt.tight_layout()
 plt.savefig(f'plots/lattice.png')

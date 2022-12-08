@@ -6,12 +6,16 @@ sns.set()
 # set default figure size
 plt.rcParams["figure.figsize"] = [8, 6]
 
-#str = "eq"
-str = "prod"
+str = "eq"
+#str = "prod"
 
 # load data from file
 array = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',', skip_header=1)
 parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
+array_prod = np.genfromtxt(f'../csv/vel_verlet_prod.csv', delimiter=',', skip_header=1)
+parameters_prod = np.genfromtxt(f'../csv/parameters_prod.csv', delimiter=',')
+
+array=array_prod
 
 end_time = parameters[-1,0]
 dt = parameters[-1,1]
@@ -47,10 +51,11 @@ axes[1].set_title(f'Kinetic Energy, dt={dt} (ps)', fontsize = 15)
 # plot total energy on third subplot
 axes[2].plot(t, e_tot, label='Total energy', color="g")
 axes[2].set_title(f'Total Energy, dt={dt} (ps)', fontsize = 15)
+axes[2].ticklabel_format(useOffset=False)
 
 for idx in range(3):
     axes[idx].set_xlabel('Time (ps)', fontsize = 15)
-    axes[idx].set_ylabel('Potential Energy (eV/unit cell)', fontsize = 15)
+    axes[idx].set_ylabel('Energy (eV/unit cell)', fontsize = 15)
     axes[idx].legend(fontsize=10)
 
 # # create figure and axes for energy plot
