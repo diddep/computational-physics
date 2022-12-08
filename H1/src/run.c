@@ -256,7 +256,7 @@ H1_task6()
     temp_eq = 973.15; press_eq = 1; //773.15 K och 1 Bar
     write_not_append = false;
 
-    int number_of_bins = 300;
+    int number_of_bins = 100;
     double *radial_distribution_vector = calloc(sizeof(double),  number_of_bins);
     char filename_radial_dist[] = {"../csv/radial_distribution.csv"};
 

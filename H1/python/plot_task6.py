@@ -30,7 +30,7 @@ fig, ax_radial = plt.subplots(1,1)
 array = (array/ideal)
 
 max =np.max(array)
-conv = 3/max
+conv = 1#3/max
 
 ax_radial.plot(bin_array*delta_r, array*conv)
 ax_radial.set_xlim(0,4)
