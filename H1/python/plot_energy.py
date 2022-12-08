@@ -38,15 +38,15 @@ fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(12, 4))
 
 # plot potential energy on first subplot
 axes[0].plot(t, e_pot, label='Potential energy', color="b")
-axes[0].set_title('Potential Energy', fontsize = 15)
+axes[0].set_title(f'Potential Energy, dt={dt} (ps)', fontsize = 15)
 
 # plot kinetic energy on second subplot
 axes[1].plot(t, e_kin, label='Kinetic energy', color="r")
-axes[1].set_title('Kinetic Energy', fontsize = 15)
+axes[1].set_title(f'Kinetic Energy, dt={dt} (ps)', fontsize = 15)
 
 # plot total energy on third subplot
 axes[2].plot(t, e_tot, label='Total energy', color="g")
-axes[2].set_title('Total Energy', fontsize = 15)
+axes[2].set_title(f'Total Energy, dt={dt} (ps)', fontsize = 15)
 
 for idx in range(3):
     axes[idx].set_xlabel('Time (ps)', fontsize = 15)

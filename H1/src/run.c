@@ -171,6 +171,7 @@ H1_task4()
     end_time = 10; dt = 1e-2;
     temp_scaling = true; press_scaling = true;
     temp_eq = 3000; press_eq = 1; //773.15 K och 1 Bar
+    tau_T = 50*dt; tau_P = 5*dt;
     write_not_append = true;
 
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
@@ -232,6 +233,7 @@ H1_task6()
     end_time = 10; dt = 1e-2;
     temp_scaling = true; press_scaling = true;
     temp_eq = 3000; press_eq = 1; //773.15 K och 1 Bar
+    tau_T = 50*dt; tau_P = 5*dt;
     write_not_append = true;
 
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
@@ -260,7 +262,7 @@ H1_task6()
     cell_length = velocity_verlet_deluxe((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
                     (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T, radial_distribution_vector, number_of_bins);
 
-    for(int bin=0; bin<number_of_bins; ++bin)
+    for(int bin = 0; bin<number_of_bins; ++bin)
     {   
         //also need to divide by number of time steps
         radial_distribution_vector[bin] /=((double)number_of_bins); 

@@ -19,14 +19,25 @@ press = array[:,6]
 
 dt = parameters[-1,1]
 
-#dt = t[0]
-#dt = array[0,0]
+average_temperature = np.mean(array[:,5])
+print(average_temperature)
+
 t = dt * np.linspace(0,len(array[:,1]), len(array[:,1]))
 
 fig2 , axT = plt.subplots(1,1)
 
 axT.plot(t, temp, label='Temperature')
 
+
+# add dashed line for the average energy
+axT.axhline(
+    average_temperature,
+    linestyle='--',
+    color='k',
+    linewidth=2
+)
+axT.annotate(f'Average temperature$_{{min}}$ = {average_temperature:.3f}', xy=(t[-10], average_temperature), xytext=(-50, 100),
+            textcoords='offset pixels', arrowprops=dict(arrowstyle='->', color='k'))
 
 plt.legend(fontsize=10)
 axT.set_xlabel('Time (ps)', fontsize = 15)
