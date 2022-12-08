@@ -13,7 +13,7 @@
 #include <gsl/gsl_randist.h>
 #include <time.h>
 
-void H1_task1(), H1_task2(), H1_task3(), H1_task4();
+void H1_task1(), H1_task2(), H1_task3(), H1_task4(), H1_task6();
 
 int
 run(
@@ -23,9 +23,10 @@ run(
 {
     //H1_task1();
     //H1_task2();
-    H1_task3();
+    //H1_task3();
     //H1_task3();
     //H1_task4();
+    //H1_task6();
 
     return 0;
 }
@@ -196,7 +197,76 @@ H1_task4()
 
 
 void 
-H1_task4()
+H1_task6()
 {
-    double a;
+    int nbr_atoms = 256; int n_rows = nbr_atoms; int n_cols = 3; int n_unitcells = 4;
+
+    // Initialising position and velocity arrrays
+    double position[nbr_atoms][n_cols];
+    double velocity[nbr_atoms][n_cols];
+    for(int ix = 0; ix < nbr_atoms; ix++){
+        for(int jx = 0; jx < n_cols; jx++){
+            velocity[ix][jx] = 0;
+        }
+    }
+
+    // Choosing lattice param
+    double lattice_param = 4.03; // True is around 4.0478 Å (Masahiko Morinaga, https://bit.ly/3ERRFt3)
+    double cell_length = 4 * lattice_param;
+    
+    // Initialice and displace fcc
+    init_fcc((double (*)[3]) position, (int) n_unitcells, (double) lattice_param); // 4 unit cells in each direction
+    
+    displace_fcc((double (*)[3]) position, (int) n_unitcells, (double) lattice_param);
+    
+    // Declaring parameters for velocity verlet. 
+    // If temp/press_scaling = false scaling is turned off and scaling factors remains = 1
+    int end_time; double dt;
+    bool temp_scaling, press_scaling, write_not_append;
+    double temp_eq, press_eq, tau_T, tau_P;
+
+
+    // Melting run
+    end_time = 10; dt = 1e-2;
+    temp_scaling = true; press_scaling = true;
+    temp_eq = 3000; press_eq = 1; //773.15 K och 1 Bar
+    write_not_append = true;
+
+    cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
+                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T);
+
+    // Cooling run
+    end_time = 10; dt = 1e-2;
+    temp_scaling = true; press_scaling = true;
+    temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
+    write_not_append = false;
+
+    cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
+                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T);
+
+
+    // Production run
+    end_time = 10; dt = 1e-2;
+    temp_scaling = false, press_scaling = false;
+    temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
+    write_not_append = false;
+
+    int number_of_bins = 1000;
+    double *radial_distribution_vector = calloc(sizeof(double),  number_of_bins);
+    char filename_radial_dist[] = {"radial_distribution.csv"};
+
+    cell_length = velocity_verlet_deluxe((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
+                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T, radial_distribution_vector, number_of_bins);
+
+    for(int bin=0; bin<number_of_bins; ++bin)
+    {   
+        //also need to divide by number of time steps
+        radial_distribution_vector[bin] /=((double)number_of_bins); 
+    }
+
+    bool is_empty = true;
+    save_vector_to_csv(radial_distribution_vector, number_of_bins,filename_radial_dist, is_empty);
+    free(radial_distribution_vector);
 }
+
+

@@ -431,10 +431,10 @@ double get_virial_AL(double positions[][3], double cell_length, int nbr_atoms)
 
 
 /* Returns the forces */
-void get_radial_dist_AL(double bin_length, double radial_histogram_vector[], double positions[][3], double cell_length, int nbr_atoms)
+void get_radial_dist_AL(int number_of_bins, double *radial_histogram_vector, double positions[][3], double cell_length, int nbr_atoms)
 {
   int i, j;
-  double cell_length_inv, cell_length_sq;
+  double cell_length_inv, cell_length_sq, bin_length;
   double rcut, rcut_sq;
   //double densityi, dens, drho_dr, force;
   //double dUpair_dr;
@@ -446,9 +446,11 @@ void get_radial_dist_AL(double bin_length, double radial_histogram_vector[], dou
   
   rcut = 6.06;
   rcut_sq = rcut * rcut;
+
   
   cell_length_inv = 1 / cell_length;
   cell_length_sq = cell_length * cell_length;
+  bin_length= cell_length/(double)number_of_bins;
   
   for (i = 0; i < nbr_atoms; i++){
     sx[i] = positions[i][0] * cell_length_inv;
