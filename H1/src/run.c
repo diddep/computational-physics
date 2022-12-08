@@ -24,8 +24,9 @@ run(
     //H1_task1();
     //H1_task2();
     //H1_task3();
+    //H1_task2();
+    //H1_task3();
     //H1_task4();
-    //H1_task5();
     H1_task6();
 
     return 0;
@@ -250,23 +251,24 @@ H1_task6()
 
 
     // Production run
-    end_time = 10; dt = 1e-2;
+    end_time = 50; dt = 1e-2;
     temp_scaling = false, press_scaling = false;
-    temp_eq = 973.15; press_eq = 1; //773.15 K och 1 Bar
-    write_not_append = true;
+    temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
+    write_not_append = false;
 
-    int number_of_bins = 1000;
+    int number_of_bins = 300;
     double *radial_distribution_vector = calloc(sizeof(double),  number_of_bins);
-    char filename_radial_dist[] = {"radial_distribution.csv"};
+    char filename_radial_dist[] = {"../csv/radial_distribution.csv"};
 
     cell_length = velocity_verlet_deluxe((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
                     (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T, radial_distribution_vector, number_of_bins);
 
-    for(int bin = 0; bin<number_of_bins; ++bin)
-    {   
-        //also need to divide by number of time steps
-        radial_distribution_vector[bin] /=((double)number_of_bins); 
-    }
+    // for(int bin = 0; bin<number_of_bins; ++bin)
+    // {   
+
+    //     //also need to divide by number of time steps
+    //     radial_distribution_vector[bin] /=((double)number_of_bins); 
+    // }
 
     bool is_empty = true;
     save_vector_to_csv(radial_distribution_vector, number_of_bins,filename_radial_dist, is_empty);
