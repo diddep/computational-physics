@@ -241,7 +241,7 @@ H1_task6()
                     (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T);
 
     // Cooling run
-    end_time = 10; dt = 1e-2;
+    end_time = 10; dt = 1e-3;
     temp_scaling = true; press_scaling = true;
     temp_eq = 973.15; press_eq = 1; //773.15 K och 1 Bar
     write_not_append = false;
@@ -251,7 +251,7 @@ H1_task6()
 
 
     // Production run
-    end_time = 50; dt = 1e-2;
+    end_time = 20; dt = 1e-3;
     temp_scaling = false, press_scaling = false;
     temp_eq = 973.15; press_eq = 1; //773.15 K och 1 Bar
     write_not_append = false;

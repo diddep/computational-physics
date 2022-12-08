@@ -23,9 +23,6 @@ def N_ideal(bin_arr, Cell_length, Number_of_particles):
 
 bin_array = np.arange(number_of_bins) 
 
-
-
-
 ideal = N_ideal(bin_array, Cell_length, number_particles)
 
 delta_r = Cell_length/number_particles
