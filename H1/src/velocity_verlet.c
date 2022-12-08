@@ -15,7 +15,8 @@
 
 double
 velocity_verlet(double positions[][3], double v[][3], double lattice_param, double cell_length, int end_time, \
-double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, double temp_eq, double press_eq, bool write_not_append)
+double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, double temp_eq, double press_eq, bool write_not_append, \
+double tau_P, double tau_T)
 {
     // Initialize variables
     double cell_volume = pow(cell_length, 3);
@@ -31,7 +32,6 @@ double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, dou
     double temp_inst = 0; double temp_inst_per_unitcell = 0;
     double press_inst = 0; double press_inst_per_unitcell = 0;
     double kB = 8.61733 * 1e-5; // Boltzmann constant in eV/K
-    double tau_T, tau_P;
     
     //char *filename_result, *filename_pos, *filename_param;
     char filename_result[] = {"../csv/vel_verlet_eq.csv"};
@@ -124,7 +124,7 @@ double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, dou
         if(temp_scaling == true){
 
             // Value of tau_T is uncertain, and unsure if we should mult. by dt. Have heard approx 50.
-            tau_T = 200*dt;
+            //tau_T = 200*dt;
 
             // Unsure if plus or minus. Scaling with "correct" sign seams to change temp in wrong direction
             alpha_T = 1 + 2 * dt / tau_T * (temp_eq - temp_inst_per_unitcell)/temp_inst_per_unitcell;
@@ -139,7 +139,7 @@ double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, dou
         if(press_scaling == true){
 
             // Value of tau_P is uncertain, and unsure if we should mult. by dt. Have heard slightly more than 50.
-            tau_P = 25 * dt;
+            //tau_P = 25 * dt;
 
             // Isothermal compressability for aluminium in Gpa^-1
             double kappa_T = 0.01385*1e-4; // Neg eller pos?
@@ -158,7 +158,7 @@ double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, dou
                                              temp_inst_per_unitcell};
 
         // Saving results to csv files
-        if(tx==0){is_write = write_not_append;} else {is_write = false;};
+        if(tx == 1){is_write = write_not_append;} else {is_write = false;};
         if(temp_scaling == true || press_scaling == true)
         {   save_vector_to_csv(result_vec, 9, filename_result, is_write); // true -> fopen with "w"
             save_vector_to_csv(position_track_vec, 10, filename_pos, is_write); // false -> fopen with "a"

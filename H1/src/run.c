@@ -71,15 +71,17 @@ H1_task2()
     // If temp/press_scaling = false scaling is turned off and scaling factors remains = 1
     int end_time; double dt;
     bool temp_scaling, press_scaling, write_not_append;
-    double temp_eq, press_eq;
+    double temp_eq, press_eq, tau_T, tau_P;
 
     // Production run
     end_time = 10; dt = 1e-2;
     temp_scaling = false, press_scaling = false;
     temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
+    tau_T = 25 * dt; tau_P = 250*dt;
     write_not_append = true;
+
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
-                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append);
+                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T);
 }
 
 void 
@@ -109,26 +111,27 @@ H1_task3()
     // If temp/press_scaling = false scaling is turned off and scaling factors remains = 1
     int end_time; double dt;
     bool temp_scaling, press_scaling, write_not_append;
-    double temp_eq, press_eq;
+    double temp_eq, press_eq, tau_T, tau_P;
 
 
     // Equalibration run
-    end_time = 10; dt = 1e-2;
+    end_time = 20; dt = 1e-2;
     temp_scaling = true; press_scaling = true;
     temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
+    tau_T = 50*dt; tau_P = 5*dt;
     write_not_append = true;
 
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
-                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append);
+                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T);
 
 
     // Production run
     end_time = 10; dt = 1e-2;
     temp_scaling = false, press_scaling = false;
     temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
-    write_not_append = false;
+    write_not_append = true;
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
-                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append);
+                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T);
 }
 
 void 
@@ -158,7 +161,7 @@ H1_task4()
     // If temp/press_scaling = false scaling is turned off and scaling factors remains = 1
     int end_time; double dt;
     bool temp_scaling, press_scaling, write_not_append;
-    double temp_eq, press_eq;
+    double temp_eq, press_eq, tau_T, tau_P;
 
 
     // Melting run
@@ -168,7 +171,7 @@ H1_task4()
     write_not_append = true;
 
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
-                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append);
+                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T);
 
     // Cooling run
     end_time = 10; dt = 1e-2;
@@ -177,7 +180,7 @@ H1_task4()
     write_not_append = false;
 
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
-                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append);
+                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T);
 
 
     // Production run
@@ -187,8 +190,13 @@ H1_task4()
     write_not_append = false;
 
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
-                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append);
+                    (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T);
 
 }
 
 
+void 
+H1_task4()
+{
+    double a;
+}

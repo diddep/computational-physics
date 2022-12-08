@@ -406,6 +406,7 @@ double get_virial_AL(double positions[][3], double cell_length, int nbr_atoms)
       /* Add force and energy contribution if distance between atoms smaller than rcut */
 			if (rij_sq < rcut_sq) {
         rij = sqrt(rij_sq);
+
         dUpair_dr = splineEvalDiff(rij, pair_potential, PAIR_POTENTIAL_ROWS);
 				drho_dr = splineEvalDiff(rij, electron_density, ELECTRON_DENSITY_ROWS);
         
@@ -425,4 +426,79 @@ double get_virial_AL(double positions[][3], double cell_length, int nbr_atoms)
   
   return(virial);
   
+}
+
+
+
+/* Returns the forces */
+void get_radial_dist_AL(double bin_length, double radial_histogram_vector[], double positions[][3], double cell_length, int nbr_atoms)
+{
+  int i, j;
+  double cell_length_inv, cell_length_sq;
+  double rcut, rcut_sq;
+  //double densityi, dens, drho_dr, force;
+  //double dUpair_dr;
+  double sxi, syi, szi, sxij, syij, szij, rij,  rij_sq;
+  
+  double *sx = malloc(nbr_atoms * sizeof (double));
+  double *sy = malloc(nbr_atoms * sizeof (double));
+  double *sz = malloc(nbr_atoms * sizeof (double));
+  
+  rcut = 6.06;
+  rcut_sq = rcut * rcut;
+  
+  cell_length_inv = 1 / cell_length;
+  cell_length_sq = cell_length * cell_length;
+  
+  for (i = 0; i < nbr_atoms; i++){
+    sx[i] = positions[i][0] * cell_length_inv;
+    sy[i] = positions[i][1] * cell_length_inv;
+    sz[i] = positions[i][2] * cell_length_inv;
+  }
+
+  /* Compute radial distribution on atoms. */
+	/* Loop over atoms again :-(. */
+  
+  for (i = 0; i < nbr_atoms; i++) {
+    /* Periodically translate coords of current particle to positive quadrants */
+		sxi = sx[i] - floor(sx[i]);
+		syi = sy[i] - floor(sy[i]);
+		szi = sz[i] - floor(sz[i]);
+		
+		/* Loop over other atoms. */
+		for (j = i + 1; j < nbr_atoms; j++) 
+    {
+      /* Periodically translate atom j to positive quadrants and calculate distance to it. */
+			sxij = sxi - (sx[j] - floor(sx[j]));
+			syij = syi - (sy[j] - floor(sy[j]));
+			szij = szi - (sz[j] - floor(sz[j]));
+      
+      /* Periodic boundary conditions. */
+			sxij = sxij - (int)floor(sxij + 0.5);
+			syij = syij - (int)floor(syij + 0.5);
+			szij = szij - (int)floor(szij + 0.5);
+      
+      /* squared distance between atom i and j */
+			rij_sq = cell_length_sq * (sxij*sxij + syij*syij + szij*szij);
+      
+
+      /*Add position into bin depending on radial size*/
+      rij = sqrt( rij_sq );
+          
+      int bin = (int) floor( bin_length * rij - 0.5);
+
+      radial_histogram_vector[bin] +=1;
+
+			// if (rij_sq < rcut_sq) 
+      // {
+      //     rij = sqrt( rij_sq );
+          
+      //     int bin = (int) floor( bin_length * rij - 0.5);
+
+      //     radial_histogram_vector[bin] +=1;
+      // }
+    }
+  }
+  
+  free(sx); free(sy); free(sz); sx = NULL; sy = NULL; sz = NULL;
 }
