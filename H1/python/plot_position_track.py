@@ -5,10 +5,16 @@ import seaborn as sns
 # Set the seaborn plotting style
 sns.set()
 
-#str = "eq"
-str = "prod"
+str = "eq"
+#str = "prod"
 
+# load data from file
 array = np.genfromtxt(f'../csv/position_track_{str}.csv', delimiter=',', skip_header=1)
+parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
+array_prod = np.genfromtxt(f'../csv/position_track_prod.csv', delimiter=',', skip_header=1)
+parameters_prod = np.genfromtxt(f'../csv/parameters_prod.csv', delimiter=',')
+
+array = array_prod
 
 #t = array[1:,0]
 q1x = array[:,1]

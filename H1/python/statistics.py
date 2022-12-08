@@ -7,7 +7,7 @@ sns.set()
 
 
 # str = "eq"
- str = "prod"
+str = "prod"
 
 array = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',')
 parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
