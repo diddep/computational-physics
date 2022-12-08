@@ -24,8 +24,6 @@ run(
     //H1_task1();
     //H1_task2();
     //H1_task3();
-    //H1_task2();
-    //H1_task3();
     //H1_task4();
     H1_task6();
 
@@ -254,7 +252,7 @@ H1_task6()
     end_time = 20; dt = 1e-3;
     temp_scaling = false, press_scaling = false;
     temp_eq = 973.15; press_eq = 1; //773.15 K och 1 Bar
-    write_not_append = false;
+    write_not_append = true;
 
     int number_of_bins = 100;
     double *radial_distribution_vector = calloc(sizeof(double),  number_of_bins);
@@ -271,7 +269,7 @@ H1_task6()
     // }
 
     bool is_empty = true;
-    save_vector_to_csv(radial_distribution_vector, number_of_bins,filename_radial_dist, is_empty);
+    save_vector_to_csv(radial_distribution_vector, number_of_bins, filename_radial_dist, is_empty);
     free(radial_distribution_vector);
 }
 

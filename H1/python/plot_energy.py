@@ -12,6 +12,7 @@ str = "eq"
 # load data from file
 array = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',', skip_header=1)
 parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
+#print(np.shape(parameters))
 array_prod = np.genfromtxt(f'../csv/vel_verlet_prod.csv', delimiter=',', skip_header=1)
 parameters_prod = np.genfromtxt(f'../csv/parameters_prod.csv', delimiter=',')
 

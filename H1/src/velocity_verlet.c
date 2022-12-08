@@ -41,7 +41,7 @@ double tau_P, double tau_T)
     char filename_result_prod[] = {"../csv/vel_verlet_prod.csv"};
     char filename_pos_prod[] = {"../csv/position_track_prod.csv"};
     char filename_param_prod[] = {"../csv/parameters_prod.csv"};
-    char filename_radial_distribution[] = {"../csv/radial_distribution"};
+    char filename_radial_distribution[] = {"../csv/radial_distribution.csv"};
     bool is_write;
     
     //Creating empty arrays
