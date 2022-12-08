@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 
 #str = "eq"
 str = "prod"
@@ -16,8 +18,12 @@ q3x = array[:,7]
 q3y = array[:,8]
 q3z = array[:,9]
 
+parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
 
-dt = array[0,0]
+end_time = parameters[-1,0]
+dt = parameters[-1,1]
+
+#dt = array[0,0]
 t = dt * np.linspace(0,len(array[:,1]), len(array[:,1]))
 str = "calibration_melt"
 

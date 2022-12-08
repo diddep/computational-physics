@@ -1,11 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 
 # set default figure size
 plt.rcParams["figure.figsize"] = [8, 6]
 
-str = "eq"
-# str = "prod"
+# str = "eq"
+str = "prod"
 
 # load data from file
 array = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',', skip_header=1)
@@ -22,7 +24,7 @@ tau_T = parameters[-1,7]
 tau_P = parameters[-1,8]
 
 # extract columns from array
-dt = array[0,0]
+#dt = array[0,0]
 t = dt * np.linspace(0,len(array[:,0]), len(array[:,0]))
 cell_length = array[:,1]
 lattice_length = cell_length/4

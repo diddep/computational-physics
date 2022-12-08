@@ -5,8 +5,8 @@ import seaborn as sns
 # Set the seaborn plotting style
 sns.set()
 
-str = "eq"
-#str = "prod"
+#str = "eq"
+str = "prod"
 
 array = np.genfromtxt(f'../csv/position_track_{str}.csv', delimiter=',', skip_header=1)
 
@@ -21,7 +21,12 @@ q3x = array[:,7]
 q3y = array[:,8]
 q3z = array[:,9]
 
-dt = array[0,0]
+parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
+
+end_time = parameters[-1,0]
+dt = parameters[-1,1]
+
+#dt = array[0,0]
 t = dt * np.linspace(0,len(array[:,1]), len(array[:,1]))
 
 # Create a figure with three subplots

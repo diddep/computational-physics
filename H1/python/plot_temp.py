@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 
-str = "eq"
-# str = "prod"
+# str = "eq"
+str = "prod"
 
 # load data from file
 array = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',', skip_header=1)
@@ -15,8 +17,10 @@ e_tot = array[:,4]
 temp = array[:,5]
 press = array[:,6]
 
+dt = parameters[-1,1]
+
 #dt = t[0]
-dt = array[0,0]
+#dt = array[0,0]
 t = dt * np.linspace(0,len(array[:,1]), len(array[:,1]))
 
 fig2 , axT = plt.subplots(1,1)

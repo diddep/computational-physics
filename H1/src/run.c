@@ -22,8 +22,8 @@ run(
    )
 {
     //H1_task1();
-    //H1_task2();
-    H1_task3();
+    H1_task2();
+    //H1_task3();
     //H1_task3();
     //H1_task4();
 
@@ -195,8 +195,8 @@ H1_task4()
 }
 
 
-void 
-H1_task4()
+void
+H1_task6()
 {
     double a;
 }

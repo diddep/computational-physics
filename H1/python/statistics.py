@@ -1,10 +1,14 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 
 
 
-str = "eq"
+# str = "eq"
+ str = "prod"
+
 array = np.genfromtxt(f'../csv/vel_verlet_{str}.csv', delimiter=',')
 parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
 

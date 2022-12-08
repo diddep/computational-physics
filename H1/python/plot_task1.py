@@ -1,10 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
 from scipy.optimize import curve_fit
 
 # Read in data from file
 array = np.genfromtxt('../csv/try_lattice_constants.csv', delimiter=',')
-print(array[:, 2].shape)
 
 # Define a function that represents the polynomial model
 def polynomial(x, a, b, c):
@@ -36,11 +37,11 @@ ax.plot(x_vals, polynomial(x_vals, *params), linestyle=':', label=f'Curve fit, \
 
 # Add an arrow pointing to the smallest y-value for the model
 ax.annotate(f'a$_{{min}}$ = {np.cbrt(x_min):.2f}', xy=(x_min, y_min), xytext=(50, -20),
-            textcoords='offset pixels', arrowprops=dict(arrowstyle='->'))
+            textcoords='offset pixels', arrowprops=dict(arrowstyle='->', color='k'))
             
 # Set axes labels and font sizes
-ax.set_ylabel(f'Volume Å$^3$', fontsize=15)
-ax.set_xlabel(f'Energy (eV/unit cell)', fontsize=15)
+ax.set_xlabel(f'Volume Å$^3$', fontsize=15)
+ax.set_ylabel(f'Energy (eV/unit cell)', fontsize=15)
 
 # Add legend
 plt.legend(fontsize=10)
