@@ -80,7 +80,7 @@ double splineEvalDiff(double x, const double *table, int m) {
 	return result;
 }
 
-/* Returns the forces */
+/* Returns the forces */ //TODO: uppdatera signatur så att positions och allt blir pointer pointer
 void get_forces_AL(double forces[][3], double positions[][3], double cell_length, int nbr_atoms)
 {
   int i, j;
@@ -444,7 +444,7 @@ void get_radial_dist_AL(int number_of_bins, double *radial_histogram_vector, dou
   double *sy = malloc(nbr_atoms * sizeof (double));
   double *sz = malloc(nbr_atoms * sizeof (double));
   
-  rcut = 6.06;
+  rcut = 6.06; // Embedded atom method potential. 
   rcut_sq = rcut * rcut;
 
   
@@ -482,24 +482,14 @@ void get_radial_dist_AL(int number_of_bins, double *radial_histogram_vector, dou
       
       /* squared distance between atom i and j */
 			rij_sq = cell_length_sq * (sxij*sxij + syij*syij + szij*szij);
-      
-
+    
       /*Add position into bin depending on radial size*/
       rij = sqrt( rij_sq );
       
       int bin = (int) floor(  rij/bin_length + 0.5);
-      //printf("bin= %d\n", bin);
 
       radial_histogram_vector[bin] +=1;
 
-			// if (rij_sq < rcut_sq) 
-      // {
-      //     rij = sqrt( rij_sq );
-          
-      //     int bin = (int) floor( bin_length * rij - 0.5);
-
-      //     radial_histogram_vector[bin] +=1;
-      // }
     }
   }
   

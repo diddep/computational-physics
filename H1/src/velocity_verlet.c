@@ -19,8 +19,8 @@ double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, dou
 double tau_P, double tau_T)
 {
     // Initialize variables
-    double cell_volume = pow(cell_length, 3);
-    double lattice_volume = pow(lattice_param, 3);
+    double cell_volume = pow(cell_length, 3.);
+    double lattice_volume = pow(lattice_param, 3.);
     double aluminium_amu = 26.98; double m_asu = 9649;
     double aluminium_asu = aluminium_amu/m_asu; //Mass in atomic simulation units
 
@@ -84,12 +84,12 @@ double tau_P, double tau_T)
             {
                 // alpha_P for scaling. If press_scaling==false this is 1.
                 positions[ix][jx] += dt * v[ix][jx];
-                positions[ix][jx] *= pow(alpha_P, (double) 1/3);
+                positions[ix][jx] *= pow(alpha_P, (double) 1./3.);
             }
         }
 
         // After scaling positions lattice_parameter is scaled to change pressure
-        cell_length *= pow(alpha_P, (double) 1/3); cell_volume = pow(cell_length, 3);
+        cell_length *= pow(alpha_P, (double) 1./3.); cell_volume = pow(cell_length, 3);
         
 
         /* a(t+dt) */
@@ -112,13 +112,13 @@ double tau_P, double tau_T)
         
         // Calculate potential, kinetic and total energy per unitcell
         E_potential = get_energy_AL((double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
-        E_potential_per_unitcell = E_potential / pow(4,3);
-        E_kinetic_per_unitcell = E_kinetic / pow(4,3);
+        E_potential_per_unitcell = E_potential / pow(4.,3.);
+        E_kinetic_per_unitcell = E_kinetic / pow(4.,3.);
         E_total_per_unitcell = E_potential_per_unitcell + E_kinetic_per_unitcell;
 
         // Calculate virial to use for pressure calculation
         virial = get_virial_AL((double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
-        virial_per_unitcell = virial / pow(4,3);
+        virial_per_unitcell = virial / pow(4.,3.);
 
         // Calculate temperature (4 atoms in unit cell, kB in eV/K)
         temp_inst_per_unitcell = 2 / (3 * 4 * kB) * E_kinetic_per_unitcell;
@@ -136,6 +136,7 @@ double tau_P, double tau_T)
 
          // Calculate pressure in eV/Å^3
         press_inst_per_unitcell = ((4 * kB * temp_inst_per_unitcell) + virial_per_unitcell) / cell_volume; //lattice_volume;
+        //FIXME: WHat should this unit be
         press_inst_per_unitcell *= 1.60219*1e2*1e4; // 1eV/Å^3 = 160.2 gPA
         
         // Changing scaling parameter for pressure
@@ -145,10 +146,12 @@ double tau_P, double tau_T)
             //tau_P = 25 * dt;
 
             // Isothermal compressability for aluminium in Gpa^-1
+            // FIXME: What should this unit be?
             double kappa_T = 0.01385*1e-4; // Neg eller pos?
 
             // Unsure if plus or minus. Scaling with "correct" sign seams to change pressure in wrong direction
             alpha_P = 1 - kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
+            //printf("alpha_p = %f", alpha)
             //alpha_P = 1 + kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
         }
         
@@ -270,7 +273,8 @@ double tau_P, double tau_T, double *radial_histogram_vector, int number_of_bins)
 
         /* a(t+dt) */
         get_forces_AL((double (*)[3]) f, (double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
-
+        get_radial_dist_AL(number_of_bins, radial_histogram_vector, (double (*)[3])positions, cell_length, nbr_atoms);
+    
         // Resetting kinetic energy for every timestep to ensure summing over particles and not over timesteps
         E_kinetic = 0;
 

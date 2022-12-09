@@ -16,7 +16,7 @@ parameters = np.genfromtxt(f'../csv/parameters_{str}.csv', delimiter=',')
 array_prod = np.genfromtxt(f'../csv/vel_verlet_prod.csv', delimiter=',', skip_header=1)
 parameters_prod = np.genfromtxt(f'../csv/parameters_prod.csv', delimiter=',')
 
-array=array_prod
+#array=array_prod
 
 end_time = parameters[-1,0]
 dt = parameters[-1,1]
