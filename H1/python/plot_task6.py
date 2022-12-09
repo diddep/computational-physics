@@ -47,6 +47,10 @@ ax_radial.axvline(minima*delta_r)
 
 print(array[:minima])
 
+radiusvec =2*bin_array*delta_r
+ax_radial.scatter(radiusvec[34], array[]*conv)
+
+
 integrand =[]
 #34
 
