@@ -254,19 +254,22 @@ H1_task6()
     temp_eq = 973.15; press_eq = 1; //773.15 K och 1 Bar
     write_not_append = true;
 
-    int number_of_bins = 100;
+    int number_of_bins = 150;
     double *radial_distribution_vector = calloc(sizeof(double),  number_of_bins);
     char filename_radial_dist[] = {"../csv/radial_distribution.csv"};
+    double normalisation_factor_radial_dist = (double) nbr_atoms*end_time/(dt);
+
 
     cell_length = velocity_verlet_deluxe((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
                     (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T, radial_distribution_vector, number_of_bins);
 
-    // for(int bin = 0; bin<number_of_bins; ++bin)
-    // {   
+    
+    for(int bin = 0; bin<number_of_bins; ++bin)
+    {   
 
-    //     //also need to divide by number of time steps
-    //     radial_distribution_vector[bin] /=((double)number_of_bins); 
-    // }
+        //also need to divide by number of time steps
+        radial_distribution_vector[bin] /=normalisation_factor_radial_dist; 
+    }
 
     bool is_empty = true;
     save_vector_to_csv(radial_distribution_vector, number_of_bins, filename_radial_dist, is_empty);
