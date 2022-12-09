@@ -77,7 +77,7 @@ H1_task2()
     end_time = 10; dt = 1e-2;
     temp_scaling = false, press_scaling = false;
     temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
-    tau_T = 25 * dt; tau_P = 250*dt;
+    tau_T = 1 * dt; tau_P = 1*dt;
     write_not_append = true;
 
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
@@ -117,10 +117,10 @@ H1_task3()
     // tau_T = 100*dt; tau_P = 50*dt;
 
     // Equalibration run
-    end_time = 25; dt = 1e-3;
+    end_time = 25; dt = 1e-2;
     temp_scaling = true; press_scaling = true;
     temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
-    tau_T = 100*dt; tau_P = 50*dt; //*dt; 50,5
+    tau_T = 100*dt; tau_P = 300*dt; //*dt; 50,5
     write_not_append = true;
 
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
@@ -128,7 +128,7 @@ H1_task3()
 
 
     // Production run
-    end_time = 5; dt = 1e-3;
+    end_time = 5; dt = 1e-2;
     temp_scaling = false, press_scaling = false;
     temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
     write_not_append = true;
@@ -167,17 +167,17 @@ H1_task4()
 
 
     // Melting run
-    end_time = 5; dt = 1e-3;
+    end_time = 20; dt = 1e-3;
     temp_scaling = true; press_scaling = true;
-    temp_eq = 2500; press_eq = 1; //773.15 K och 1 Bar
-    tau_T = 100*dt; tau_P = 50*dt;
+    temp_eq = 5000; press_eq = 1; //773.15 K och 1 Bar
+    tau_T = 100*dt; tau_P = 300*dt; //50*dt;
     write_not_append = true;
 
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
                     (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T);
 
     // Cooling run
-    end_time = 10; dt = 1e-3;
+    end_time = 20; dt = 1e-3;
     temp_scaling = true; press_scaling = true;
     temp_eq = 973.15; press_eq = 1; //773.15 K och 1 Bar
     write_not_append = false;
@@ -187,7 +187,7 @@ H1_task4()
 
 
     // Production run
-    end_time = 10; dt = 1e-3;
+    end_time = 20; dt = 1e-3;
     temp_scaling = false, press_scaling = false;
     temp_eq = 973.15; press_eq = 1; //773.15 K och 1 Bar
     write_not_append = true;
@@ -229,17 +229,17 @@ H1_task6()
 
 
     // Melting run
-    end_time = 5; dt = 1e-3;
+    end_time = 20; dt = 1e-3;
     temp_scaling = true; press_scaling = true;
-    temp_eq = 2500; press_eq = 1; //773.15 K och 1 Bar
-    tau_T = 100*dt; tau_P = 50*dt; //*dt; 50,5
+    temp_eq = 5000; press_eq = 1; //773.15 K och 1 Bar
+    tau_T = 100*dt; tau_P = 300*dt; //*dt; 50,5
     write_not_append = true;
 
     cell_length = velocity_verlet((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
                     (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T);
 
     // Cooling run
-    end_time = 10; dt = 1e-3;
+    end_time = 20; dt = 1e-3;
     temp_scaling = true; press_scaling = true;
     temp_eq = 973.15; press_eq = 1; //773.15 K och 1 Bar
     write_not_append = false;
