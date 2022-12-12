@@ -7,9 +7,7 @@
 #include <gsl/gsl_randist.h>
 #include <time.h>
 
-
 #include "tools.h"
-
 
 double phi_lag(double *E_local_chain, int N_steps, int Lag)
 {
@@ -31,7 +29,7 @@ double phi_lag(double *E_local_chain, int N_steps, int Lag)
     }
     lagged_average/=N_steps;
 
-    phi_k = (lagged_average -average_E_local*average_E_local);
+    phi_k = (lagged_average -average_E_local*average_E_local)/(average_squared_E_local-average_E_local*average_E_local);
 
     return phi_k;
 }
