@@ -31,7 +31,7 @@ run(
     // alpha Parameters
     int n_alpha_steps; double A, beta, E_average;
 
-    bool is_task1 = true, is_task2 = false, is_task3 = false, is_task4 = false;
+    bool is_task1 = false, is_task2 = false, is_task3 = false, is_task4 = true;
 
     if(is_task1)
     {
