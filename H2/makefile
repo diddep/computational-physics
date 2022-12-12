@@ -27,6 +27,7 @@ OBJ = \
       obj/MCMC_chain_operations.o \
       obj/run.o \
 	  obj/statistical_ineff.o\
+	  obj/restructured_stat_ineff.o\
       obj/tools.o
 MAIN = \
        obj/main.o
