@@ -1,5 +1,6 @@
 import matplotlib as plt
 
+## TODO: If text sies are updated, check also that subplots with custom figsize looks good
 def main():
     # set default figure size
     plt.rcParams["figure.figsize"] = [8, 6]

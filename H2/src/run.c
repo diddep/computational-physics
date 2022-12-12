@@ -18,7 +18,7 @@
 
 void initialize_positions(double **R1, double **R2, double d_displacement);
 void MCMC_burn_in(int N_steps, double alpha, double d_displacement, double **R1, double **R2);
-double MCMC(int N_steps, double alpha, double d_displacement, double **R1, double **R2);
+double MCMC(int N_steps, double alpha, double d_displacement, double **R1, double **R2, bool is_save);
 
 
 int
@@ -32,7 +32,7 @@ run(
     // alpha Parameters
     int N_alpha_steps; double A, beta, E_average;
 
-    bool is_task1 = true, is_task2 = false, is_task3 = false, is_task4 = false;
+    bool is_task1 = false, is_task2 = false, is_task3 = false, is_task4 = true, is_save = true;
 
     if(is_task1)
     {
@@ -41,18 +41,18 @@ run(
     }
     if(is_task2)
     {
-        N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
+        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
         N_alpha_steps = 1; A = 0.; beta = 0.; 
     }
     if(is_task3)
     {
-        N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.05, d_displacement = 0.1; 
-        N_alpha_steps = 1; A = 0.; beta = 0.;
+        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.05, d_displacement = 0.1; 
+        N_alpha_steps = 1; A = 0.; beta = 0.; 
     }
     if(is_task4)
     {
-        N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
-        N_alpha_steps = 5; A = 1.; beta = 1.; // beta from 0.5 to 1
+        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
+        N_alpha_steps = 100; A = 1.; beta = 1.; is_save = false; // beta from 0.5 to 1
     }
 
     double **R1 = create_2D_array(N_steps, NDIM), **R2 = create_2D_array(N_steps, NDIM);
@@ -70,8 +70,13 @@ run(
 
     E_average = 0;
     for(int ix = 1; ix < N_alpha_steps + 1; ix++)
-    {
-        E_average = MCMC(N_steps, alpha, d_displacement, R1, R2);
+    {   
+        if( ix == N_alpha_steps)
+        {
+            is_save = true;
+        }
+
+        E_average = MCMC(N_steps, alpha, d_displacement, R1, R2, is_save);
 
         E_PD_average = partialEnergyDerivative(E_local_derivative, alpha, N_steps, R1, R2);
 
@@ -115,7 +120,7 @@ void initialize_positions(double **R1, double **R2, double d_displacement)
 
         random_number = gsl_ran_flat(r, -0.5, 0.5);
         R2[0][kx] = d_displacement * random_number;
-        printf("R1[0][%d]: %f, R2[0][%d]: %f\n", kx, R1[0][kx], kx, R2[0][kx]);
+        //printf("R1[0][%d]: %f, R2[0][%d]: %f\n", kx, R1[0][kx], kx, R2[0][kx]);
     }
     gsl_rng_free(r);
 }
@@ -167,7 +172,7 @@ void MCMC_burn_in(int N_steps, double alpha, double d_displacement, double **R1,
     gsl_rng_free(r);
 }
 
-double MCMC(int N_steps, double alpha, double d_displacement, double **R1, double **R2)
+double MCMC(int N_steps, double alpha, double d_displacement, double **R1, double **R2, bool is_save)
 {
     // Filenames for saving in csv
     char filename_R1[] = {"../csv/R1.csv"}, filename_R2[] = {"../csv/R2.csv"};
@@ -202,6 +207,11 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     int accept_count = 0;
     for(int ix = 0; ix < N_steps - 1; ++ix)
     {
+        int percent_size = N_steps/100;
+        if (ix % percent_size == 0 && is_save)
+        {
+            printf("MCMC sampling at {%i} percent \n", ix/percent_size);
+        }
         // get proposal positons
         for (int kx = 0; kx < NDIM; ++kx)
         {
@@ -248,7 +258,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     {
         double phi_inst =phi_lag(E_local, N_steps, lag); 
         phi_k_vec[lag] = phi_inst;
-        printf("phi_k=%f\n", phi_inst);
+        //printf("phi_k=%f\n", phi_inst);
     }
 
 
@@ -260,34 +270,34 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
         average_E_local += E_local[ix]/N_steps;
     }
 
-    //theta_fun(theta_chain, N_steps, R1, R2);
-    x_distribution(x_chain, N_steps, R1,R2);
-    double statistical_inefficiency = correlation_function(Phi_k_vec, E_local, N_steps, M_C);
-    printf("statistical inefficiency from correlation function= %f\n", statistical_inefficiency);
-    statistical_inefficiency=0;
-    statistical_inefficiency = block_average(block_average_vec,E_local, N_steps, number_of_blocks);
-
-    //printf("Accept_count = %d \n", accept_count);
-    printf("statistical inefficiency from block averaging= %f\n", statistical_inefficiency);
     
-    // Save in csv:s
-    save_matrix_to_csv(R1, N_steps, NDIM, filename_R1);
-    save_matrix_to_csv(R2, N_steps, NDIM, filename_R2);
-    // save_matrix_to_csv(&E_local, N_steps, 2, filename_energy);
-    // save_matrix_to_csv(&E_local_derivative, N_steps, 2, filename_energy_derivative);
-    // save_matrix_to_csv(&x_chain, N_steps, 2, filename_xdist);
-    // save_matrix_to_csv(&theta_chain, N_steps, 2, filename_theta);
-    // save_matrix_to_csv(&Phi_k_vec, N_steps, 2, filename_phi_k);
+    if(is_save)
+    {
+        
 
+        //theta_fun(theta_chain, N_steps, R1, R2);
+        x_distribution(x_chain, N_steps, R1,R2);
+        double statistical_inefficiency = correlation_function(Phi_k_vec, E_local, N_steps, M_C);
+        printf("Statistical inefficiency from correlation function= %f\n", statistical_inefficiency);
+        statistical_inefficiency=0;
+        statistical_inefficiency = block_average(block_average_vec,E_local, N_steps, number_of_blocks);
 
-    double result_vec[] = {N_steps, accept_count};
-    open_with_write = true;
-    save_vector_to_csv(result_vec, 2, filename_results, open_with_write);
-    save_transposedvector_to_csv(E_local_derivative, N_steps, filename_energy_derivative, open_with_write);
-    save_transposedvector_to_csv(E_local, N_steps, filename_energy, open_with_write);
-    save_transposedvector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
-    //save_transposedvector_to_csv(Phi_k_vec, n_phi_rows, filename_phi_k, open_with_write);
-    save_transposedvector_to_csv(phi_k_vec, max_lag, filename_phi_k, open_with_write);
+        //printf("Accept_count = %d \n", accept_count);
+        printf("Statistical inefficiency from block averaging= %f\n", statistical_inefficiency);
+
+        // Save in csv:s
+        save_matrix_to_csv(R1, N_steps, NDIM, filename_R1);
+        save_matrix_to_csv(R2, N_steps, NDIM, filename_R2);
+
+        double result_vec[] = {N_steps, accept_count};
+        open_with_write = true;
+        save_vector_to_csv(result_vec, 2, filename_results, open_with_write);
+        save_transposedvector_to_csv(E_local_derivative, N_steps, filename_energy_derivative, open_with_write);
+        save_transposedvector_to_csv(E_local, N_steps, filename_energy, open_with_write);
+        save_transposedvector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
+        save_transposedvector_to_csv(theta_chain, N_steps, filename_theta, open_with_write);
+        save_transposedvector_to_csv(phi_k_vec, max_lag, filename_phi_k, open_with_write);
+    }
 
     // Destroy and free arrays
     free(E_local), free(E_local_derivative), free(x_chain), free(theta_chain), free(Phi_k_vec), free(block_average_vec);
