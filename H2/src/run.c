@@ -231,6 +231,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
 
         double theta_ix = theta_fun_vec(R1[ix], R2[ix]);
         double x_cos = cos(theta_ix);
+        theta_chain[ix] = theta_ix;
 
     }
 
@@ -245,7 +246,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
         average_E_local += E_local[ix]/N_steps;
     }
 
-    theta_fun(theta_chain, N_steps, R1, R2);
+    //theta_fun(theta_chain, N_steps, R1, R2);
     x_distribution(x_chain, N_steps, R1,R2);
     double statistical_inefficiency = correlation_function(Phi_k_vec, E_local, N_steps, M_C);
     printf("statistical inefficiency from correlation function= %f\n", statistical_inefficiency);
@@ -258,6 +259,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     // Save in csv:s
     save_matrix_to_csv(R1, N_steps, NDIM, filename_R1);
     save_matrix_to_csv(R2, N_steps, NDIM, filename_R2);
+    
 
     double result_vec[] = {N_steps, accept_count};
     open_with_write = true;
@@ -266,6 +268,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     save_vector_to_csv(E_local, N_steps, filename_energy, open_with_write);
     save_vector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
     save_vector_to_csv(Phi_k_vec, n_phi_rows, filename_phi_k, open_with_write);
+    save_vector_to_csv(theta_chain, N_steps, filename_theta, open_with_write);
 
     // Destroy and free arrays
     free(E_local), free(E_local_derivative), free(x_chain), free(theta_chain), free(Phi_k_vec), free(block_average_vec);
