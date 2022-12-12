@@ -248,6 +248,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     {
         double phi_inst =phi_lag(E_local, N_steps, lag); 
         phi_k_vec[lag] = phi_inst;
+        printf("phi_k=%f\n", phi_inst);
     }
 
 
@@ -286,7 +287,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     save_transposedvector_to_csv(E_local, N_steps, filename_energy, open_with_write);
     save_transposedvector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
     //save_transposedvector_to_csv(Phi_k_vec, n_phi_rows, filename_phi_k, open_with_write);
-    save_transposedvector_to_csv(Phi_k_vec, max_lag, filename_phi_k, open_with_write);
+    save_transposedvector_to_csv(phi_k_vec, max_lag, filename_phi_k, open_with_write);
 
     // Destroy and free arrays
     free(E_local), free(E_local_derivative), free(x_chain), free(theta_chain), free(Phi_k_vec), free(block_average_vec);
