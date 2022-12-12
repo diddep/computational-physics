@@ -230,6 +230,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
 
         double theta_ix = theta_fun_vec(R1[ix], R2[ix]);
         double x_cos = cos(theta_ix);
+        theta_chain[ix] = theta_ix;
 
     }
 
@@ -244,7 +245,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
         average_E_local += E_local[ix]/N_steps;
     }
 
-    theta_fun(theta_chain, N_steps, R1, R2);
+    //theta_fun(theta_chain, N_steps, R1, R2);
     x_distribution(x_chain, N_steps, R1,R2);
     double statistical_inefficiency = correlation_function(Phi_k_vec, E_local, N_steps, M_C);
     printf("statistical inefficiency from correlation function= %f\n", statistical_inefficiency);

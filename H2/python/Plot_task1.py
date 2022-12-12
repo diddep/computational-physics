@@ -23,7 +23,9 @@ arr_E_L = np.genfromtxt("../E_local.csv", delimiter=',')
 arr_E_L_Derivative = np.genfromtxt("../E_local_derivative.csv", delimiter=',')
 arr_xdist = np.genfromtxt("../x_distribution.csv", delimiter=',')
 arr_theta_csv = np.genfromtxt("../theta.csv", delimiter=',')
-arr_theta = arr_theta_csv[:,1]
+arr_theta = arr_theta_csv#arr_theta_csv[:,1]
+arr_sin = np.sin(arr_theta)
+print('length=',len(arr_sin))
 
 params = np.genfromtxt("../alpha_params.csv", delimiter=',')
 
@@ -38,7 +40,7 @@ d_displacement = params[4]
 ix = np.linspace(0, n_timesteps, n_timesteps)
 
 
-arr_steps = arr_theta_csv[:,0]
+#arr_steps = arr_theta_csv[:,0]
 #print(arr_E_L.shape)
 #print(ix.shape)
 
@@ -102,12 +104,14 @@ fig_dist.savefig('plots_python/x_distribution.png')
 print("Plotted x-distribution")
 print("--- %s seconds ---" % (time.time() - start_time))
 
-fig_theta, ax_theta = plt.subplots(1,2, figsize=(10,5))
+fig_theta, ax_theta = plt.subplots(1,3, figsize=(15,5))
 #counts_theta, bins_theta = np.histogram(x, bins = 10, density = True)
 #ax_theta.stairs(counts_theta, bins_theta)
 counts_x, bins_x = np.histogram(arr_theta, bins = n_bins, density = True)
 
 counts_theta, bins_theta = np.histogram(np.arccos(arr_theta), bins = n_bins, density = True)
+
+counts_sinus, bins_sinus = np.histogram(arr_sin, bins = n_bins, density = True)
 ax_theta[0].stairs(counts_x, bins_x, fill = True, label='Sampled distribution')
 ax_theta[0].axhline(1/2, label='Distribution for uncorrelated electrons', color='r', linewidth=2, linestyle='dashed')
 ax_theta[0].set_title('Distribution for x', fontsize=15)
@@ -120,6 +124,11 @@ ax_theta[1].stairs(counts_theta, bins_theta, fill = True)
 ax_theta[1].set_title(r'Distribution for $\theta$', fontsize=15)
 ax_theta[1].set_xlabel(r'$\theta$ [rad]', fontsize=15)
 ax_theta[1].set_ylabel('Probability Density', fontsize=15)
+
+ax_theta[2].stairs(counts_sinus, bins_sinus, fill = True)
+ax_theta[2].set_title(r'Distribution for $\sin(\theta)$', fontsize=15)
+ax_theta[2].set_xlabel(r'$\sin(\theta)$', fontsize=15)
+ax_theta[2].set_ylabel('Probability Density', fontsize=15)
 plt.tight_layout()
 fig_theta.savefig('plots_python/theta.png')
 
