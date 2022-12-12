@@ -3,25 +3,20 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import set_plot_style
 import unpack_csv
+import get_task_str
 
 sns.set_theme()
 set_plot_style.main()
 
 results = unpack_csv.main()
-(R1, R2, E_local, E_local_derivative, x_distribution, phi_k, alpha_results, steps_linspace, params) = results
+(R1, R2, E_local, E_local_derivative, x_distribution, phi_k, steps_linspace, alpha_results, params) = results
 
-alpha_steps = alpha_results.ix
-average_energy = alpha_results.E_average
-alpha_task4 = alpha_results.alpha
 
-if params.is_task1.values[0]:
-    task_str = "task1"
-elif params.is_task2.values[0]:
-    task_str = "task2"
-elif params.is_task3.values[0]:
-    task_str = "task3"
-elif params.is_task4.values[0]:
-    task_str = "task4"
+task_str = get_task_str.main()
+#TODO: implement more datapoints to plot sequence
+alpha_steps = alpha_results.ix.values[0]
+average_energy = alpha_results.E_average.values[0]
+alpha_task4 = alpha_results.alpha.values[0]
 
 
 fig_alpha, ax_alpha = plt.subplots(figsize=(10,5))

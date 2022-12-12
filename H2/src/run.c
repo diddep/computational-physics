@@ -30,29 +30,29 @@ run(
     // MCMC Parameters
     int N_steps; int N_discarded_steps; double alpha, d_displacement; 
     // alpha Parameters
-    int n_alpha_steps; double A, beta, E_average;
+    int N_alpha_steps; double A, beta, E_average;
 
-    bool is_task1 = false, is_task2 = false, is_task3 = false, is_task4 = true;
+    bool is_task1 = true, is_task2 = false, is_task3 = false, is_task4 = false;
 
     if(is_task1)
     {
         N_steps = 1e6; N_discarded_steps = 0; alpha = 0.1, d_displacement = 0.1; 
-        n_alpha_steps = 1; A = 0.; beta = 0.; 
+        N_alpha_steps = 1; A = 0.; beta = 0.; 
     }
     if(is_task2)
     {
         N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
-        n_alpha_steps = 1; A = 0.; beta = 0.; 
+        N_alpha_steps = 1; A = 0.; beta = 0.; 
     }
     if(is_task3)
     {
         N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.05, d_displacement = 0.1; 
-        n_alpha_steps = 1; A = 0.; beta = 0.;
+        N_alpha_steps = 1; A = 0.; beta = 0.;
     }
     if(is_task4)
     {
         N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
-        n_alpha_steps = 5; A = 1.; beta = 1.; // beta from 0.5 to 1
+        N_alpha_steps = 5; A = 1.; beta = 1.; // beta from 0.5 to 1
     }
 
     double **R1 = create_2D_array(N_steps, NDIM), **R2 = create_2D_array(N_steps, NDIM);
@@ -69,7 +69,7 @@ run(
     }
 
     E_average = 0;
-    for(int ix = 1; ix < n_alpha_steps + 1; ix++)
+    for(int ix = 1; ix < N_alpha_steps + 1; ix++)
     {
         E_average = MCMC(N_steps, alpha, d_displacement, R1, R2);
 
@@ -83,14 +83,14 @@ run(
 
         alpha -= gamma * E_PD_average;
 
-        // TODO: Eventuell speed up att spara dessa i en matris en gång istället för en vector n_alpha_steps gånger
+        // TODO: Eventuell speed up att spara dessa i en matris en gång istället för en vector N_alpha_steps gånger
         double alpha_result_vector[] = {ix, E_average, alpha, gamma, E_PD_average};
         if(ix == 1){ open_with_write = true; } else { open_with_write = false; }
         save_vector_to_csv(alpha_result_vector, 5, filename_alpha_results, open_with_write);
         printf("Iteration: %d\n", ix);
     }
 
-    double param_vector[] = {n_alpha_steps, N_discarded_steps, alpha, A, beta, N_steps, d_displacement, is_task1, is_task2, is_task3, is_task4};
+    double param_vector[] = {N_alpha_steps, N_discarded_steps, alpha, A, beta, N_steps, d_displacement, is_task1, is_task2, is_task3, is_task4};
     save_vector_to_csv(param_vector, 11, filename_params, true);
     destroy_2D_array(R1, N_steps); destroy_2D_array(R2, N_steps);
     free(E_local_derivative);
