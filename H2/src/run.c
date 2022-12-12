@@ -11,6 +11,7 @@
 #include "distribution.h"
 #include "MCMC_chain_operations.h"
 #include "statistical_ineff.h"
+#include "restructured_stat_ineff.h"
 
 #define NDIM 3
 #define M_C 1000
@@ -31,7 +32,7 @@ run(
     // alpha Parameters
     int n_alpha_steps; double A, beta, E_average;
 
-    bool is_task1 = true, is_task2 = false, is_task3 = false, is_task4 = false;
+    bool is_task1 = false, is_task2 = true, is_task3 = false, is_task4 = false;
 
     if(is_task1)
     {
@@ -184,6 +185,12 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     double *block_average_vec = malloc(sizeof(double) *number_of_blocks);
     double *theta_chain = malloc(sizeof(double) * N_steps);
     double *x_chain = malloc(sizeof(double) * N_steps);
+
+    // testing corr func
+
+    int max_lag = 1e3;
+    double phi_k=0;
+    double *phi_k_vec = malloc(sizeof(double)*max_lag);
     
 
     double R1_test[NDIM], R2_test[NDIM];
@@ -237,6 +244,13 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     // Calculate energies of all positions in chain
     Energy(E_local, alpha, N_steps, R1, R2); 
     
+    for (int lag=0; lag< max_lag; ++lag)
+    {
+        double phi_inst =phi_lag(E_local, N_steps, lag); 
+        phi_k_vec[lag] = phi_inst;
+    }
+
+
     double E_PD_average = partialEnergyDerivative(E_local_derivative, alpha, N_steps, R1, R2);
 
     double average_E_local = 0;
@@ -271,7 +285,8 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     save_transposedvector_to_csv(E_local_derivative, N_steps, filename_energy_derivative, open_with_write);
     save_transposedvector_to_csv(E_local, N_steps, filename_energy, open_with_write);
     save_transposedvector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
-    save_transposedvector_to_csv(Phi_k_vec, n_phi_rows, filename_phi_k, open_with_write);
+    //save_transposedvector_to_csv(Phi_k_vec, n_phi_rows, filename_phi_k, open_with_write);
+    save_transposedvector_to_csv(Phi_k_vec, max_lag, filename_phi_k, open_with_write);
 
     // Destroy and free arrays
     free(E_local), free(E_local_derivative), free(x_chain), free(theta_chain), free(Phi_k_vec), free(block_average_vec);
