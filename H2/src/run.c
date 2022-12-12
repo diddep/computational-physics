@@ -15,6 +15,90 @@
 #define NDIM 3
 #define M_C 1000
 
+void initialize_positions(double **R1, double **R2, double d_displacement);
+void MCMC_burn_in(int N_steps, double alpha, double d_displacement, double **R1, double **R2);
+double MCMC(int N_steps, double alpha, double d_displacement, double **R1, double **R2);
+
+
+int
+run(
+    int argc,
+    char *argv[]
+   )
+{
+    // MCMC Parameters
+    int N_steps; int N_discarded_steps; double alpha, d_displacement; 
+    // alpha Parameters
+    int n_alpha_steps; double A, beta, E_average;
+
+    bool is_task1 = false, is_task2 = false, is_task3 = false, is_task4 = true;
+
+    if(is_task1)
+    {
+        N_steps = 1e5; N_discarded_steps = 0; alpha = 0.1, d_displacement = 0.1; 
+        n_alpha_steps = 1; A = 0.; beta = 0.; 
+    }
+    if(is_task2)
+    {
+        N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
+        n_alpha_steps = 1; A = 0.; beta = 0.; 
+    }
+    if(is_task3)
+    {
+        N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.05, d_displacement = 0.1; 
+        n_alpha_steps = 1; A = 0.; beta = 0.;
+    }
+    if(is_task4)
+    {
+        N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
+        n_alpha_steps = 5; A = 1.; beta = 1.; // beta from 0.5 to 1
+    }
+
+    double **R1 = create_2D_array(N_steps, NDIM), **R2 = create_2D_array(N_steps, NDIM);
+    double E_PD_average;
+    double *E_local_derivative = malloc(sizeof(double) * N_steps);
+    char filename_alpha_results[] = {"alpha_results.csv"}, filename_alpha_params[] = {"alpha_params.csv"};
+    bool open_with_write;
+
+    initialize_positions((double **) R1, (double **) R2, (double) d_displacement);
+    
+    if(is_task3 || is_task4)
+    {
+        MCMC_burn_in(N_discarded_steps, alpha, d_displacement, R1, R2);
+    }
+
+    E_average = 0;
+    for(int ix = 1; ix < n_alpha_steps + 1; ix++)
+    {
+        E_average = MCMC(N_steps, alpha, d_displacement, R1, R2);
+
+        E_PD_average = partialEnergyDerivative(E_local_derivative, alpha, N_steps, R1, R2);
+
+        double gamma = 0;
+        if(is_task3 || is_task4)
+        {
+            gamma = A*pow(ix, (double) - beta);
+        }
+
+        alpha -= gamma * E_PD_average;
+
+        // TODO: Eventuell speed up att spara dessa i en matris en gång istället för en vector n_alpha_steps gånger
+        double alpha_result_vector[] = {ix, E_average, alpha, gamma, E_PD_average};
+        if(ix == 1){ open_with_write = true; } else { open_with_write = false; }
+        save_vector_to_csv(alpha_result_vector, 5, filename_alpha_results, open_with_write);
+        printf("Iteration: %d\n", ix);
+    }
+
+    double alpha_param_vector[] = {n_alpha_steps, N_discarded_steps, alpha, A, beta, N_steps, d_displacement, is_task1, is_task2, is_task3, is_task4};
+    save_vector_to_csv(alpha_param_vector, 11, filename_alpha_params, true);
+
+    destroy_2D_array(R1, N_steps); destroy_2D_array(R2, N_steps);
+    free(E_local_derivative);
+
+    return 0;
+}
+
+
 // Function running the markov-chain
 void initialize_positions(double **R1, double **R2, double d_displacement)
 {
@@ -61,7 +145,7 @@ void MCMC_burn_in(int N_steps, double alpha, double d_displacement, double **R1,
         double prob_old = distribution(R1[ix], R2[ix], alpha);
 
         // If new prob > old, make step OR take exploration step
-        if(prob_test > prob_old || prob_test / prob_old > gsl_ran_flat(r, 0.0, 1.0))
+        if(prob_test / prob_old > gsl_ran_flat(r, 0.0, 1.0))
         {
             // If accepted, save new position in next row.
             for (int kx=0; kx < NDIM; ++kx)
@@ -126,7 +210,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
         double prob_old = distribution(R1[ix], R2[ix], alpha);
 
         // If new prob > old, make step OR take exploration step
-        if(prob_test > prob_old || prob_test / prob_old > gsl_ran_flat(r, 0.0, 1.0))
+        if(prob_test / prob_old > gsl_ran_flat(r, 0.0, 1.0))
         {
             // If accepted, save new position in next row.
             for (int kx=0; kx < NDIM; ++kx)
@@ -148,10 +232,6 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
         double theta_ix = theta_fun_vec(R1[ix], R2[ix]);
         double x_cos = cos(theta_ix);
 
-        //double result_vec[] = {ix, E_PD_average};
-        //if(ix == 0){ open_with_write = true; } else { open_with_write = false; }
-        //save_vector_to_csv(result_vec, 2, filename_results, open_with_write);
-        //printf("MCMC step: %d\n", ix);
     }
 
     // Calculate energies of all positions in chain
@@ -179,7 +259,9 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     save_matrix_to_csv(R1, N_steps, NDIM, filename_R1);
     save_matrix_to_csv(R2, N_steps, NDIM, filename_R2);
 
+    double result_vec[] = {N_steps, accept_count};
     open_with_write = true;
+    save_vector_to_csv(result_vec, 2, filename_results, open_with_write);
     save_vector_to_csv(E_local_derivative, N_steps, filename_energy_derivative, open_with_write);
     save_vector_to_csv(E_local, N_steps, filename_energy, open_with_write);
     save_vector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
@@ -190,76 +272,4 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     gsl_rng_free(r);
 
     return average_E_local;
-}
-
-int
-run(
-    int argc,
-    char *argv[]
-   )
-{
-    // MCMC Parameters
-    int N_steps; int N_discarded_steps; double alpha, d_displacement; 
-    // alpha Parameters
-    int n_alpha_steps; double A, beta, E_average;
-
-    bool is_task1 = false, is_task2 = false, is_task3 = true, is_task4 = false;
-
-    if(is_task1)
-    {
-        N_steps = 1e5; N_discarded_steps = 0; alpha = 0.1, d_displacement = 0.1; 
-        n_alpha_steps = 1; A = 0.; beta = 0.; 
-    }
-    if(is_task2)
-    {
-        N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
-        n_alpha_steps = 1; A = 0.; beta = 0.; 
-    }
-    if(is_task3)
-    {
-        N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.05, d_displacement = 0.1; 
-        n_alpha_steps = 1; A = 0.; beta = 0.;
-    }
-    if(is_task4)
-    {
-        N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
-        n_alpha_steps = 50; A = 1.; beta = 1.; // beta from 0.5 to 1
-    }
-
-    double **R1 = create_2D_array(N_steps, NDIM), **R2 = create_2D_array(N_steps,NDIM), E_PD_average;
-    double *E_local_derivative = malloc(sizeof(double) * N_steps);
-    char filename_alpha_results[] = {"alpha_results.csv"}, filename_alpha_params[] = {"alpha_params.csv"};
-    bool open_with_write;
-
-    initialize_positions((double **) R1, (double **) R2, (double) d_displacement);
-    
-    if(is_task3 || is_task4)
-    {
-        MCMC_burn_in(N_discarded_steps, alpha, d_displacement, R1, R2);
-    }
-
-    E_average = 0;
-    for(int ix = 1; ix < n_alpha_steps + 1; ix++)
-    {
-        double gamma = A*pow(ix, (double) - beta);
-
-        E_average = MCMC(N_steps, alpha, d_displacement, R1, R2);
-
-        E_PD_average = partialEnergyDerivative(E_local_derivative, alpha, N_steps, R1, R2);
-
-        alpha -= gamma * E_PD_average;
-
-        double alpha_result_vector[] = {ix, E_average, alpha, gamma, E_PD_average};
-        if(ix == 1){ open_with_write = true; } else { open_with_write = false; }
-        save_vector_to_csv(alpha_result_vector, 5, filename_alpha_results, open_with_write);
-        printf("Iteration: %d\n", ix);
-    }
-
-    double alpha_param_vector[] = {n_alpha_steps, N_discarded_steps, alpha, A, beta, N_steps, d_displacement, is_task1, is_task2, is_task3, is_task4};
-    save_vector_to_csv(alpha_param_vector, 11, filename_alpha_params, true);
-
-    destroy_2D_array(R1, N_steps); destroy_2D_array(R2, N_steps);
-    free(E_local_derivative);
-
-    return 0;
 }
