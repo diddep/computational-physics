@@ -30,31 +30,31 @@ tau_P = parameters[-1,8]
 # extract columns from array
 #dt = array[0,0]
 t = dt * np.linspace(0,len(array[:,0]), len(array[:,0]))
+
 cell_length = array[:,1]
 lattice_length = cell_length/4
 
 
 # create figure and axes for energy plot
-fig , ax = plt.subplots(1,1)
+figlattice , ax_lattice = plt.subplots(1,1)
 
 # plot energy data
-ax.plot(t, lattice_length, label='Lattice parameter')
+ax_lattice.plot(t, lattice_length, label='Lattice parameter')
 
 average_lattice = np.mean(lattice_length)
 
 # add dashed line for the average energy
-
-ax.annotate(f'a$_{{0}}$ = {lattice_length[-1]:.2f}', xy=(t[-1], lattice_length[-1]), xytext=(-50, -50),
+ax_lattice.annotate(f'a$_{{0}}$ = {lattice_length[-1]:.2f}', xy=(t[-1], lattice_length[-1]), xytext=(-50, -50),
             textcoords='offset pixels', arrowprops=dict(arrowstyle='->', color='k'))
 
 # set labels and title
-ax.set_xlabel('Time (ps)', fontsize = 15)
-ax.set_ylabel('Lattice parameter (Å)', fontsize = 15)
-ax.set_title(f'Lattice parameter, dt={dt}', fontsize = 15)
+ax_lattice.set_xlabel('Time (ps)', fontsize = 15)
+ax_lattice.set_ylabel('Lattice parameter (Å)', fontsize = 15)
+ax_lattice.set_title(f'Lattice parameter, dt={dt}', fontsize = 15)
 # if(str == "eq"):
-#     ax.set_title(f'Lattice parameter, dt={dt}, $tau_T$={tau_T}, $tau_P$={tau_P}', fontsize = 15)
+#     ax_lattice.set_title(f'Lattice parameter, dt={dt}, $tau_T$={tau_T}, $tau_P$={tau_P}', fontsize = 15)
 # else:
-#     ax.set_title(f'Lattice parameter, dt={dt}', fontsize = 15)
+#     ax_lattice.set_title(f'Lattice parameter, dt={dt}', fontsize = 15)
 plt.legend(fontsize=10)
 plt.tight_layout()
 plt.savefig(f'plots/lattice.png')

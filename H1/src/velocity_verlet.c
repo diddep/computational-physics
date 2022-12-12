@@ -121,8 +121,6 @@ double tau_P, double tau_T)
         virial = get_virial_AL((double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
         virial_per_unitcell = virial / pow(4.,3.);
 
-        // Calculate temperature (4 atoms in unit cell, kB in eV/K)
-        //double N =  4; //TODO: Remember also in other vel_verlet
         double N = 256;
         double N1 = 4;
         temp_inst_per_unitcell = 2 / (3 * N * kB) * E_kinetic;
@@ -131,36 +129,23 @@ double tau_P, double tau_T)
         // Change scaling parameter for temperature
         if(temp_scaling == true){
 
-            // Value of tau_T is uncertain, and unsure if we should mult. by dt. Have heard approx 50.
-            //tau_T = 200*dt;
-
-            // Unsure if plus or minus. Scaling with "correct" sign seams to change temp in wrong direction
             alpha_T = 1 + 2 * dt / tau_T * (temp_eq - temp_inst_per_unitcell)/temp_inst_per_unitcell;
-            //alpha_T = 1 - 2 * dt / tau_T * (temp_eq - temp_inst_per_unitcell)/temp_inst_per_unitcell;
-        }
+
 
          // Calculate pressure in eV/Å^3
         press_inst_per_unitcell = ((N * kB * temp_inst_per_unitcell) + virial) / cell_volume; //lattice_volume;
         
         //press_inst_per_unitcell = ((N * kB * temp_inst_per_unitcell) + virial_per_unitcell) / cell_volume; //lattice_volume;
-        
-        //FIXME: WHat should this unit be
+
         press_inst_per_unitcell *= 1.60219*1e2*1e4; // 1eV/Å^3 = 160.2 Gpa, 1 GPa = 10^4 Bar 
         
         // Changing scaling parameter for pressure
         if(press_scaling == true){
 
-            // Value of tau_P is uncertain, and unsure if we should mult. by dt. Have heard slightly more than 50.
-            //tau_P = 25 * dt;
-
-            // Isothermal compressability for aluminium in Gpa^-1
-            // FIXME: What should this unit be?
             double kappa_T = 0.01385*1e-4; // Neg eller pos?
 
             // Unsure if plus or minus. Scaling with "correct" sign seams to change pressure in wrong direction
             alpha_P = 1 - kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
-            //printf("alpha_p = %f", alpha)
-            //alpha_P = 1 + kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
         }
         
         // Creating vectors so to save results in csv files. Can be plotted with python files plot_energy.py and plot_position_track.py
@@ -199,7 +184,7 @@ double tau_P, double tau_T)
 //
 
 double
-velocity_verlet_deluxe(double positions[][3], double v[][3], double lattice_param, double cell_length, int end_time, \
+velocity_verlet_with_radial(double positions[][3], double v[][3], double lattice_param, double cell_length, int end_time, \
 double dt, int n_cols, int nbr_atoms, bool temp_scaling, bool press_scaling, double temp_eq, double press_eq, bool write_not_append, \
 double tau_P, double tau_T, double *radial_histogram_vector, int number_of_bins)
 {
@@ -308,10 +293,7 @@ double tau_P, double tau_T, double *radial_histogram_vector, int number_of_bins)
         // Calculate virial to use for pressure calculation
         virial = get_virial_AL((double (*)[3]) positions, (double) cell_length, (int) nbr_atoms);
         virial_per_unitcell = virial / 64;//pow(4.,3.);
-
-        //TODO: Remember this is also in other vel verlet
-        //double N =  4; 
-        double N1 = 4;
+    
         double N = 256;
 
         // Calculate temperature (4 atoms in unit cell, kB in eV/K)
@@ -321,32 +303,18 @@ double tau_P, double tau_T, double *radial_histogram_vector, int number_of_bins)
         // Change scaling parameter for temperature
         if(temp_scaling == true){
 
-            // Value of tau_T is uncertain, and unsure if we should mult. by dt. Have heard approx 50.
-            //tau_T = 200*dt;
-
-            // Unsure if plus or minus. Scaling with "correct" sign seams to change temp in wrong direction
             alpha_T = 1 + 2 * dt / tau_T * (temp_eq - temp_inst_per_unitcell)/temp_inst_per_unitcell;
-            //alpha_T = 1 - 2 * dt / tau_T * (temp_eq - temp_inst_per_unitcell)/temp_inst_per_unitcell;
         }
-
-         // Calculate pressure in eV/Å^3
-        //press_inst_per_unitcell = ((N * kB * temp_inst_per_unitcell) + virial_per_unitcell) / cell_volume; //lattice_volume;
-        
         press_inst_per_unitcell = ((N * kB * temp_inst_per_unitcell) + virial) / cell_volume; //lattice_volume;
         press_inst_per_unitcell *= 1.60219*1e2*1e4; // 1eV/Å^3 = 160.2 gPA
         
         // Changing scaling parameter for pressure
         if(press_scaling == true){
 
-            // Value of tau_P is uncertain, and unsure if we should mult. by dt. Have heard slightly more than 50.
-            //tau_P = 25 * dt;
-
             // Isothermal compressability for aluminium in Gpa^-1
-            double kappa_T = 0.01385*1e-4; // Neg eller pos?
+            double kappa_T = 0.01385*1e-4;
 
-            // Unsure if plus or minus. Scaling with "correct" sign seams to change pressure in wrong direction
             alpha_P = 1 - kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
-            //alpha_P = 1 + kappa_T * dt / tau_P * (press_eq - press_inst_per_unitcell);
         }
         
         // Creating vectors so to save results in csv files. Can be plotted with python files plot_energy.py and plot_position_track.py
@@ -375,8 +343,72 @@ double tau_P, double tau_T, double *radial_histogram_vector, int number_of_bins)
             }
             printf("Production: Inst. Temp, Press at t = [%i]: %f,   %f\n", tx, temp_inst_per_unitcell, press_inst_per_unitcell);
         }
-        // Printing temperature for each timestep to keep track during longer measurements
-        //printf("Inst. Temp, Press at t = [%i]: %f,   %f\n", tx, temp_inst_per_unitcell, press_inst_per_unitcell);
-    }
+       }
     return cell_length;
+}
+
+/* Returns the forces */
+void get_radial_dist_AL(int number_of_bins, double *radial_histogram_vector, double positions[][3], double cell_length, int nbr_atoms)
+{
+  int i, j;
+  double cell_length_inv, cell_length_sq, bin_length;
+  double rcut, rcut_sq;
+  //double densityi, dens, drho_dr, force;
+  //double dUpair_dr;
+  double sxi, syi, szi, sxij, syij, szij, rij,  rij_sq;
+  
+  double *sx = malloc(nbr_atoms * sizeof (double));
+  double *sy = malloc(nbr_atoms * sizeof (double));
+  double *sz = malloc(nbr_atoms * sizeof (double));
+  
+  rcut = 6.06; // Embedded atom method potential. 
+  rcut_sq = rcut * rcut;
+
+  
+  cell_length_inv = 1 / cell_length;
+  cell_length_sq = cell_length * cell_length;
+  bin_length= cell_length/(double)number_of_bins;
+  
+  for (i = 0; i < nbr_atoms; i++){
+    sx[i] = positions[i][0] * cell_length_inv;
+    sy[i] = positions[i][1] * cell_length_inv;
+    sz[i] = positions[i][2] * cell_length_inv;
+  }
+
+  /* Compute radial distribution on atoms. */
+	/* Loop over atoms again :-(. */
+  
+  for (i = 0; i < nbr_atoms; i++) {
+    /* Periodically translate coords of current particle to positive quadrants */
+		sxi = sx[i] - floor(sx[i]);
+		syi = sy[i] - floor(sy[i]);
+		szi = sz[i] - floor(sz[i]);
+		
+		/* Loop over other atoms. */
+		for (j = i + 1; j < nbr_atoms; j++) 
+    {
+      /* Periodically translate atom j to positive quadrants and calculate distance to it. */
+			sxij = sxi - (sx[j] - floor(sx[j]));
+			syij = syi - (sy[j] - floor(sy[j]));
+			szij = szi - (sz[j] - floor(sz[j]));
+      
+      /* Periodic boundary conditions. */
+			sxij = sxij - (int)floor(sxij + 0.5);
+			syij = syij - (int)floor(syij + 0.5);
+			szij = szij - (int)floor(szij + 0.5);
+      
+      /* squared distance between atom i and j */
+			rij_sq = cell_length_sq * (sxij*sxij + syij*syij + szij*szij);
+    
+      /*Add position into bin depending on radial size*/
+      rij = sqrt( rij_sq );
+      
+      int bin = (int) floor(  rij/bin_length + 0.5);
+
+      radial_histogram_vector[bin] +=1;
+
+    }
+  }
+  
+  free(sx); free(sy); free(sz); sx = NULL; sy = NULL; sz = NULL;
 }

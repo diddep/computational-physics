@@ -21,10 +21,10 @@ run(
     char *argv[]
    )
 {
-    //H1_task1();
-    //H1_task2();
-    //H1_task3();
-    //H1_task4();
+    H1_task1();
+    H1_task2();
+    H1_task3();
+    H1_task4();
     H1_task6();
 
     return 0;
@@ -74,7 +74,7 @@ H1_task2()
     double temp_eq, press_eq, tau_T, tau_P;
 
     // Production run
-    end_time = 10; dt = 1e-2;
+    end_time = 10; dt = 2e-2;
     temp_scaling = false, press_scaling = false;
     temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
     tau_T = 1 * dt; tau_P = 1*dt;
@@ -117,7 +117,7 @@ H1_task3()
     // tau_T = 100*dt; tau_P = 50*dt;
 
     // Equalibration run
-    end_time = 25; dt = 1e-2;
+    end_time = 20; dt = 1e-2;
     temp_scaling = true; press_scaling = true;
     temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
     tau_T = 100*dt; tau_P = 300*dt; //*dt; 50,5
@@ -128,7 +128,7 @@ H1_task3()
 
 
     // Production run
-    end_time = 5; dt = 1e-2;
+    end_time = 20; dt = 1e-2;
     temp_scaling = false, press_scaling = false;
     temp_eq = 773.15; press_eq = 1; //773.15 K och 1 Bar
     write_not_append = true;
@@ -260,7 +260,7 @@ H1_task6()
     double normalisation_factor_radial_dist = (double) nbr_atoms*end_time/(dt);
 
 
-    cell_length = velocity_verlet_deluxe((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
+    cell_length = velocity_verlet_with_radial((double (*)[3]) position, (double (*)[3]) velocity, (double) lattice_param, (double) cell_length, (int) end_time, (double) dt, (int) n_cols, (int) nbr_atoms, \
                     (bool) temp_scaling, (bool) press_scaling, (double) temp_eq, (double) press_eq, (bool) write_not_append, (double) tau_P, (double) tau_T, radial_distribution_vector, number_of_bins);
 
     

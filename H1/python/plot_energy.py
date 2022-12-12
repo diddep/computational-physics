@@ -6,6 +6,8 @@ sns.set()
 # set default figure size
 plt.rcParams["figure.figsize"] = [8, 6]
 
+for idx, val in enumerate(["eq", "prod"]):
+    str = val
 str = "eq"
 #str = "prod"
 

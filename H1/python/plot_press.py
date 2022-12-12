@@ -33,7 +33,7 @@ tau_P = parameters[-1,8]
 
 t = dt * np.linspace(0,len(array[:,1]), len(array[:,1]))
 
-fig3 , axP = plt.subplots(1,1)
+figP , axP = plt.subplots(1,1)
 axP.plot(t, press, label='Pressure')
 
 average_pressure = np.mean(press)
