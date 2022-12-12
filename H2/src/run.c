@@ -31,7 +31,7 @@ run(
     // alpha Parameters
     int n_alpha_steps; double A, beta, E_average;
 
-    bool is_task1 = false, is_task2 = true, is_task3 = false, is_task4 = false;
+    bool is_task1 = true, is_task2 = false, is_task3 = false, is_task4 = false;
 
     if(is_task1)
     {
@@ -57,7 +57,7 @@ run(
     double **R1 = create_2D_array(N_steps, NDIM), **R2 = create_2D_array(N_steps, NDIM);
     double E_PD_average;
     double *E_local_derivative = malloc(sizeof(double) * N_steps);
-    char filename_alpha_results[] = {"alpha_results.csv"}, filename_alpha_params[] = {"alpha_params.csv"};
+    char filename_alpha_results[] = {"../csv/alpha_results.csv"}, filename_params[] = {"../csv/params.csv"};
     bool open_with_write;
 
     initialize_positions((double **) R1, (double **) R2, (double) d_displacement);
@@ -89,8 +89,8 @@ run(
         printf("Iteration: %d\n", ix);
     }
 
-    double alpha_param_vector[] = {n_alpha_steps, N_discarded_steps, alpha, A, beta, N_steps, d_displacement, is_task1, is_task2, is_task3, is_task4};
-    save_vector_to_csv(alpha_param_vector, 11, filename_alpha_params, true);
+    double param_vector[] = {n_alpha_steps, N_discarded_steps, alpha, A, beta, N_steps, d_displacement, is_task1, is_task2, is_task3, is_task4};
+    save_vector_to_csv(param_vector, 11, filename_params, true);
     destroy_2D_array(R1, N_steps); destroy_2D_array(R2, N_steps);
     free(E_local_derivative);
 
@@ -169,10 +169,10 @@ void MCMC_burn_in(int N_steps, double alpha, double d_displacement, double **R1,
 double MCMC(int N_steps, double alpha, double d_displacement, double **R1, double **R2)
 {
     // Filenames for saving in csv
-    char filename_R1[] = {"R1.csv"}, filename_R2[] = {"R2.csv"};
-    char filename_energy[] = {"E_local.csv"}, filename_xdist[] = {"x_distribution.csv"}, filename_theta[] = {"theta.csv"};
-    char filename_energy_derivative[] = {"E_local_derivative.csv"};
-    char filename_results[] = {"MCMC_results.csv"}, filename_phi_k[] ={"phi_k.csv"}, filename_block_avg[] ={"block_avg_vec.csv"};
+    char filename_R1[] = {"../csv/R1.csv"}, filename_R2[] = {"../csv/R2.csv"};
+    char filename_energy[] = {"../csv/E_local.csv"}, filename_xdist[] = {"../csv/x_distribution.csv"}, filename_theta[] = {"../csv/theta.csv"};
+    char filename_energy_derivative[] = {"../csv/E_local_derivative.csv"};
+    char filename_results[] = {"../csv/MCMC_results.csv"}, filename_phi_k[] ={"../csv/phi_k.csv"}, filename_block_avg[] ={"../csv/block_avg_vec.csv"};
     bool open_with_write;
     
      // Initializing arrays
@@ -257,14 +257,20 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     // Save in csv:s
     save_matrix_to_csv(R1, N_steps, NDIM, filename_R1);
     save_matrix_to_csv(R2, N_steps, NDIM, filename_R2);
+    // save_matrix_to_csv(&E_local, N_steps, 2, filename_energy);
+    // save_matrix_to_csv(&E_local_derivative, N_steps, 2, filename_energy_derivative);
+    // save_matrix_to_csv(&x_chain, N_steps, 2, filename_xdist);
+    // save_matrix_to_csv(&theta_chain, N_steps, 2, filename_theta);
+    // save_matrix_to_csv(&Phi_k_vec, N_steps, 2, filename_phi_k);
+
 
     double result_vec[] = {N_steps, accept_count};
     open_with_write = true;
     save_vector_to_csv(result_vec, 2, filename_results, open_with_write);
-    save_vector_to_csv(E_local_derivative, N_steps, filename_energy_derivative, open_with_write);
-    save_vector_to_csv(E_local, N_steps, filename_energy, open_with_write);
-    save_vector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
-    save_vector_to_csv(Phi_k_vec, n_phi_rows, filename_phi_k, open_with_write);
+    save_transposedvector_to_csv(E_local_derivative, N_steps, filename_energy_derivative, open_with_write);
+    save_transposedvector_to_csv(E_local, N_steps, filename_energy, open_with_write);
+    save_transposedvector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
+    save_transposedvector_to_csv(Phi_k_vec, n_phi_rows, filename_phi_k, open_with_write);
 
     // Destroy and free arrays
     free(E_local), free(E_local_derivative), free(x_chain), free(theta_chain), free(Phi_k_vec), free(block_average_vec);

@@ -255,8 +255,7 @@ int save_vector_to_csv(
         printf("Error while opening the file.\n");
         return 1;
     }
-    //fprintf(fp1, "%10.5f,%10.5f,%10.5f", vec[0], vec[1], vec[2]);
-    //tror det ska ndims-1 men var ndism förut på if
+
     for(int i =0; i<ndims; ++i){
         if(i!=ndims-1){
             fprintf(fp1, "%10.5f, ", vec[i]);
@@ -265,7 +264,36 @@ int save_vector_to_csv(
         }
     }
 
-    //fprintf(fp1,"\n");
+
+    fclose(fp1);
+    return 0;
+}
+
+int save_transposedvector_to_csv(
+        double *vec,  // Vector to save
+        unsigned int ndims,  // Number of dimensions
+        char *filename, // filename
+        bool is_empty
+)
+{
+    FILE *fp1;
+    if(is_empty == true){
+        fp1 = fopen(filename, "w"); // Create a file if is_empty == true
+    } else {
+        fp1 = fopen(filename, "a"); // Append if file if is_empty == false
+    }
+
+    if (fp1 == NULL)
+    {
+        printf("Error while opening the file.\n");
+        return 1;
+    }
+    
+    for(int i =0; i<ndims; ++i){
+        
+        fprintf(fp1, "%10.5f, \n", vec[i]);
+    }
+
 
     fclose(fp1);
     return 0;

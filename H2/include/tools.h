@@ -159,6 +159,13 @@ save_vector_to_csv(
         bool is_empty
 );
 
+int save_transposedvector_to_csv(
+        double *vec,  // Vector to save
+        unsigned int ndims,  // Number of dimensions
+        char *filename, // filename
+        bool is_empty
+);
+
 int
 save_matrix_to_csv(
         double **matrix,

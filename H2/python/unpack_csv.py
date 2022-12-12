@@ -1,39 +1,35 @@
 import numpy as np
 import pandas as pd
 import time
-start_time = time.time()
 
-print("Starting program")
-print("--- %s seconds ---" % (time.time() - start_time))
+def main():
+    start_time = time.time()
 
-#array_names = ["R1", "R2", "E_local", "E_local_derivative", "x_distribution", "theta", "phi_k", "alpha_results", "alpha_params"]
-array_names = ["R1"]
-for array_name in array_names:
-    print(array_name)
-    array_name =np.genfromtxt(f"../{array_name}.csv", delimiter=',')
+    R1 = pd.read_csv(f"../csv/R1.csv", engine="pyarrow", header=0)
+    R2 = pd.read_csv("../csv/R2.csv", engine="pyarrow", header=0)
+    E_local = pd.read_csv("../csv/E_local.csv", engine="pyarrow", header=0)
+    E_local_derivative = pd.read_csv("../csv/E_local_derivative.csv", engine="pyarrow", header=0)
+    x_distribution = pd.read_csv("../csv/x_distribution.csv", engine="pyarrow", header=0)
+    #arr_theta_csv = pd.read_csv("../csv/theta.csv", engine="pyarrow", header=0)
+    phi_k =pd.read_csv("../csv/phi_k.csv", engine="pyarrow", header=0)
+    alpha_results = pd.read_csv("../csv/alpha_results.csv", engine="pyarrow", header=0)
+    params = np.genfromtxt("../csv/params.csv", delimiter=',')
+    steps_linspace = np.linspace(0,int(params[5])+1, int(params[5])+1, endpoint=False)
+  
+
+    array_tuple = (R1, R2, E_local, E_local_derivative, x_distribution, phi_k, alpha_results, params, steps_linspace)
+
+    print("Read CSV:s with pyarrow in")
+    print("--- %s seconds ---" % (time.time() - start_time))
+    # TODO: Change array names
+    # TODO: Change array name in plot task1, multiple names of arr_r1/R1
+    # TODO: alpha-params -> params filename change
 
 
 
-#TODO: Change array name in plot task1, multiple names of arr_r1/R1
-# R1 =np.genfromtxt("../R1.csv", delimiter=',')
-# R2 =np.genfromtxt("../R2.csv", delimiter=',')
-# arr_E_L = np.genfromtxt("../E_local.csv", delimiter=',')
-# arr_E_L_Derivative = np.genfromtxt("../E_local_derivative.csv", delimiter=',')
-# arr_xdist = np.genfromtxt("../x_distribution.csv", delimiter=',')
-# arr_theta_csv = np.genfromtxt("../theta.csv", delimiter=',')
-# Phi_k =np.genfromtxt("../phi_k.csv", delimiter=',')
-# alpha_results = np.genfromtxt("../alpha_results.csv", delimiter=',')
-# params = np.genfromtxt("../alpha_params.csv", delimiter=',')
-# arr_theta = arr_theta_csv[:,1]
-#TODO: arr_steps from alpha_params
+    return array_tuple
 
-#alpha_param_vector[] = {n_alpha_steps, N_discarded_steps, alpha, A, beta, N_steps, d_displacement, is_task1, is_task2, is_task3, is_task4};
+# results = main()
 
-print("Read with numpy")
-print("--- %s seconds ---" % (time.time() - start_time))
+# (R1, R2, E_local, E_local_derivative, x_distribution, phi_k, alpha_results, params, steps_linspace) = results
 
-#import pandas as pd
-#R1 = pd.read_csv("../R1.csv", engine="pyarrow")
-
-print("Read with pandas pyArrow")
-print("--- %s seconds ---" % (time.time() - start_time))
