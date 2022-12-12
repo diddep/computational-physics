@@ -14,7 +14,6 @@ CFLAGS_SANITIZE = \
 		 -Wall \
 	 	 -pedantic \
 	 	 -g \
-	 	 -fsanitize=address \
 		 -fno-omit-frame-pointer \
 		 -Iinclude
 
