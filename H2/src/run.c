@@ -242,19 +242,21 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     
      // Initializing arrays
     int n_phi_rows = 2*M_C+10;
-    int number_of_blocks = 100;
+    //int number_of_blocks = 100;
     double *E_local = malloc(sizeof(double) * N_steps);
     double *E_local_derivative = malloc(sizeof(double) * N_steps);
     double *Phi_k_vec = malloc(sizeof(double) *n_phi_rows);
-    double *block_average_vec = malloc(sizeof(double) *number_of_blocks);
     double *theta_chain = malloc(sizeof(double) * N_steps);
     double *x_chain = malloc(sizeof(double) * N_steps);
 
     // testing corr func
-
     int max_lag = 2*1e2;
     double phi_k=0;
     double *phi_k_vec = malloc(sizeof(double)*max_lag);
+    
+    // testing block averaging
+    int max_block_size = 400;
+    double *block_average_vec = malloc(sizeof(double) *max_block_size);
     
 
     double R1_test[NDIM], R2_test[NDIM];
@@ -308,11 +310,18 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     // Calculate energies of all positions in chain
     Energy(E_local, alpha, N_steps, R1, R2); 
     
+    //testing corrolation function
     for (int lag=0; lag< max_lag; ++lag)
     {
         double phi_inst =phi_lag(E_local, N_steps, lag); 
         phi_k_vec[lag] = phi_inst;
         //printf("phi_k=%f\n", phi_inst);
+    }
+
+    //testing block averaging
+    for (int block_size =1; block_size<max_block_size; ++block_size)
+    {
+        block_average_vec[block_size] = statistical_ineff_from_BLAV(E_local, N_steps, block_size);
     }
 
 
@@ -330,13 +339,13 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
 
         //theta_fun(theta_chain, N_steps, R1, R2);
         x_distribution(x_chain, N_steps, R1,R2);
-        double statistical_inefficiency = correlation_function(Phi_k_vec, E_local, N_steps, M_C);
-        printf("Statistical inefficiency from correlation function= %f\n", statistical_inefficiency);
-        statistical_inefficiency=0;
-        statistical_inefficiency = block_average(block_average_vec,E_local, N_steps, number_of_blocks);
+        //double statistical_inefficiency = correlation_function(Phi_k_vec, E_local, N_steps, M_C);
+        //printf("Statistical inefficiency from correlation function= %f\n", statistical_inefficiency);
+        //statistical_inefficiency=0;
+        //statistical_inefficiency = block_average(block_average_vec,E_local, N_steps, number_of_blocks);
 
         //printf("Accept_count = %d \n", accept_count);
-        printf("Statistical inefficiency from block averaging= %f\n", statistical_inefficiency);
+        //printf("Statistical inefficiency from block averaging= %f\n", statistical_inefficiency);
 
         // Save in csv:s
         save_matrix_to_csv(R1, N_steps, NDIM, filename_R1);
@@ -350,6 +359,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
         save_transposedvector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
         save_transposedvector_to_csv(theta_chain, N_steps, filename_theta, open_with_write);
         save_transposedvector_to_csv(phi_k_vec, max_lag, filename_phi_k, open_with_write);
+        save_transposedvector_to_csv(block_average_vec, max_block_size, filename_block_avg, open_with_write);
     }
     // Destroy and free arrays
     free(E_local), free(E_local_derivative), free(x_chain), free(theta_chain), free(Phi_k_vec), free(block_average_vec);
