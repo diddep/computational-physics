@@ -12,6 +12,7 @@ def main(results):
     # results = unpack_csv.main()
     (R1, R2, E_local, E_local_derivative, x_distribution, theta_distribution, phi_k, steps_linspace, alpha_results, params) = results
 
+
     task_str = get_task_str.main()
     #TODO: implement more datapoints to plot sequence
     #print(alpha_results.ix.values[:])

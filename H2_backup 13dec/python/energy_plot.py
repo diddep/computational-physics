@@ -6,11 +6,11 @@ import set_plot_style
 import unpack_csv
 import get_task_str
 
-def main():
+def main(results):
     sns.set_theme()
     set_plot_style.main()
 
-    results = unpack_csv.main()
+    #results = unpack_csv.main()
     (R1, R2, E_local, E_local_derivative, x_distribution, theta_distribution, phi_k, steps_linspace, alpha_results, params) = results
 
     task_str = get_task_str.main()
@@ -37,4 +37,6 @@ def main():
     ax_energy.legend(loc="lower left")
     fig_energy.savefig(f'plots_python/{task_str}/energy.png')
 
-main()
+if(__name__ == "__main__"):
+    results = unpack_csv.main()
+    main(results)

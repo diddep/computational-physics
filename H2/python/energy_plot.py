@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.signal import savgol_filter
 import seaborn as sns
 import set_plot_style
 import unpack_csv
 import get_task_str
-from scipy import signal
 
 def main(results):
     sns.set_theme()
@@ -23,7 +23,7 @@ def main(results):
     # Calculate moving average of energy
 
     window_size = 10000; poly_order = 3
-    moving_averages = signal.savgol_filter(E_local, window_size, poly_order)
+    moving_averages = savgol_filter(E_local, window_size, poly_order)
 
     # Plot energy
     fig_energy, ax_energy = plt.subplots(1,1)

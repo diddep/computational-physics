@@ -6,11 +6,11 @@ import set_plot_style
 import unpack_csv
 import get_task_str
 
-def main():
+def main(results):
     sns.set_theme()
     set_plot_style.main()
 
-    results = unpack_csv.main()
+    #results = unpack_csv.main()
     (R1, R2, E_local, E_local_derivative, x_distribution, theta_distribution, phi_k, steps_linspace, alpha_results, params) = results
 
     task_str = get_task_str.main()
@@ -32,7 +32,9 @@ def main():
     ax_energy_deriv.set_ylabel("Energy [a.u.]")
     ax_energy_deriv.set_title(f'Derivative of local energy, alpha = {alpha}')
     #ax_energy_deriv.set_title(f'Derivative of local energy, alpha = {alpha}')
-    ax_energy_deriv.legend()
+    ax_energy_deriv.legend(loc="lower left")
     fig_energy_deriv.savefig(f'plots_python/{task_str}/energy_derivative.png')
 
-main()
+if(__name__ == "__main__"):
+    results = unpack_csv.main()
+    main(results)

@@ -73,7 +73,7 @@ run(
     if(task_num == 4)
     {
         N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 1.24; 
-        N_alpha_steps = 50; A = 1.; beta = 1.; is_save = false; // beta from 0.5 to 1
+        N_alpha_steps = 10; A = 1.; beta = 1.; is_save = false; // beta from 0.5 to 1
         is_task4 = true;
     }
 

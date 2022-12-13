@@ -1,6 +1,10 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
+import set_plot_style
+import unpack_csv
+import get_task_str
 
 def main(results):
     sns.set_theme()
@@ -8,6 +12,8 @@ def main(results):
 
     #results = unpack_csv.main()
     (R1, R2, E_local, E_local_derivative, x_distribution, theta_distribution, phi_k, steps_linspace, alpha_results, params) = results
+
+    task_str = get_task_str.main()
 
     lag_vec = np.arange(0,len(phi_k))
 
