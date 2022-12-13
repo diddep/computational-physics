@@ -54,7 +54,7 @@ run(
         N_steps = 1e6; N_discarded_steps = 0; alpha = 0.1, d_displacement = 1.24; 
         N_alpha_steps = 1; A = 0.; beta = 0.; 
         is_task1 = true;
-    }
+}
     if(task_num == 2)
     {
         N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
@@ -89,12 +89,7 @@ run(
 
     E_average = 0;
     for(int ix = 1; ix < N_alpha_steps + 1; ix++)
-    {   
-        if( ix == N_alpha_steps)
-        {
-            is_save = true;
-        }
-
+    {
         E_average = MCMC(N_steps, alpha, d_displacement, R1, R2, is_save);
 
         E_PD_average = partialEnergyDerivative(E_local_derivative, alpha, N_steps, R1, R2);
@@ -107,7 +102,7 @@ run(
 
         alpha -= gamma * E_PD_average;
 
-        // TODO: Eventuell speed up att spara dessa i en matris en gång istället för en vector N_alpha_steps gånger
+        // TODO: Eventuell speed up att spara dessa i en matris en gång istället för en vector n_alpha_steps gånger
         double alpha_result_vector[] = {ix, E_average, alpha, gamma, E_PD_average};
         if(ix == 1){ open_with_write = true; } else { open_with_write = false; }
         save_vector_to_csv(alpha_result_vector, 5, filename_alpha_results, open_with_write);
@@ -139,7 +134,7 @@ void initialize_positions(double **R1, double **R2, double d_displacement)
 
         random_number = gsl_ran_flat(r, -0.5, 0.5);
         R2[0][kx] = d_displacement * random_number;
-        //printf("R1[0][%d]: %f, R2[0][%d]: %f\n", kx, R1[0][kx], kx, R2[0][kx]);
+        printf("R1[0][%d]: %f, R2[0][%d]: %f\n", kx, R1[0][kx], kx, R2[0][kx]);
     }
     gsl_rng_free(r);
 }
@@ -202,7 +197,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     
      // Initializing arrays
     int n_phi_rows = 2*M_C+10;
-    int number_of_blocks = 3;
+    int number_of_blocks = 100;
     double *E_local = malloc(sizeof(double) * N_steps);
     double *E_local_derivative = malloc(sizeof(double) * N_steps);
     double *Phi_k_vec = malloc(sizeof(double) *n_phi_rows);
@@ -212,7 +207,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
 
     // testing corr func
 
-    int max_lag = 1e3;
+    int max_lag = 2*1e2;
     double phi_k=0;
     double *phi_k_vec = malloc(sizeof(double)*max_lag);
     
@@ -226,11 +221,6 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     int accept_count = 0;
     for(int ix = 0; ix < N_steps - 1; ++ix)
     {
-        int percent_size = N_steps/100;
-        if (ix % percent_size == 0 && is_save)
-        {
-            printf("MCMC sampling at {%i} percent \n", ix/percent_size);
-        }
         // get proposal positons
         for (int kx = 0; kx < NDIM; ++kx)
         {
@@ -289,7 +279,6 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
         average_E_local += E_local[ix]/N_steps;
     }
 
-    
     if(is_save)
     {
         printf("Accept ratio = %f\n", (double) accept_count/N_steps);
@@ -317,7 +306,6 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
         save_transposedvector_to_csv(theta_chain, N_steps, filename_theta, open_with_write);
         save_transposedvector_to_csv(phi_k_vec, max_lag, filename_phi_k, open_with_write);
     }
-
     // Destroy and free arrays
     free(E_local), free(E_local_derivative), free(x_chain), free(theta_chain), free(Phi_k_vec), free(block_average_vec);
     gsl_rng_free(r);

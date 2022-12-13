@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.signal import savgol_filter
 import seaborn as sns
 import set_plot_style
 import unpack_csv

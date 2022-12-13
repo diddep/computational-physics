@@ -335,9 +335,9 @@ int save_matrix_to_csv(
 
 gsl_rng *
 init_random_num_generator()
-{  
-    //TODO: Set seed till Time
-    int seed = 42;
+{
+    //int seed = 42;
+    int seed= time(NULL);
     const gsl_rng_type * T;
     gsl_rng * r;
     gsl_rng_env_setup();
