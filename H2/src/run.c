@@ -32,7 +32,7 @@ run(
     // alpha Parameters
     int n_alpha_steps; double A, beta, E_average;
 
-    bool is_task1 = false, is_task2 = false, is_task3 = false, is_task4 = true;
+    bool is_task1 = false, is_task2 = true, is_task3 = false, is_task4 = false;
 
     if(is_task1)
     {
@@ -41,7 +41,7 @@ run(
     }
     if(is_task2)
     {
-        N_steps = 1e5; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
+        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 1.24; 
         n_alpha_steps = 1; A = 0.; beta = 0.; 
     }
     if(is_task3)
@@ -178,7 +178,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     
      // Initializing arrays
     int n_phi_rows = 2*M_C+10;
-    int number_of_blocks = 3;
+    int number_of_blocks = 100;
     double *E_local = malloc(sizeof(double) * N_steps);
     double *E_local_derivative = malloc(sizeof(double) * N_steps);
     double *Phi_k_vec = malloc(sizeof(double) *n_phi_rows);
@@ -188,7 +188,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
 
     // testing corr func
 
-    int max_lag = 1e3;
+    int max_lag = 2*1e2;
     double phi_k=0;
     double *phi_k_vec = malloc(sizeof(double)*max_lag);
     
@@ -248,7 +248,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     {
         double phi_inst =phi_lag(E_local, N_steps, lag); 
         phi_k_vec[lag] = phi_inst;
-        printf("phi_k=%f\n", phi_inst);
+        //printf("phi_k=%f\n", phi_inst);
     }
 
 
@@ -283,6 +283,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     double result_vec[] = {N_steps, accept_count};
     open_with_write = true;
     save_vector_to_csv(result_vec, 2, filename_results, open_with_write);
+    save_vector_to_csv(block_average_vec, number_of_blocks, filename_block_avg, open_with_write);
     save_transposedvector_to_csv(E_local_derivative, N_steps, filename_energy_derivative, open_with_write);
     save_transposedvector_to_csv(E_local, N_steps, filename_energy, open_with_write);
     save_transposedvector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);

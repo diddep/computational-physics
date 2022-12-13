@@ -27,10 +27,27 @@ double phi_lag(double *E_local_chain, int N_steps, int Lag)
     {
         lagged_average += E_local_chain[step]*E_local_chain[step+Lag];
     }
-    lagged_average/=N_steps;
+    lagged_average/=(N_steps-Lag);
 
     phi_k = (lagged_average -average_E_local*average_E_local)/(average_squared_E_local-average_E_local*average_E_local);
 
     return phi_k;
 }
+
+
+// double restructured_block_average(double *E_local_vec, int N_steps, int number_of_blocks)
+// {
+//     int block_size = N_steps/number_of_blocks;
+//     double average_i = 0, variance_block=0, variance_E_local=0, statistical_inneficiency, error_bar=0;
+//     double average_tot =0;
+    
+//     for(int step =0; step<N_steps; ++step)
+//     {
+//         average_tot += E_local_vec[step];
+//     }
+//     average_tot /=N_steps;
+
+    
+
+// }
 

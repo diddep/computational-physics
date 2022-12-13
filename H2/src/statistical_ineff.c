@@ -64,7 +64,9 @@ double block_average(double *block_average_vec, double *E_local_vec, int N_steps
             //should maybe be [block*(block_size-1) +step]
             average_i += E_local_vec[block*(block_size) +step] /(block_size);
             //printf("avava =%f\n", average_i);
+            //printf("%d\n", step);
         }
+        printf("%f\n", average_i);
         block_average_vec[block] = average_i;
     }
 
