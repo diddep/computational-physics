@@ -34,6 +34,33 @@ double phi_lag(double *E_local_chain, int N_steps, int Lag)
     return phi_k;
 }
 
+double statistical_ineff_from_BLAV(double *E_local_vec, int N_steps, int Block_size)
+{
+    int number_of_blocks = N_steps/Block_size;
+    double average_i = 0, variance_block=0, variance_E_local=0, statistical_inneficiency;
+    double average_tot =0;
+    // array to save averages for each block
+    double *block_vec = malloc(sizeof(double)*number_of_blocks);
+
+    for(int block=0; block<number_of_blocks; ++block)
+    {
+        //calculate average inside a block
+        //for(int step =block*Block_size; step<(block+1)*Block_size; ++step)
+        for(int step =0; step< Block_size; ++step)
+        {
+            block_vec[block] += E_local_vec[Block_size*(block) +step]; 
+            //block_vec[block] += E_local_vec[step];
+        }
+        block_vec[block] /=Block_size;
+    }
+    variance_block = variance(block_vec,number_of_blocks);
+    variance_E_local = variance(E_local_vec,N_steps);
+
+    statistical_inneficiency = (variance_block*Block_size)/variance_E_local;
+    free(block_vec);
+    return statistical_inneficiency;
+}
+
 
 // double restructured_block_average(double *E_local_vec, int N_steps, int number_of_blocks)
 // {
