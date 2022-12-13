@@ -31,8 +31,9 @@ run(
     int N_steps; int N_discarded_steps; double alpha, d_displacement; 
     // alpha Parameters
     int N_alpha_steps; double A, beta, E_average;
+    bool is_save = true;
 
-    bool is_task1 = false, is_task2 = false, is_task3 = false, is_task4 = true, is_save = true;
+    bool is_task1 = true, is_task2 = false, is_task3 = false, is_task4 = false;
 
     if(is_task1)
     {
@@ -273,7 +274,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     
     if(is_save)
     {
-        
+        printf("Accept ratio = %f\n", (double) accept_count/N_steps);
 
         //theta_fun(theta_chain, N_steps, R1, R2);
         x_distribution(x_chain, N_steps, R1,R2);
