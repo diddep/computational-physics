@@ -107,6 +107,7 @@ double partialEnergyDerivative(double *E_local_derivative, double alpha, int N_s
     average_E /= N_steps; 
 
     gradient = 2*(average_mix - average_E*average_derivative);
+    
     free(E_local_chain);
 
     return gradient;

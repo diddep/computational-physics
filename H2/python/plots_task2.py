@@ -20,14 +20,16 @@ def main(results):
     block_average = pd.read_csv("../csv/block_avg_vec.csv", engine="pyarrow", names= ["block_average"])
     block_average = block_average.values[:,0].astype(float)
 
-    t_relaxation = np.argmin(np.abs(phi_k-np.exp(-2)))+1
+    t_relaxation = np.argmin(np.abs(phi_k-np.exp(-2)))
 
+    #stat_ineff_cor = 2*np.sum(phi_k[:t_relaxation]) #factor 2 from fact that it is symmetric, -1 because we count k=0 twice
+    stat_ineff_cor = 2*np.sum(phi_k)-1 #factor 2 from fact that it is symmetric, -1 because we count k=0 twice
     
-    stat_ineff_cor = 2*np.sum(phi_k[:t_relaxation]) #factor 2 from fact that it is symmetric, -1 because we count k=0 twice
     stat_ineff_block_av = np.average(block_average[150:])
     print(f"------\nstatistical inefficiency calculated from correlation funcion = {stat_ineff_cor}\n----")
     print(f"------\nstatistical inefficiency calculated from block averaging = {stat_ineff_block_av}\n----")
-    
+    print("relaxation time =",t_relaxation)
+
 
     fig_phi_k, ax_phi = plt.subplots(1,1)
 
@@ -39,22 +41,23 @@ def main(results):
     ax_phi.set_title(r'correlation function $\Phi_k$')
     ax_phi.legend()
 
-    #fig_phi_k.savefig(f"plots_python/{task_str}/phi_k.png")
+    fig_phi_k.savefig(f"plots_python/{task_str}/phi_k.png")
 
     fig_block_avg, ax_blav = plt.subplots(1,1)
     
 
     block_size_vec = np.arange(1, len(block_average)+1)
 
-    ax_blav.plot(block_size_vec, block_average)
+    #ax_blav.plot(block_size_vec, block_average)
     ax_blav.set_xlabel("Block size")
     ax_blav.set_ylabel(r"$n_s$")
     ax_blav.set_title(r"Statistical inefficiency $n_s$ calculated from block averaging")
-    ax_blav.axhline(stat_ineff_cor, label =r"$n_s$ calculated from correlation function")
-
-    #ax_blav.scatter(block_size_vec, block_average, facecolor ="none", edgecolor="k")
+    ax_blav.axhline(stat_ineff_cor, label =r"$n_s$ calculated from correlation function", color="r", linewidth=4)
+    ax_blav.legend()
+    ax_blav.scatter(block_size_vec, block_average, facecolor ="none", edgecolor="k", alpha=0.8)
 
     fig_block_avg.savefig(f"plots_python/task2/block_avg.png") 
+    
 
     
 

@@ -18,10 +18,16 @@
 
 #define NDIM 3
 #define M_C 1000
+#define RELAXATION_TIME 10
+//#define BLOCK_SIZE 
+
 
 void initialize_positions(double **R1, double **R2, double d_displacement);
 void MCMC_burn_in(int N_steps, double alpha, double d_displacement, double **R1, double **R2);
 double MCMC(int N_steps, double alpha, double d_displacement, double **R1, double **R2, bool is_save);
+double MCMC_task3(int N_steps,double alpha, double d_displacement,double **R1, double **R2, double *E_variance_vec,int index,bool is_save);
+
+
 
 
 int
@@ -81,7 +87,7 @@ run(
     double E_PD_average;
     double *E_local_derivative = malloc(sizeof(double) * N_steps);
 
-    char filename_alpha_results[200], filename_params[200];
+    char filename_alpha_results[200], filename_params[200], filename_variance_alpha[200],filename_of_alpha[200];
     char cwd[200], buf[200];
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
         printf("Current working directory %s\n", cwd);
@@ -95,6 +101,12 @@ run(
     strcpy(filename_alpha_results, buf);
     snprintf(buf + written, 200 - written, "/csv/params.csv");
     strcpy(filename_params, buf);
+
+    snprintf(buf + written, 200 - written, "/csv/variance_alpha.csv");
+    strcpy(filename_variance_alpha, buf);
+    snprintf(buf + written, 200 - written, "/csv/E_of_alpha.csv");
+    strcpy(filename_of_alpha, buf);
+    
     
 
 
@@ -105,6 +117,50 @@ run(
     if(is_task3 || is_task4)
     {
         MCMC_burn_in(N_discarded_steps, alpha, d_displacement, R1, R2);
+    }
+
+    if(is_task3)
+    {
+        int Number_of_alphas = 10;
+        int runs_per_alpha = 5;
+
+        double *temp_E_vec = malloc(sizeof(double)*runs_per_alpha);
+        double *temp_variance_vec = malloc(sizeof(double)*runs_per_alpha);
+        double *E_average_vec= malloc(sizeof(double)*Number_of_alphas);
+        double *E_variance_vec= malloc(sizeof(double)*Number_of_alphas);
+        double start_alpha = 0.05, final_alpha= 0.25;
+        double alpha_increment = (final_alpha-start_alpha)/((double)Number_of_alphas);
+
+        for(int n_alpha=0; n_alpha< Number_of_alphas; ++n_alpha)
+        {
+            for(int run=0; run< runs_per_alpha; ++run)
+            {
+                //calculating average  energy for separate runs along with variance 
+                //in each run
+                MCMC_burn_in(N_discarded_steps, alpha, d_displacement, R1, R2);
+                temp_E_vec[run] = MCMC_task3(N_steps, alpha, d_displacement, R1, R2,temp_variance_vec,run, is_save);
+                
+            }
+            //inte säker på hur man räknar ut std här, och lägga till stat ineff, ifall den inte är konstant
+            // borde is sånna fall fixa det i mcmc_task3
+
+            double stat_ineff = 11.0;
+            double average_E =0;
+            average_E= average(temp_E_vec, runs_per_alpha);
+            double variance_between_runs =0;
+            double variance_in_run=0;
+
+            variance_between_runs=variance(temp_E_vec, runs_per_alpha);
+            variance_in_run = average(temp_variance_vec, runs_per_alpha);
+            E_average_vec[n_alpha] = average_E; 
+            E_variance_vec[n_alpha]=variance_between_runs+ variance_in_run;
+            printf("runs left =%d\n", Number_of_alphas- n_alpha);
+        }
+
+        save_vector_to_csv(E_average_vec,Number_of_alphas,filename_of_alpha, open_with_write);
+        save_vector_to_csv(E_variance_vec, Number_of_alphas,filename_variance_alpha, open_with_write);
+        free(E_average_vec),free(E_variance_vec), free(temp_E_vec), free(temp_variance_vec); 
+        
     }
 
     E_average = 0;
@@ -255,7 +311,7 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     double *phi_k_vec = malloc(sizeof(double)*max_lag);
     
     // testing block averaging
-    int max_block_size = 400;
+    int max_block_size = 3000;
     double *block_average_vec = malloc(sizeof(double) *max_block_size);
     
 
@@ -363,6 +419,168 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     }
     // Destroy and free arrays
     free(E_local), free(E_local_derivative), free(x_chain), free(theta_chain), free(Phi_k_vec), free(block_average_vec);
+    gsl_rng_free(r);
+
+    return average_E_local;
+}
+
+
+
+double MCMC_task3(
+    int N_steps,
+    double alpha, 
+    double d_displacement,
+    double **R1, double **R2, 
+    double *E_variance_vec,
+    int index,
+    bool is_save)
+{
+    char filename_R1[200], filename_R2[200], filename_energy[200], filename_xdist[200], filename_theta[200], \
+     filename_energy_derivative[200], filename_results[200], filename_phi_k[200], filename_block_avg[200];
+    
+    char cwd[200], buf[200];
+    if (getcwd(cwd, sizeof(cwd)) == NULL) {
+        perror("getcwd() error");
+        return 1;
+    }
+    
+    int written = snprintf(buf, 200, "%s", cwd);
+    snprintf(buf + written, 200 - written, "/csv/R1.cvs");
+    strcpy(filename_R1, buf);
+    snprintf(buf + written, 200 - written, "/csv/R2.csv");
+    strcpy(filename_R2, buf);
+    snprintf(buf + written, 200 - written, "/csv/E_local.cvs");
+    strcpy(filename_energy, buf);
+    snprintf(buf + written, 200 - written, "/csv/x_distribution.csv");
+    strcpy(filename_xdist, buf);
+    snprintf(buf + written, 200 - written, "/csv/theta.cvs");
+    strcpy(filename_theta, buf);
+    snprintf(buf + written, 200 - written, "/csv/E_local_derivative.cvs");
+    strcpy(filename_energy_derivative, buf);
+    snprintf(buf + written, 200 - written, "/csv/filename_results.csv");
+    strcpy(filename_results, buf);
+    snprintf(buf + written, 200 - written, "/csv/phi_k.cvs");
+    strcpy(filename_phi_k, buf);
+    snprintf(buf + written, 200 - written, "/csv/block_avg_vec.csv");
+    strcpy(filename_block_avg, buf);
+
+    bool open_with_write;
+    
+     // Initializing arrays
+    int n_phi_rows = 2*M_C+10;
+    //int number_of_blocks = 100;
+    double *E_local = malloc(sizeof(double) * N_steps);
+    double *E_local_derivative = malloc(sizeof(double) * N_steps);
+    double *Phi_k_vec = malloc(sizeof(double) *n_phi_rows);
+    double *theta_chain = malloc(sizeof(double) * N_steps);
+    double *x_chain = malloc(sizeof(double) * N_steps);
+
+    // testing corr func
+    //int max_lag = 2*1e2;
+    //double phi_k=0;
+    //double *phi_k_vec = malloc(sizeof(double)*max_lag);
+    
+    // testing block averaging
+    // int max_block_size = 3000;
+    // double *block_average_vec = malloc(sizeof(double) *max_block_size);
+    
+
+    double R1_test[NDIM], R2_test[NDIM];
+    
+    gsl_rng * r;
+    r = init_random_num_generator();
+    double random_number = 0;
+
+    int accept_count = 0;
+    for(int ix = 0; ix < N_steps - 1; ++ix)
+    {
+        // get proposal positons
+        for (int kx = 0; kx < NDIM; ++kx)
+        {
+            random_number = gsl_ran_flat(r, -0.5, 0.5);
+            R1_test[kx] = R1[ix][kx] + d_displacement * random_number;
+            random_number = gsl_ran_flat(r, -0.5, 0.5);
+            R2_test[kx] = R2[ix][kx] + d_displacement * random_number;
+        }
+        
+        // Probability for particle occupying new and old positions
+        double prob_test = distribution(R1_test, R2_test, alpha);
+        double prob_old = distribution(R1[ix], R2[ix], alpha);
+
+        // If new prob > old, make step OR take exploration step
+        if(prob_test / prob_old > gsl_ran_flat(r, 0.0, 1.0))
+        {
+            // If accepted, save new position in next row.
+            for (int kx=0; kx < NDIM; ++kx)
+            {
+                R1[ix+1][kx] = R1_test[kx];
+                R2[ix+1][kx] = R2_test[kx];
+            }
+            
+            accept_count = accept_count + 1;
+        } else {
+            // If not accepted save old position in next row
+            for (int kx=0; kx < NDIM; ++kx)
+            {
+                R1[ix+1][kx] = R1[ix][kx];
+                R2[ix+1][kx] = R2[ix][kx];
+            }
+        }
+
+        double theta_ix = theta_fun_vec(R1[ix], R2[ix]);
+        double x_cos = cos(theta_ix);
+        theta_chain[ix] = theta_ix;
+
+    }
+
+    // Calculate energies of all positions in chain
+    Energy(E_local, alpha, N_steps, R1, R2); 
+    
+    //testing corrolation function
+    // for (int lag=0; lag< max_lag; ++lag)
+    // {
+    //     double phi_inst =phi_lag(E_local, N_steps, lag); 
+    //     phi_k_vec[lag] = phi_inst;
+    //     //printf("phi_k=%f\n", phi_inst);
+    // }
+
+    //testing block averaging
+    // for (int block_size =1; block_size<max_block_size; ++block_size)
+    // {
+    //     block_average_vec[block_size] = statistical_ineff_from_BLAV(E_local, N_steps, block_size);
+    // }
+
+
+    double E_PD_average = partialEnergyDerivative(E_local_derivative, alpha, N_steps, R1, R2);
+
+    double average_E_local = 0;
+    for(int ix = 0; ix < N_steps - 1; ++ix)
+    {
+        average_E_local += E_local[ix]/N_steps;
+    }
+    double variance_E = variance(E_local,N_steps);
+    E_variance_vec[index] = variance_E; 
+
+    if(is_save)
+    {
+        printf("Accept ratio = %f\n", (double) accept_count/N_steps);
+
+        x_distribution(x_chain, N_steps, R1,R2);
+        save_matrix_to_csv(R1, N_steps, NDIM, filename_R1);
+        save_matrix_to_csv(R2, N_steps, NDIM, filename_R2);
+
+        double result_vec[] = {N_steps, accept_count};
+        open_with_write = true;
+        save_vector_to_csv(result_vec, 2, filename_results, open_with_write);
+        save_transposedvector_to_csv(E_local_derivative, N_steps, filename_energy_derivative, open_with_write);
+        save_transposedvector_to_csv(E_local, N_steps, filename_energy, open_with_write);
+        save_transposedvector_to_csv(x_chain, N_steps, filename_xdist, open_with_write);
+        save_transposedvector_to_csv(theta_chain, N_steps, filename_theta, open_with_write);
+        //save_transposedvector_to_csv(phi_k_vec, max_lag, filename_phi_k, open_with_write);
+        //save_transposedvector_to_csv(block_average_vec, max_block_size, filename_block_avg, open_with_write);
+    }
+    // Destroy and free arrays
+    free(E_local), free(E_local_derivative), free(x_chain), free(theta_chain), free(Phi_k_vec);//, free(block_average_vec);
     gsl_rng_free(r);
 
     return average_E_local;
