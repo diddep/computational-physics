@@ -27,33 +27,51 @@ run(
     char *argv[]
    )
 {
+    bool is_task1 = false, is_task2 = false, is_task3 = false, is_task4 =  false;
+    int task_num = 1;
+    if (argc < 2) {
+        task_num = 1;
+        //printf("Usage: %s TASK\n", argv[0]);
+        //exit(1);
+    } else {
+        task_num = atol(argv[1]);
+
+        if (task_num > 5) {
+            printf("Task should be between 1 and 5\n");
+            exit(1);
+        }
+    }
+
+
     // MCMC Parameters
     int N_steps; int N_discarded_steps; double alpha, d_displacement; 
     // alpha Parameters
     int N_alpha_steps; double A, beta, E_average;
     bool is_save = true;
 
-    bool is_task1 = true, is_task2 = false, is_task3 = false, is_task4 = false;
-
-    if(is_task1)
+    if(task_num == 1)
     {
-        N_steps = 1e6; N_discarded_steps = 0; alpha = 0.1, d_displacement = 0.1; 
+        N_steps = 1e6; N_discarded_steps = 0; alpha = 0.1, d_displacement = 1.24; 
         N_alpha_steps = 1; A = 0.; beta = 0.; 
+        is_task1 = true;
     }
-    if(is_task2)
+    if(task_num == 2)
     {
         N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
         N_alpha_steps = 1; A = 0.; beta = 0.; 
+        is_task2 = true;
     }
-    if(is_task3)
+    if(task_num == 3)
     {
         N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.05, d_displacement = 0.1; 
         N_alpha_steps = 1; A = 0.; beta = 0.; 
+        is_task3 = true;
     }
-    if(is_task4)
+    if(task_num == 4)
     {
         N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 0.1; 
         N_alpha_steps = 100; A = 1.; beta = 1.; is_save = false; // beta from 0.5 to 1
+        is_task4 = true;
     }
 
     double **R1 = create_2D_array(N_steps, NDIM), **R2 = create_2D_array(N_steps, NDIM);
