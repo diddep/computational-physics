@@ -4,6 +4,9 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 #include <time.h>
+#include <unistd.h>
+#include <limits.h>
+#include <string.h>
 
 #include <stdbool.h>
 
@@ -77,7 +80,22 @@ run(
     double **R1 = create_2D_array(N_steps, NDIM), **R2 = create_2D_array(N_steps, NDIM);
     double E_PD_average;
     double *E_local_derivative = malloc(sizeof(double) * N_steps);
-    char filename_alpha_results[] = {"../csv/alpha_results.csv"}, filename_params[] = {"../csv/params.csv"};
+
+    char filename_alpha_results[200], filename_params[200];
+    char cwd[200], buf[200];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("Current working directory %s\n", cwd);
+    } else {
+        perror("getcwd() error");
+        return 1;
+    }
+    
+    int written = snprintf(buf, 200, "%s", cwd);
+    snprintf(buf + written, 200 - written, "/csv/alpha_results.cvs");
+    strcpy(filename_alpha_results, buf);
+    snprintf(buf + written, 200 - written, "/csv/params.csv");
+    strcpy(filename_params, buf);
+    
     bool open_with_write;
 
     initialize_positions((double **) R1, (double **) R2, (double) d_displacement);
@@ -188,11 +206,35 @@ void MCMC_burn_in(int N_steps, double alpha, double d_displacement, double **R1,
 
 double MCMC(int N_steps, double alpha, double d_displacement, double **R1, double **R2, bool is_save)
 {
-    // Filenames for saving in csv
-    char filename_R1[] = {"../csv/R1.csv"}, filename_R2[] = {"../csv/R2.csv"};
-    char filename_energy[] = {"../csv/E_local.csv"}, filename_xdist[] = {"../csv/x_distribution.csv"}, filename_theta[] = {"../csv/theta.csv"};
-    char filename_energy_derivative[] = {"../csv/E_local_derivative.csv"};
-    char filename_results[] = {"../csv/MCMC_results.csv"}, filename_phi_k[] ={"../csv/phi_k.csv"}, filename_block_avg[] ={"../csv/block_avg_vec.csv"};
+    char filename_R1[200], filename_R2[200], filename_energy[200], filename_xdist[200], filename_theta[200], \
+     filename_energy_derivative[200], filename_results[200], filename_phi_k[200], filename_block_avg[200];
+    
+    char cwd[200], buf[200];
+    if (getcwd(cwd, sizeof(cwd)) == NULL) {
+        perror("getcwd() error");
+        return 1;
+    }
+    
+    int written = snprintf(buf, 200, "%s", cwd);
+    snprintf(buf + written, 200 - written, "/csv/R1.cvs");
+    strcpy(filename_R1, buf);
+    snprintf(buf + written, 200 - written, "/csv/R2.csv");
+    strcpy(filename_R2, buf);
+    snprintf(buf + written, 200 - written, "/csv/E_local.cvs");
+    strcpy(filename_energy, buf);
+    snprintf(buf + written, 200 - written, "/csv/x_distribution.csv");
+    strcpy(filename_xdist, buf);
+    snprintf(buf + written, 200 - written, "/csv/theta.cvs");
+    strcpy(filename_theta, buf);
+    snprintf(buf + written, 200 - written, "/csv/E_local_derivative.cvs");
+    strcpy(filename_energy_derivative, buf);
+    snprintf(buf + written, 200 - written, "/csv/filename_results.csv");
+    strcpy(filename_results, buf);
+    snprintf(buf + written, 200 - written, "/csv/phi_k.cvs");
+    strcpy(filename_phi_k, buf);
+    snprintf(buf + written, 200 - written, "/csv/block_avg_vec.csv");
+    strcpy(filename_block_avg, buf);
+
     bool open_with_write;
     
      // Initializing arrays
