@@ -121,8 +121,8 @@ run(
 
     if(is_task3)
     {
-        int Number_of_alphas = 10;
-        int runs_per_alpha = 5;
+        int Number_of_alphas = 30;
+        int runs_per_alpha = 7;
 
         double *temp_E_vec = malloc(sizeof(double)*runs_per_alpha);
         double *temp_variance_vec = malloc(sizeof(double)*runs_per_alpha);
@@ -133,12 +133,16 @@ run(
 
         for(int n_alpha=0; n_alpha< Number_of_alphas; ++n_alpha)
         {
+            alpha = (double)n_alpha*alpha_increment + start_alpha;
+            printf("current alpha = %f\n", alpha);
             for(int run=0; run< runs_per_alpha; ++run)
             {
                 //calculating average  energy for separate runs along with variance 
                 //in each run
+                initialize_positions((double **) R1, (double **) R2, (double) d_displacement);
                 MCMC_burn_in(N_discarded_steps, alpha, d_displacement, R1, R2);
                 temp_E_vec[run] = MCMC_task3(N_steps, alpha, d_displacement, R1, R2,temp_variance_vec,run, is_save);
+                printf("average E in run =%f\n",temp_E_vec[run]);
                 
             }
             //inte säker på hur man räknar ut std här, och lägga till stat ineff, ifall den inte är konstant
@@ -151,14 +155,15 @@ run(
             double variance_in_run=0;
 
             variance_between_runs=variance(temp_E_vec, runs_per_alpha);
+            printf("variance between runs %f\n", variance_between_runs);
             variance_in_run = average(temp_variance_vec, runs_per_alpha);
             E_average_vec[n_alpha] = average_E; 
             E_variance_vec[n_alpha]=variance_between_runs+ variance_in_run;
             printf("runs left =%d\n", Number_of_alphas- n_alpha);
         }
 
-        save_vector_to_csv(E_average_vec,Number_of_alphas,filename_of_alpha, open_with_write);
-        save_vector_to_csv(E_variance_vec, Number_of_alphas,filename_variance_alpha, open_with_write);
+        save_vector_to_csv(E_average_vec,Number_of_alphas,filename_of_alpha, true);
+        save_vector_to_csv(E_variance_vec, Number_of_alphas,filename_variance_alpha, true);
         free(E_average_vec),free(E_variance_vec), free(temp_E_vec), free(temp_variance_vec); 
         
     }
@@ -551,7 +556,7 @@ double MCMC_task3(
     // }
 
 
-    double E_PD_average = partialEnergyDerivative(E_local_derivative, alpha, N_steps, R1, R2);
+    //double E_PD_average = partialEnergyDerivative(E_local_derivative, alpha, N_steps, R1, R2);
 
     double average_E_local = 0;
     for(int ix = 0; ix < N_steps - 1; ++ix)
@@ -559,7 +564,8 @@ double MCMC_task3(
         average_E_local += E_local[ix]/N_steps;
     }
     double variance_E = variance(E_local,N_steps);
-    E_variance_vec[index] = variance_E; 
+    double statistical_inefficiency = 11;
+    E_variance_vec[index] = statistical_inefficiency* variance_E/((double)N_steps); 
 
     if(is_save)
     {
