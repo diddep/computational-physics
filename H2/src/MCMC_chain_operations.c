@@ -90,7 +90,7 @@ double partialEnergyDerivative(double *E_local_derivative, double alpha, int N_s
     double *E_local_chain = malloc(sizeof(double)*N_steps);
     double r12=0, ln_d_psi=0;
     double average_E=0, average_derivative =0, average_mix=0;
-    double gradient=0;
+    double gradient=0, gradient_step = 0;
     
     Energy(E_local_chain, alpha, N_steps, R1, R2);
 
@@ -101,6 +101,8 @@ double partialEnergyDerivative(double *E_local_derivative, double alpha, int N_s
         average_derivative += ln_d_psi;
         average_mix += ln_d_psi*E_local_chain[step];
         average_E += E_local_chain[step];
+        gradient_step = E_local_chain[step] * ln_d_psi;
+        E_local_derivative[step] = gradient_step;
     }
     average_derivative /= N_steps;
     average_mix /= N_steps;
