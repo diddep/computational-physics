@@ -53,33 +53,37 @@ run(
 
 
     // MCMC Parameters
-    int N_steps; int N_discarded_steps; double alpha, d_displacement; 
+    int N_steps; int N_discarded_steps; double alpha, initial_displacement, d_displacement;
     // alpha Parameters
     int N_alpha_steps; double A, beta, E_average;
     bool is_save = true;
-    
+
     // TODO: d_displacement, annan parameter för att initializera initial villkor, bra i uppgift 1 och dåliga i uppgift 2
     if(task_num == 1)
     {
-        N_steps = 1e6; N_discarded_steps = 0; alpha = 0.1, d_displacement = 1.24; 
+        N_steps = 1e6; N_discarded_steps = 0; alpha = 0.1;
+        initial_displacement = 50, d_displacement = 1.24; 
         N_alpha_steps = 1; A = 0.; beta = 0.; 
         is_task1 = true;
 }
     if(task_num == 2)
     {
-        N_steps = 1e4; N_discarded_steps = 0; alpha = 0.1, d_displacement = 20; 
+        N_steps = 5e3; N_discarded_steps = 0; alpha = 0.1;
+        initial_displacement = 50, d_displacement = 1.24; 
         N_alpha_steps = 1; A = 0.; beta = 0.; 
         is_task2 = true;
     }
     if(task_num == 3)
     {
-        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.05, d_displacement = 1.24; 
+        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.05; 
+        initial_displacement = 50, d_displacement = 1.24; 
         N_alpha_steps = 1; A = 0.; beta = 0.; 
         is_task3 = true;
     }
     if(task_num == 4)
     {
-        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 1.24; 
+        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.1;
+        initial_displacement = 50, d_displacement = 1.24; 
         N_alpha_steps = 10; A = 1.; beta = 1.; is_save = false; // beta from 0.5 to 1
         is_task4 = true;
     }
@@ -113,14 +117,14 @@ run(
 
     bool open_with_write;
     
-    initialize_positions((double **) R1, (double **) R2, (double) d_displacement);
+    initialize_positions((double **) R1, (double **) R2, (double) initial_displacement);
 
     if(is_task2)
     {
         for (int kx = 0; kx < NDIM; kx++)
         {
-            R1[0][kx] = d_displacement * 0.5; // Maximal displacement
-            R2[0][kx] = d_displacement * (-0.5);
+            R1[0][kx] = initial_displacement * 0.5;
+            R2[0][kx] = initial_displacement * (-0.5);
         }
     }
 
@@ -208,7 +212,7 @@ run(
 
 
 // Function running the markov-chain
-void initialize_positions(double **R1, double **R2, double d_displacement)
+void initialize_positions(double **R1, double **R2, double initial_displacement)
 {
     double random_number = 0;
     gsl_rng * r;
@@ -219,13 +223,13 @@ void initialize_positions(double **R1, double **R2, double d_displacement)
     {
         // -0.5 to 0.5 because it's length 1 and symmetric around zero
         random_number = gsl_ran_flat(r, -0.5, 0.5);
-        R1[0][kx] = d_displacement * random_number;
+        R1[0][kx] = initial_displacement * random_number;
         printf("random number: %f\n", random_number);
-        printf("d_displacement: %f\n", d_displacement);
+        printf("d_displacement: %f\n", initial_displacement);
 
 
         random_number = gsl_ran_flat(r, -0.5, 0.5);
-        R2[0][kx] = d_displacement * random_number;
+        R2[0][kx] = initial_displacement * random_number;
         printf("R1[0][%d]: %f, R2[0][%d]: %f\n", kx, R1[0][kx], kx, R2[0][kx]);
     }
     gsl_rng_free(r);

@@ -21,18 +21,18 @@ def main(results):
 
     # Calculate moving average of energy
 
-    window_size = 10000; poly_order = 3
-    moving_averages = savgol_filter(E_local_derivative, window_size, poly_order)
+    #window_size = N_steps/100; poly_order = 3
+    #moving_averages = savgol_filter(E_local_derivative, window_size, poly_order)
 
     # Plot energy
     fig_energy_deriv, ax_energy_deriv = plt.subplots(1,1)
     ax_energy_deriv.plot(steps_linspace, E_local_derivative, alpha = 0.5, label = "Measured energy derivative")
-    ax_energy_deriv.plot(steps_linspace, moving_averages, 'k--', label = f"Savitzky-Golay with w={window_size}, p={poly_order}")
+    #ax_energy_deriv.plot(steps_linspace, moving_averages, 'k--', label = f"Savitzky-Golay with w={window_size}, p={poly_order}")
     ax_energy_deriv.set_xlabel("Steps [a.u.]")
     ax_energy_deriv.set_ylabel("Energy [a.u.]")
     ax_energy_deriv.set_title(f'Derivative of local energy, alpha = {alpha}')
     #ax_energy_deriv.set_title(f'Derivative of local energy, alpha = {alpha}')
-    ax_energy_deriv.legend(loc="lower left")
+    ax_energy_deriv.legend(loc="upper right")
     fig_energy_deriv.savefig(f'plots_python/{task_str}/energy_derivative.png')
 
 if(__name__ == "__main__"):

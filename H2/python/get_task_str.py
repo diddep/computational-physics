@@ -13,5 +13,7 @@ def main():
         task_str = "task3"
     elif params.is_task4.values[0]:
         task_str = "task4"
+    else:
+        task_str = "task5"
 
     return task_str

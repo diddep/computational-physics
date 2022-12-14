@@ -56,7 +56,7 @@ def main(results):
     ax_blav.legend()
     ax_blav.scatter(block_size_vec, block_average, facecolor ="none", edgecolor="k", alpha=0.8)
 
-    fig_block_avg.savefig(f"plots_python/task2/block_avg.png") 
+    fig_block_avg.savefig(f"plots_python/{task_str}/block_avg.png") 
     
 
     
