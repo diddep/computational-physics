@@ -53,32 +53,37 @@ run(
 
 
     // MCMC Parameters
-    int N_steps; int N_discarded_steps; double alpha, d_displacement; 
+    int N_steps; int N_discarded_steps; double alpha, initial_displacement, d_displacement;
     // alpha Parameters
     int N_alpha_steps; double A, beta, E_average;
     bool is_save = true;
 
+    // TODO: d_displacement, annan parameter för att initializera initial villkor, bra i uppgift 1 och dåliga i uppgift 2
     if(task_num == 1)
     {
-        N_steps = 1e6; N_discarded_steps = 0; alpha = 0.1, d_displacement = 1.24; 
+        N_steps = 1e6; N_discarded_steps = 0; alpha = 0.1;
+        initial_displacement = 50, d_displacement = 1.24; 
         N_alpha_steps = 1; A = 0.; beta = 0.; 
         is_task1 = true;
 }
     if(task_num == 2)
     {
-        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 1.24; 
+        N_steps = 5e3; N_discarded_steps = 0; alpha = 0.1;
+        initial_displacement = 50, d_displacement = 1.24; 
         N_alpha_steps = 1; A = 0.; beta = 0.; 
         is_task2 = true;
     }
     if(task_num == 3)
     {
-        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.05, d_displacement = 1.24; 
+        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.05; 
+        initial_displacement = 50, d_displacement = 1.24; 
         N_alpha_steps = 1; A = 0.; beta = 0.; 
         is_task3 = true;
     }
     if(task_num == 4)
     {
-        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.1, d_displacement = 1.24; 
+        N_steps = 1e6; N_discarded_steps = 1e4; alpha = 0.1;
+        initial_displacement = 50, d_displacement = 1.24; 
         N_alpha_steps = 10; A = 1.; beta = 1.; is_save = false; // beta from 0.5 to 1
         is_task4 = true;
     }
@@ -97,7 +102,7 @@ run(
     }
     
     int written = snprintf(buf, 200, "%s", cwd);
-    snprintf(buf + written, 200 - written, "/csv/alpha_results.cvs");
+    snprintf(buf + written, 200 - written, "/csv/alpha_results.csv");
     strcpy(filename_alpha_results, buf);
     snprintf(buf + written, 200 - written, "/csv/params.csv");
     strcpy(filename_params, buf);
@@ -111,12 +116,16 @@ run(
 
 
     bool open_with_write;
-
-    initialize_positions((double **) R1, (double **) R2, (double) d_displacement);
     
-    if(is_task3 || is_task4)
+    initialize_positions((double **) R1, (double **) R2, (double) initial_displacement);
+
+    if(is_task2)
     {
-        MCMC_burn_in(N_discarded_steps, alpha, d_displacement, R1, R2);
+        for (int kx = 0; kx < NDIM; kx++)
+        {
+            R1[0][kx] = initial_displacement * 0.5;
+            R2[0][kx] = initial_displacement * (-0.5);
+        }
     }
 
     if(is_task3)
@@ -166,11 +175,17 @@ run(
         save_vector_to_csv(E_variance_vec, Number_of_alphas,filename_variance_alpha, true);
         free(E_average_vec),free(E_variance_vec), free(temp_E_vec), free(temp_variance_vec); 
         
+        return 0;
     }
 
     E_average = 0;
     for(int ix = 1; ix < N_alpha_steps + 1; ix++)
-    {
+    {   
+        if(is_task4)
+        {
+            MCMC_burn_in(N_discarded_steps, alpha, d_displacement, R1, R2);
+        }
+
         if (ix == N_alpha_steps) {is_save = true; }
         E_average = MCMC(N_steps, alpha, d_displacement, R1, R2, is_save);
 
@@ -201,7 +216,7 @@ run(
 
 
 // Function running the markov-chain
-void initialize_positions(double **R1, double **R2, double d_displacement)
+void initialize_positions(double **R1, double **R2, double initial_displacement)
 {
     double random_number = 0;
     gsl_rng * r;
@@ -212,10 +227,13 @@ void initialize_positions(double **R1, double **R2, double d_displacement)
     {
         // -0.5 to 0.5 because it's length 1 and symmetric around zero
         random_number = gsl_ran_flat(r, -0.5, 0.5);
-        R1[0][kx] = d_displacement * random_number;
+        R1[0][kx] = initial_displacement * random_number;
+        printf("random number: %f\n", random_number);
+        printf("d_displacement: %f\n", initial_displacement);
+
 
         random_number = gsl_ran_flat(r, -0.5, 0.5);
-        R2[0][kx] = d_displacement * random_number;
+        R2[0][kx] = initial_displacement * random_number;
         printf("R1[0][%d]: %f, R2[0][%d]: %f\n", kx, R1[0][kx], kx, R2[0][kx]);
     }
     gsl_rng_free(r);
@@ -280,21 +298,21 @@ double MCMC(int N_steps, double alpha, double d_displacement, double **R1, doubl
     }
     
     int written = snprintf(buf, 200, "%s", cwd);
-    snprintf(buf + written, 200 - written, "/csv/R1.cvs");
+    snprintf(buf + written, 200 - written, "/csv/R1.csv");
     strcpy(filename_R1, buf);
     snprintf(buf + written, 200 - written, "/csv/R2.csv");
     strcpy(filename_R2, buf);
-    snprintf(buf + written, 200 - written, "/csv/E_local.cvs");
+    snprintf(buf + written, 200 - written, "/csv/E_local.csv");
     strcpy(filename_energy, buf);
     snprintf(buf + written, 200 - written, "/csv/x_distribution.csv");
     strcpy(filename_xdist, buf);
-    snprintf(buf + written, 200 - written, "/csv/theta.cvs");
+    snprintf(buf + written, 200 - written, "/csv/theta.csv");
     strcpy(filename_theta, buf);
-    snprintf(buf + written, 200 - written, "/csv/E_local_derivative.cvs");
+    snprintf(buf + written, 200 - written, "/csv/E_local_derivative.csv");
     strcpy(filename_energy_derivative, buf);
     snprintf(buf + written, 200 - written, "/csv/filename_results.csv");
     strcpy(filename_results, buf);
-    snprintf(buf + written, 200 - written, "/csv/phi_k.cvs");
+    snprintf(buf + written, 200 - written, "/csv/phi_k.csv");
     strcpy(filename_phi_k, buf);
     snprintf(buf + written, 200 - written, "/csv/block_avg_vec.csv");
     strcpy(filename_block_avg, buf);
@@ -450,21 +468,21 @@ double MCMC_task3(
     }
     
     int written = snprintf(buf, 200, "%s", cwd);
-    snprintf(buf + written, 200 - written, "/csv/R1.cvs");
+    snprintf(buf + written, 200 - written, "/csv/R1.csv");
     strcpy(filename_R1, buf);
     snprintf(buf + written, 200 - written, "/csv/R2.csv");
     strcpy(filename_R2, buf);
-    snprintf(buf + written, 200 - written, "/csv/E_local.cvs");
+    snprintf(buf + written, 200 - written, "/csv/E_local.csv");
     strcpy(filename_energy, buf);
     snprintf(buf + written, 200 - written, "/csv/x_distribution.csv");
     strcpy(filename_xdist, buf);
-    snprintf(buf + written, 200 - written, "/csv/theta.cvs");
+    snprintf(buf + written, 200 - written, "/csv/theta.csv");
     strcpy(filename_theta, buf);
-    snprintf(buf + written, 200 - written, "/csv/E_local_derivative.cvs");
+    snprintf(buf + written, 200 - written, "/csv/E_local_derivative.csv");
     strcpy(filename_energy_derivative, buf);
     snprintf(buf + written, 200 - written, "/csv/filename_results.csv");
     strcpy(filename_results, buf);
-    snprintf(buf + written, 200 - written, "/csv/phi_k.cvs");
+    snprintf(buf + written, 200 - written, "/csv/phi_k.csv");
     strcpy(filename_phi_k, buf);
     snprintf(buf + written, 200 - written, "/csv/block_avg_vec.csv");
     strcpy(filename_block_avg, buf);
@@ -473,7 +491,7 @@ double MCMC_task3(
     
      // Initializing arrays
     int n_phi_rows = 2*M_C+10;
-    //int number_of_blocks = 100;
+    //int number_of_blocks = 100
     double *E_local = malloc(sizeof(double) * N_steps);
     double *E_local_derivative = malloc(sizeof(double) * N_steps);
     double *Phi_k_vec = malloc(sizeof(double) *n_phi_rows);

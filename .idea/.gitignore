@@ -9,3 +9,4 @@
 
 *.csv git rm --cached *.csv
 *.o git rm --cached *.0
+*.png git rm --cached *.png
