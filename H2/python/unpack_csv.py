@@ -12,7 +12,7 @@ def main():
     x_distribution = pd.read_csv("../csv/x_distribution.csv", engine="pyarrow", names= ["x_distribution"])
     theta_distribution = pd.read_csv("../csv/theta.csv", engine="pyarrow", names= ["theta"])
     phi_k =pd.read_csv("../csv/phi_k.csv", engine="pyarrow", names= ["phi_k"])
-    alpha_results = pd.read_csv("../csv/alpha_results.csv", engine="pyarrow", names= ["ix", "E_average", "alpha", "gamma", "E_PD_average"])
+    alpha_results = pd.read_csv("../csv/alpha_results.csv", engine="pyarrow", names= ["ix", "E_average", "alpha", "gamma", "E_PD_average", "beta"])
     params = pd.read_csv("../csv/params.csv", names = ["N_alpha_steps", "N_discarded_steps", "alpha", "A", "beta", "N_steps", "d_displacement", "is_task1", "is_task2", "is_task3", "is_task4"])
     
     steps_linspace = np.linspace(0,int(params.N_steps), int(params.N_steps), endpoint=False)

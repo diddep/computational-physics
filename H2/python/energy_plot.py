@@ -23,13 +23,13 @@ def main(results):
     # Calculate moving average of energy
     #print(N_steps)
     #print(E_local)
-    window_size = int(N_steps/10); poly_order = 2
-    moving_averages = savgol_filter(E_local, window_size, poly_order)
+    #window_size = int(N_steps/10); poly_order = 2
+    #moving_averages = savgol_filter(E_local, window_size, poly_order)
 
     # Plot energy
     fig_energy, ax_energy = plt.subplots(1,1)
     ax_energy.plot(steps_linspace, E_local, alpha = 0.5, label = "Measured energy")
-    ax_energy.plot(steps_linspace, moving_averages, 'k--', label = f"Averaged energy (w={window_size}, p={poly_order})")
+    #ax_energy.plot(steps_linspace, moving_averages, 'k--', label = f"Averaged energy (w={window_size}, p={poly_order})")
     #ax_energy.hlines(y=E_average, xmin=0, xmax=N_steps, linewidth=2, color='r', linestyles='--', label = f"E_average = {E_average}")
     ax_energy.vlines(x=1000, ymin=min(E_local), ymax=max(E_local), linewidth=2, color='r', linestyles='--', label = f"N$_{{eq}}$")
     ax_energy.set_xlabel("Steps [a.u.]")
