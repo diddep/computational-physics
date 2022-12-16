@@ -8,13 +8,20 @@
 
 
 #include "tools.h"
-
+//number of spacial dimensions
 #define NDIM 3
 
 
-//easier to use R1, R2 as matrices or input x1,x2,y1,y2,z1,z2?
 
-//R1, R2 on form [[x1,y1,z1],...,[xN,yN,zN]]
+/*Function that calculates energy at each step of MCMC-chain from two position vectors at each step
+    args:
+        double *E_local = N_steps long array to save values of energy in
+        double alpha = parameter value 
+        int N_steps = number of steps in mcmc-chain
+        double **R1 = 2D-array [3][N_steps] that saves x,y,z for electron 1 in each step of mcmc-chain
+        double **R2 = 2D-array [3][N_steps] that saves x,y,z for electron 2 in each step of mcmc-chain
+*/
+
 void Energy(double *E_local, double alpha, int N_steps, double **R1, double **R2){
 
     double r12;
@@ -47,44 +54,19 @@ void Energy(double *E_local, double alpha, int N_steps, double **R1, double **R2
     free(r1_nrm), free(r2_nrm), free(diff_nrm), free(diff_vec);
 }
 
-// double partialEnergyDerivative(double *E_local_derivative, double alpha, int N_steps, double **R1, double **R2){
+/*Function that calculates gradient with respect to parameter alpha
+for performing damped gradient descent.
+    args:
+        double *E_local_derivative = N_steps long array to save values of derivative
+        double alpha = parameter value 
+        int N_steps = number of steps in mcmc-chain
+        double **R1 = 2D-array [3][N_steps] that saves x,y,z for electron 1 in each step of mcmc-chain
+        double **R2 = 2D-array [3][N_steps] that saves x,y,z for electron 2 in each step of mcmc-chain
+    returns:
+       double gradient = Gradient for performing damped gradient descent
+*/
 
-//     double r12;
-//     double *r1_nrm = malloc(sizeof(double) * NDIM), *r2_nrm = malloc(sizeof(double) * NDIM);
-//     double *diff_vec = malloc(sizeof(double) * NDIM), *diff_nrm = malloc(sizeof(double) * NDIM);
-//     //double *E_local_derivative;// = malloc(sizeof(double) * N_steps);
-//     double prod = 0., div = 0., E_derivative_sum = 0;
 
-//     for (int ix = 0; ix < N_steps; ++ix){
-//         for (int dim=0; dim<NDIM; ++dim){
-//             r1_nrm[dim] = R1[ix][dim];
-//             r2_nrm[dim] = R2[ix][dim];
-//         }
-
-//         normalize_vector(r1_nrm, NDIM);
-//         normalize_vector(r2_nrm, NDIM);
-//         r12 = distance_between_vectors(R1[ix], R2[ix], NDIM);
-
-//         elementwise_subtraction(diff_vec, R1[ix], R2[ix], NDIM);
-//         elementwise_subtraction(diff_nrm, r1_nrm, r2_nrm, NDIM);
-//         prod = dot_product(diff_vec, diff_nrm,NDIM);
-//         div = (1. + alpha * r12);
-
-//         E_local_derivative[ix] = - 0.0 \
-//                                 - 2 * r12 * prod/(r12 * pow(div, 3.0)) \
-//                                 + 3 * r12 * 1.0/(r12* pow(div, 4.0)) \
-//                                 + 4 * r12 * 1./(4.0* pow(div, 5.0)) 
-//                                 + 0.0;
-
-//         E_derivative_sum += E_local_derivative[ix];
-//     }
-
-//     free(r1_nrm), free(r2_nrm), free(diff_nrm), free(diff_vec);
-
-//     return E_derivative_sum/N_steps;
-// }
-
-//TODO kan göras snabbare om vi skickar in E_local chain istället
 double partialEnergyDerivative(double *E_local_derivative, double alpha, int N_steps, double **R1, double **R2)
 {
     double *E_local_chain = malloc(sizeof(double)*N_steps);
@@ -138,6 +120,15 @@ void x_distribution(double *x_chain, int N_steps, double **R1_chain, double **R2
     }
 }
 
+/*
+function that calculates the angle between arrays along entire mcmc-chain
+ args:
+        double *theta_chain = N_steps long array to save values of angle in
+        double alpha = parameter value 
+        int N_steps = number of steps in mcmc-chain
+        double **R1 = 2D-array [3][N_steps] that saves x,y,z for electron 1 in each step of mcmc-chain
+        double **R2 = 2D-array [3][N_steps] that saves x,y,z for electron 2 in each step of mcmc-chain
+*/
 void theta_fun(double *theta_chain, int N_steps, double **R1_chain, double **R2_chain)
 {
     // initializing values used to calculate instance of x
@@ -151,7 +142,14 @@ void theta_fun(double *theta_chain, int N_steps, double **R1_chain, double **R2_
     }
 }
 
-/*theta(*R1, *R2) =  arccos( dot(R1,R2) / (|R1|*|R2|)*/
+/*
+function that calculates angle between position vectors for electron
+    args:
+        double *R1 = position array for electron 1 [x,y,z]
+        double *R2 = position array for electron 2 [x,y,z]
+    returns:
+        double theta = angle between the position vectors of the two electrons
+*/
 double theta_fun_vec(double *R1, double *R2)
 {
     double R1_abs = vector_norm(R1,NDIM);
