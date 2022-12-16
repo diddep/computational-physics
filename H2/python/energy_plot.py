@@ -37,6 +37,18 @@ def main(results):
     ax_energy.set_title(f'Local energy, alpha = {alpha}')
     ax_energy.legend(loc="lower right")
     fig_energy.savefig(f'plots_python/{task_str}/energy.png')
+    print(task_str)
+
+
+    fig_hist, ax_hist = plt.subplots(1,1)
+    n_bins =50
+    counts, bins = np.histogram(E_local, bins = n_bins, density = True)
+    ax_hist.stairs(counts, bins, fill = True, label='Sampled distribution')
+    ax_hist.axvline(E_average, color = 'r', label=rf"$\langle E_L\rangle ={E_average}$")
+    ax_hist.legend()
+    fig_hist.savefig(f'plots_python/{task_str}/histo_energy.png')
+    
+    
 
 if(__name__ == "__main__"):
     results = unpack_csv.main()

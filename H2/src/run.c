@@ -75,7 +75,7 @@ run(
     }
     if(task_num == 3)
     {
-        N_steps = 1e6; N_discarded_steps = 1e3; alpha = 0.05; 
+        N_steps = 1e7; N_discarded_steps = 2*1e4; alpha = 0.05; 
         initial_displacement = 50, d_displacement = 1.24; 
         N_alpha_steps = 1; A = 0.; beta = 0.; 
         is_task3 = true;
@@ -144,8 +144,8 @@ run(
 
     if(is_task3)
     {
-        int Number_of_alphas = 30;
-        int runs_per_alpha = 7;
+        int Number_of_alphas = 100;
+        int runs_per_alpha = 15;
 
         double *temp_E_vec = malloc(sizeof(double)*runs_per_alpha);
         double *temp_variance_vec = malloc(sizeof(double)*runs_per_alpha);
@@ -153,6 +153,7 @@ run(
         double *E_variance_vec= malloc(sizeof(double)*Number_of_alphas);
         double start_alpha = 0.05, final_alpha= 0.25;
         double alpha_increment = (final_alpha-start_alpha)/((double)Number_of_alphas);
+        is_save = false;
 
         for(int n_alpha=0; n_alpha< Number_of_alphas; ++n_alpha)
         {
@@ -178,7 +179,7 @@ run(
             double variance_in_run=0;
 
             variance_between_runs=variance(temp_E_vec, runs_per_alpha);
-            printf("variance between runs %f\n", variance_between_runs);
+            //printf("variance between runs %f\n", variance_between_runs);
             variance_in_run = average(temp_variance_vec, runs_per_alpha);
             E_average_vec[n_alpha] = average_E; 
             E_variance_vec[n_alpha]=variance_between_runs+ variance_in_run;
@@ -820,7 +821,7 @@ double MCMC_task3(
     }
     double variance_E = variance(E_local,N_steps);
     double statistical_inefficiency = 11;
-    E_variance_vec[index] = statistical_inefficiency* variance_E/((double)N_steps); 
+    E_variance_vec[index] = statistical_inefficiency* variance_E;///((double)N_steps); 
 
     if(is_save)
     {

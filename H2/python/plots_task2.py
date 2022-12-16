@@ -33,12 +33,14 @@ def main(results):
 
     fig_phi_k, ax_phi = plt.subplots(1,1)
 
-    ax_phi.plot(lag_vec, phi_k, label = "phi_k")
+    ax_phi.plot(lag_vec, phi_k, label = r"$\phi_k$", linewidth =3)
+    
+    ax_phi.axhline(np.exp(-2), label = r"$e^{-2}$", color='r')
     
     # dom här är enhetslösa
     ax_phi.set_xlabel(r"$k$")
     ax_phi.set_ylabel(r"$\Phi_k$")
-    ax_phi.set_title(r'correlation function $\Phi_k$')
+    ax_phi.set_title(r'Correlation function $\Phi_k$')
     ax_phi.legend()
 
     fig_phi_k.savefig(f"plots_python/{task_str}/phi_k.png")
@@ -53,11 +55,12 @@ def main(results):
     ax_blav.set_ylabel(r"$n_s$")
     ax_blav.set_title(r"Statistical inefficiency $n_s$ calculated from block averaging")
     ax_blav.axhline(stat_ineff_cor, label =r"$n_s$ calculated from correlation function", color="r", linewidth=4)
-    ax_blav.legend()
-    ax_blav.scatter(block_size_vec, block_average, facecolor ="none", edgecolor="k", alpha=0.8)
+    ax_blav.set_yticks([0,2,4,6,8,stat_ineff_cor,12 ])
 
+    ax_blav.scatter(block_size_vec[1:2000], block_average[1:2000], facecolor ="none", edgecolor="k", alpha=0.8, label=r"$n_s$ calculated from block averaging")
+    ax_blav.legend()
     fig_block_avg.savefig(f"plots_python/{task_str}/block_avg.png") 
-    
+    print(task_str)
 
     
 

@@ -27,7 +27,7 @@ double phi_lag(double *E_local_chain, int N_steps, int Lag)
     {
         lagged_average += E_local_chain[step]*E_local_chain[step+Lag];
     }
-    lagged_average/=(N_steps-Lag);
+    lagged_average/=(N_steps-abs(Lag));
 
     phi_k = (lagged_average -average_E_local*average_E_local)/(average_squared_E_local-average_E_local*average_E_local);
 
