@@ -27,12 +27,13 @@ run(
     // This makes it possible to test
     // 100% of you code
 
-    int N_steps = 1000, N_0_walkers=200;
+    int N_steps = 10000, N_eq_steps=100, N_0_walkers=200;
 
     double gamma = 0.5, ET=0.5, delta_tau=0.02;
     int *N_walker_vec = malloc(sizeof(int)*N_steps+1);
     double  *E_T_vec = malloc(sizeof(double)*N_steps+1);
-    ET = diffusion_monte_carlo(N_steps, N_0_walkers, gamma, E_T_vec, N_walker_vec, delta_tau);
+    //ET = diffusion_monte_carlo(N_steps, N_0_walkers, gamma, E_T_vec, N_walker_vec, delta_tau);
+    ET = clean_DMC(N_steps, N_eq_steps, N_0_walkers, gamma, delta_tau, E_T_vec);
     printf("final ET= %f\n", ET);
     
     return 0;
@@ -195,6 +196,8 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
         for(int walker=0; walker < Number_of_walkers; ++walker)
         {
             coordinate_handling[walker] = coordinate_array[walker];
+            //printf("coord= %f\n", coordinate_array[walker]);
+            //printf("    number of walkers= %d\n", Number_of_walkers);
             coordinate_array[walker] = 0.0;
         }
 
@@ -203,14 +206,17 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
             random_number =  gsl_ran_gaussian (r, 1.0);
         
             double new_coordinate = coordinate_array[old_walker] + sqrt(delta_tau)*random_number;
+            //printf("new coord = %f\n", new_coordinate);
 
             E_T= E_T_vector[time_step];
+            printf("ET %f\n", E_T);
             double W = weight_factor(new_coordinate, E_T, delta_tau);
             
             random_number = gsl_ran_flat(r, 0.0, 1.0);
-
+            printf("weight %f\n", W);
             int m_spawn = (int) W+ random_number;
 
+            printf("spawn= %d\n", m_spawn);
             new_number_of_walkers =new_number_of_walkers+ m_spawn;
 
             //spawn new walkers
@@ -258,15 +264,12 @@ double weight_factor(double x_coordinate, double E_T, double delta_tau)
 {
     double potential=0.0, weight_factor=0.0;
 
-    potential = 0.5*pow((1-exp(-x_coordinate)),2.0);
+    potential = 0.5*(1-exp(-abs(x_coordinate)))*(1-exp(-abs(x_coordinate)));
 
     weight_factor = exp(-(potential-E_T)*delta_tau);
-    //printf("w= %f \n", weight_factor);
+    printf("w= %f \n", weight_factor);
     
     return weight_factor;
 }
 
-double calculate_energy(int current_number_of_walkers, int inital_number_of_walker, double gamma)
-{
-    
-}
+//double calculate_energy(int current_number_of_walkers, int inital_number_of_walker, double gamma)
