@@ -12,7 +12,7 @@
 #include "tools.h"
 
 double weight_factor(double x_coordinate, double E_T, double delta_tau);
-double diffusion_monte_carlo(int N_steps, int N0_walkers, double gamma, double *ET_vec, double N_walker_vec, double delta_tau);
+double diffusion_monte_carlo(int N_steps, int N0_walkers, double gamma, double *ET_vec, int *N_walker_vec, double delta_tau);
 
 
 
@@ -28,8 +28,11 @@ run(
 
     int N_steps = 1000, N_0_walkers=100;
 
-    double gamma = 0.5;
-    int *N_walker_vec = malloc(sizeof(int)*N_steps), *E_T_vec = malloc(sizeof(int)*N_steps);
+    double gamma = 0.5, ET=0., delta_tau=0.02;
+    int *N_walker_vec = malloc(sizeof(int)*N_steps);
+    double  *E_T_vec = malloc(sizeof(double)*N_steps);
+    ET = diffusion_monte_carlo(N_steps, N_0_walkers, gamma, E_T_vec, N_walker_vec, delta_tau);
+    printf("final ET= %f\n", ET);
     
     return 0;
 }
@@ -45,7 +48,7 @@ idea:
 
 */
 
-double diffusion_monte_carlo(int N_steps, int N0_walkers, double gamma, double *ET_vec, double N_walker_vec, double delta_tau)
+double diffusion_monte_carlo(int N_steps, int N0_walkers, double gamma, double *ET_vec, int *N_walker_vec, double delta_tau)
 {
     int Number_of_walkers= N0_walkers, max_number_walkers=1e6;
     int highest_number_walker = 1000;
@@ -138,6 +141,7 @@ double weight_factor(double x_coordinate, double E_T, double delta_tau)
     potential = 0.5*(1-exp(-x_coordinate));
 
     weight_factor = exp(-(potential-E_T)*delta_tau);
+    printf("w= %f \n", weight_factor);
     
     return weight_factor;
 }
