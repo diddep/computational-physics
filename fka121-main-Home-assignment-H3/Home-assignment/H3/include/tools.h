@@ -7,6 +7,7 @@
  * for this function to work correctly
  *
  * **********************************************/
+#include <stdbool.h>
 void
 elementwise_addition(
         double *res,

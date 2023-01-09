@@ -8,6 +8,15 @@ CFLAGS_OPT = \
 	     -O2 \
 	     -march=native
 
+CFLAGS_SANITIZE = \
+		 -march=native\
+	 	 -Werror \
+		 -Wall \
+	 	 -pedantic \
+	 	 -g \
+		 -fno-omit-frame-pointer \
+		 -Iinclude
+
 LIB = \
       -lm \
       -lgsl \
@@ -29,7 +38,7 @@ endif
 H3: obj _H3
 
 _H3: $(MAIN) $(OBJ)
-	$(CC) $(CFLAGS) $^ -o H1 $(LIB)
+	$(CC) $(CFLAGS) $^ -o H3 $(LIB)
 
 obj/%.o: src/%.c
 	$(CC) -MMD -c $(CFLAGS) $< -o $@ 

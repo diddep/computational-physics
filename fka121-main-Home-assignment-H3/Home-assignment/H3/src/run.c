@@ -11,6 +11,10 @@
 
 #include "tools.h"
 
+double weight_factor(double x_coordinate, double E_T, double delta_tau);
+double diffusion_monte_carlo(int N_steps, int N0_walkers, double gamma, double *ET_vec, double N_walker_vec, double delta_tau);
+
+
 
 int
 run(
@@ -74,7 +78,7 @@ double diffusion_monte_carlo(int N_steps, int N0_walkers, double gamma, double *
        for(int walker=0; walker< Number_of_walkers; ++walker)
        { 
         //random number, updating position and saving in handling vec
-        random_number =  ran_gaussian (r, 1.0);
+        random_number =  gsl_ran_gaussian (r, 1.0);
         double x_coord = coordinate_array[walker] + sqrt(delta_tau)*random_number;
         coordinate_handling[walker] = x_coord;
        }
