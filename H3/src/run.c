@@ -27,7 +27,7 @@ run(
     // This makes it possible to test
     // 100% of you code
 
-    int N_steps = 1000, N_eq_steps=10000, N_0_walkers=200;
+    int N_steps = 5000, N_eq_steps=100, N_0_walkers=200;
 
     double gamma = 0.5, ET=0.5, delta_tau=0.02;
     int *N_walker_vec = malloc(sizeof(int)*N_steps+1);
@@ -161,11 +161,22 @@ double diffusion_monte_carlo(int N_steps, int N0_walkers, double gamma, double *
     return ET_vec[N_steps+1];
 }
 
+
+//New version of dmc 
+/*
+clean_DMC()
+    N_steps = number of to take during simulation
+    N_eq_steps = Number of equilibration steps
+    N0_walkers = initial number of walkers
+    gamma = damping constant
+    delta_tau = timestep
+    E_T_vector for saving energy at each step of simulation
+*/
 double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, double delta_tau, double *E_T_vector)
 {
+    // 
     int Number_of_walkers= N0_walkers, max_number_walkers=1e6;
-    int highest_number_walker = 10000;
-    int equilibration_steps=100;
+    //int equilibration_steps=N_eq_steps;
 
     gsl_rng * r;
     r = init_random_num_generator();
@@ -190,7 +201,9 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
 
     for(int time_step=0; time_step<N_steps; ++time_step)
     {
-        printf("numbwalk %d\n", Number_of_walkers);
+        //printf("numbwalk %d\n", Number_of_walkers);
+
+        // array for saving positions during run
         double *coordinate_handling = malloc(sizeof(double)*Number_of_walkers);
         int new_number_of_walkers=0;
 
@@ -201,32 +214,47 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
             coordinate_handling[walker] = coordinate_array[walker];
             //printf("coord= %f\n", coordinate_array[walker]);
             //printf("    number of walkers= %d\n", Number_of_walkers);
-            coordinate_array[walker] = 0.0;
+            //coordinate_array[walker] = 0.0;
+        }
+        for(int walker=0; walker < max_number_walkers; ++walker)
+        {
+            coordinate_array[walker]=0.0;
         }
 
+        //looping through current walkers as old_walkers
         for(int old_walker=0; old_walker<Number_of_walkers; ++old_walker)
         {
             
+            //random number for displacing walkers
             random_number =  gsl_ran_gaussian (r, 1.0);
-        
+
+            //new coordinate
             double new_coordinate = coordinate_handling[old_walker] + sqrt(delta_tau)*random_number;
             //printf("new coord = %f\n", new_coordinate);
 
+            //current E_T value
             E_T= E_T_vector[time_step];
+            
             //printf("ET %f\n", E_T);
+
+            //calculating weight factor
             double W = weight_factor(new_coordinate, E_T, delta_tau);
             
-            random_number = gsl_ran_flat(r, 0.0, 1.0);
+            // random number for spawning in walkers and rounding the sum to integer
+            random_number = gsl_ran_flat(r, 0.0, 1);
             //printf("    new coord %f\n", new_coordinate);
-            //printf("weight %f\n", W);
+            //printf("weight %f\n", W +random_number);
             int m_spawn = (int) W+ random_number;
 
-            printf("    spawn= %d\n", m_spawn);
+            //printf("    spawn= %d\n", m_spawn);
+
+            // calculating the number of walkers for next iteration
             new_number_of_walkers =new_number_of_walkers+ m_spawn;
 
-            //spawn new walkers
+            //spawning new walkers if it should be done
             if(m_spawn>0)
             {
+                //saving the number of copies of walker specified by m_spawn in coordinate array
                 for(int new_walker=0; new_walker<m_spawn; ++new_walker)
                 {
                     //printf("Old walker %d \n", old_walker);
@@ -236,34 +264,56 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
             }
         }
 
-        Number_of_walkers = new_number_of_walkers;
-        //printf("    number of walkers %d\n", Number_of_walkers);
-        // calculating new energy
+        // calculating new energy by averaging
 
         double E_average = 0.0;
         double E_T_new = 0.0;
-        if(time_step< N_eq_steps)
+
+        //averaging done during the equilibration run 
+        if(0<time_step< N_eq_steps)
         {
             for(int step=0; step<time_step; ++step)
             {
                 E_average = E_average+ E_T_vector[step];
+                //printf("eav %f",E_average);
+
             }
-            E_average /= (double) time_step+1;
-            //printf("E_average eq= %f\n", E_average);
+            E_average /= (double) time_step; //+1;
+            printf("E_average eq= %f\n", E_average);
+            //printf("norm %f\n", (double) time_step+1);
         }
         else
         {
-            for(int step= N_eq_steps-1; step<time_step; ++step)
+            // calculating average for production
+            for(int step= N_eq_steps; step<time_step; ++step)
             {
                 E_average += E_T_vector[step];
             }
-            E_average /= (double) time_step +1 - N_eq_steps;
+            E_average /= (double) time_step +1- N_eq_steps;
             //printf("E_average prod = %f\n", E_average);
         }
+
+        if(time_step<1)
+        {
+            E_average=0.5;
+        }
+        //formula according to QS structure
+        //setting number of walkers for next run
+        Number_of_walkers = new_number_of_walkers;
+        printf("    number of walkers %d\n", Number_of_walkers);
+
+        printf("numb w = %d \n", Number_of_walkers);
+        printf("log %f\n", log((double) Number_of_walkers/N0_walkers));
+
         E_T_new = E_average - gamma * log((double) Number_of_walkers/N0_walkers);
+
         E_T_vector[time_step+1] = E_T_new;
-        //printf( "E_T new %f\n", E_T_new);
+
+        printf( "E_T new %f\n", E_T_new);
         free(coordinate_handling);
+
+        
+        
     }
 
     free(coordinate_array);
@@ -275,12 +325,11 @@ double weight_factor(double x_coordinate, double E_T, double delta_tau)
 {
     double potential=0.0, weight_factor=0.0, exp_term=0.0;
 
-    //TODO abs coord?
-    exp_term = (1- exp(-x_coordinate));
+    exp_term = (1.- exp(-x_coordinate));
     potential = 0.5* exp_term*exp_term;
 
     weight_factor = exp(-(potential-E_T)*delta_tau);
-    printf("w= %f \n", weight_factor);
+    //printf("w= %f \n", weight_factor);
     
     return weight_factor;
 }
