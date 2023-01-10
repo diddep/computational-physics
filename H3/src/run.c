@@ -27,7 +27,7 @@ run(
     // This makes it possible to test
     // 100% of you code
 
-    int N_steps = 10000, N_eq_steps=100, N_0_walkers=200;
+    int N_steps = 1000, N_eq_steps=100, N_0_walkers=200;
 
     double gamma = 0.5, ET=0.5, delta_tau=0.02;
     int *N_walker_vec = malloc(sizeof(int)*N_steps+1);
@@ -35,6 +35,8 @@ run(
     //ET = diffusion_monte_carlo(N_steps, N_0_walkers, gamma, E_T_vec, N_walker_vec, delta_tau);
     ET = clean_DMC(N_steps, N_eq_steps, N_0_walkers, gamma, delta_tau, E_T_vec);
     printf("final ET= %f\n", ET);
+
+    
     
     return 0;
 }
@@ -168,13 +170,13 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
     gsl_rng * r;
     r = init_random_num_generator();
     double random_number = 0;
-    double E_T=0.5;
+    double E_T= 0.5;
     E_T_vector[0]=0.5;
 
     double x_start = -5.0, x_end=5.0;
     double x_placement_increment = (x_end-x_start)/((double) N0_walkers);
 
-    int *array_of_death = malloc(sizeof(int)*max_number_walkers);
+    //int *array_of_death = malloc(sizeof(int)*max_number_walkers);
     double *coordinate_array = malloc(sizeof(double)*max_number_walkers);
 
 
@@ -205,18 +207,19 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
         {
             random_number =  gsl_ran_gaussian (r, 1.0);
         
-            double new_coordinate = coordinate_array[old_walker] + sqrt(delta_tau)*random_number;
+            double new_coordinate = coordinate_handling[old_walker] + sqrt(delta_tau)*random_number;
             //printf("new coord = %f\n", new_coordinate);
 
             E_T= E_T_vector[time_step];
-            printf("ET %f\n", E_T);
+            //printf("ET %f\n", E_T);
             double W = weight_factor(new_coordinate, E_T, delta_tau);
             
             random_number = gsl_ran_flat(r, 0.0, 1.0);
-            printf("weight %f\n", W);
+            //printf("    new coord %f\n", new_coordinate);
+            //printf("weight %f\n", W);
             int m_spawn = (int) W+ random_number;
 
-            printf("spawn= %d\n", m_spawn);
+            //printf("spawn= %d\n", m_spawn);
             new_number_of_walkers =new_number_of_walkers+ m_spawn;
 
             //spawn new walkers
@@ -230,7 +233,7 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
         }
 
         Number_of_walkers = new_number_of_walkers;
-
+        //printf("    number of walkers %d\n", Number_of_walkers);
         // calculating new energy
 
         double E_average = 0.0;
@@ -242,21 +245,25 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
                 E_average = E_average+ E_T_vector[step];
             }
             E_average /= (double) time_step+1;
+            //printf("E_average eq= %f\n", E_average);
         }
         else
         {
             for(int step= N_eq_steps-1; step<time_step; ++step)
             {
                 E_average += E_T_vector[step];
-
             }
             E_average /= (double) time_step +1 - N_eq_steps;
+            //printf("E_average prod = %f\n", E_average);
         }
-        E_T_new = E_T_vector[time_step] - gamma * log((double) Number_of_walkers/N0_walkers);
+        E_T_new = E_average - gamma * log((double) Number_of_walkers/N0_walkers);
         E_T_vector[time_step+1] = E_T_new;
+        //printf( "E_T new %f\n", E_T_new);
+        free(coordinate_handling);
     }
 
-    return E_T_vector[N_steps+1];
+    free(coordinate_array);
+    return E_T_vector[N_steps];
 }
 
 
@@ -264,10 +271,11 @@ double weight_factor(double x_coordinate, double E_T, double delta_tau)
 {
     double potential=0.0, weight_factor=0.0;
 
-    potential = 0.5*(1-exp(-abs(x_coordinate)))*(1-exp(-abs(x_coordinate)));
+    //TODO abs coord?
+    potential = 0.5*(1-exp(-(x_coordinate)))*(1-(-(x_coordinate)));
 
     weight_factor = exp(-(potential-E_T)*delta_tau);
-    printf("w= %f \n", weight_factor);
+    //printf("w= %f \n", weight_factor);
     
     return weight_factor;
 }
