@@ -27,7 +27,7 @@ run(
     // This makes it possible to test
     // 100% of you code
 
-    int N_steps = 1000, N_eq_steps=100, N_0_walkers=200;
+    int N_steps = 1000, N_eq_steps=10000, N_0_walkers=200;
 
     double gamma = 0.5, ET=0.5, delta_tau=0.02;
     int *N_walker_vec = malloc(sizeof(int)*N_steps+1);
@@ -190,6 +190,7 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
 
     for(int time_step=0; time_step<N_steps; ++time_step)
     {
+        printf("numbwalk %d\n", Number_of_walkers);
         double *coordinate_handling = malloc(sizeof(double)*Number_of_walkers);
         int new_number_of_walkers=0;
 
@@ -205,6 +206,7 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
 
         for(int old_walker=0; old_walker<Number_of_walkers; ++old_walker)
         {
+            
             random_number =  gsl_ran_gaussian (r, 1.0);
         
             double new_coordinate = coordinate_handling[old_walker] + sqrt(delta_tau)*random_number;
@@ -219,7 +221,7 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
             //printf("weight %f\n", W);
             int m_spawn = (int) W+ random_number;
 
-            //printf("spawn= %d\n", m_spawn);
+            printf("    spawn= %d\n", m_spawn);
             new_number_of_walkers =new_number_of_walkers+ m_spawn;
 
             //spawn new walkers
@@ -227,6 +229,8 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
             {
                 for(int new_walker=0; new_walker<m_spawn; ++new_walker)
                 {
+                    //printf("Old walker %d \n", old_walker);
+                    //printf("New walker %d\n", new_walker);
                     coordinate_array[old_walker+new_walker]= new_coordinate;
                 }
             }
@@ -269,13 +273,14 @@ double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, doub
 
 double weight_factor(double x_coordinate, double E_T, double delta_tau)
 {
-    double potential=0.0, weight_factor=0.0;
+    double potential=0.0, weight_factor=0.0, exp_term=0.0;
 
     //TODO abs coord?
-    potential = 0.5*(1-exp(-(x_coordinate)))*(1-(-(x_coordinate)));
+    exp_term = (1- exp(-x_coordinate));
+    potential = 0.5* exp_term*exp_term;
 
     weight_factor = exp(-(potential-E_T)*delta_tau);
-    //printf("w= %f \n", weight_factor);
+    printf("w= %f \n", weight_factor);
     
     return weight_factor;
 }
