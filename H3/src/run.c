@@ -15,7 +15,7 @@ double weight_factor(double x_coordinate, double E_T, double delta_tau);
 
 void update_coordinates(double *x_coordinates, int number_walkers, gsl_rng * r, double delta_tau);
 int spawn_kill(double *x_coordinates, int * array_of_death, int number_walkers, gsl_rng * r, double delta_tau, double ET);
-double restructured_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, double delta_tau, double *E_T_vector);
+double restructured_DMC(int N_steps, int N_eq_steps,int save_cutoff, int N0_walkers, double gamma, double delta_tau, double *E_T_vector);
 
 
 int
@@ -28,19 +28,15 @@ run(
     // This makes it possible to test
     // 100% of you code
 
-    int N_steps = 50000, N_eq_steps=1000, N_0_walkers=200;
+    int N_steps = 5*5000, N_eq_steps=1000, N_0_walkers=200, save_cutoff=N_steps-2500;
 
     double gamma = 0.5, ET=0.5, delta_tau=0.02;
     int *N_walker_vec = malloc(sizeof(int)*N_steps+1);
     double  *E_T_vec = malloc(sizeof(double)*N_steps+1);
-    //ET = diffusion_monte_carlo(N_steps, N_0_walkers, gamma, E_T_vec, N_walker_vec, delta_tau);
-    //ET = clean_DMC(N_steps, N_eq_steps, N_0_walkers, gamma, delta_tau, E_T_vec);
-    ET = restructured_DMC(N_steps, N_eq_steps, N_0_walkers, gamma, delta_tau, E_T_vec);
-
+    ET = restructured_DMC(N_steps, N_eq_steps,save_cutoff, N_0_walkers, gamma, delta_tau, E_T_vec);
 
     printf("final ET= %f\n", ET);
 
-    
     return 0;
 }
 
@@ -56,11 +52,14 @@ idea:
 */
 
 
-double restructured_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, double delta_tau, double *E_T_vector)
+double restructured_DMC(int N_steps, int N_eq_steps,int save_cutoff, int N0_walkers, double gamma, double delta_tau, double *E_T_vector)
 {
     // 
-    int Number_of_walkers= N0_walkers, max_number_walkers=1e4;
+    int Number_of_walkers= N0_walkers, max_number_walkers=1e3, saved_walkers=0;
     //int equilibration_steps=N_eq_steps;
+
+    //what time step to save after for distribution, max number of positions to save
+    int max_save =1e6;
 
     gsl_rng * r;
     r = init_random_num_generator();
@@ -73,6 +72,10 @@ double restructured_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamm
 
     //int *array_of_death = malloc(sizeof(int)*max_number_walkers);
     double *coordinate_array = calloc(sizeof(double),max_number_walkers);
+    double *evolution_walker_array = calloc(sizeof(double), N_steps);
+
+    //array to save last iterations in
+    double *save_coordinates = calloc(sizeof(double), max_save);
 
 
     //initial placement for walkers
@@ -87,6 +90,8 @@ double restructured_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamm
     {
         E_T = E_T_vector[time_step];
 
+        evolution_walker_array[time_step]= (double) Number_of_walkers;
+
         // array for saving positions during run
         double *coordinate_handling = calloc(sizeof(double),Number_of_walkers);
         
@@ -98,6 +103,16 @@ double restructured_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamm
         for(int walker=0; walker < Number_of_walkers; ++walker){coordinate_handling[walker] = coordinate_array[walker];}
 
         for(int walker=0; walker < max_number_walkers; ++walker){coordinate_array[walker]=0.0;}
+        
+        //if above save cutoff, save coordinates in large array
+        if(time_step>save_cutoff)
+        {
+            for(int walker =0; walker< Number_of_walkers; ++walker)
+            {
+                save_coordinates[saved_walkers+walker]= coordinate_handling[walker];
+            }
+            saved_walkers +=Number_of_walkers;
+        }
 
         //updating walker positions
         update_coordinates(coordinate_handling, Number_of_walkers, r, delta_tau);
@@ -106,7 +121,7 @@ double restructured_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamm
 
         new_number_of_walkers = spawn_kill(coordinate_handling, array_of_death, Number_of_walkers, r, delta_tau, E_T);
 
-        printf("new_number of walkers= %d\n", new_number_of_walkers);
+        //printf("new_number of walkers= %d\n", new_number_of_walkers);
         // spawning new walkers
 
         int tot_spawned =0;
@@ -146,11 +161,39 @@ double restructured_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamm
 
         new_ET = E_average - gamma *log((double) Number_of_walkers/N0_walkers);
         E_T_vector[time_step+1]= new_ET;
-        printf("new energy = %f\n", new_ET);
+        //printf("new energy = %f\n", new_ET);
 
-
-    free(coordinate_handling), free(array_of_death);
+    free(coordinate_handling), free(array_of_death) ;
     }
+
+    //saving arrays
+
+    char filename_distribution[200], filename_ET_vec[200], filename_evolution_walkers[200];
+    char cwd[200], buf[200];
+
+    int written = snprintf(buf, 200, "%s", cwd);
+
+    snprintf(buf + written, 200 - written, "./csv/task1_distribution.csv");
+    strcpy(filename_distribution, buf);
+
+    snprintf(buf + written, 200 - written, "./csv/task1_ET_vec.csv");
+    strcpy(filename_ET_vec, buf);
+
+    snprintf(buf + written, 200 - written, "./csv/evolution_walkers.csv");
+    strcpy(filename_evolution_walkers, buf);
+
+    bool open_with_write = true;
+
+    //save_vector_to_csv(coordinate_array, Number_of_walkers, filename_distribution, true);
+    save_vector_to_csv(save_coordinates, saved_walkers, filename_distribution, true);
+    save_vector_to_csv(E_T_vector,N_steps, filename_ET_vec, true);
+
+    save_vector_to_csv(evolution_walker_array,N_steps, filename_evolution_walkers, true);
+    
+    printf("total number of saved walkers%d\n", saved_walkers);
+
+    free(save_coordinates), free(coordinate_array);
+
    return E_T_vector[N_steps];
 }
 
