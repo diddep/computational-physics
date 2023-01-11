@@ -15,9 +15,10 @@ double weight_factor(double x_coordinate, double E_T, double delta_tau);
 double diffusion_monte_carlo(int N_steps, int N0_walkers, double gamma, double *ET_vec, int *N_walker_vec, double delta_tau);
 double clean_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, double delta_tau, double *E_T_vector);
 double cheap_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, double delta_tau, double *E_T_vector);
-void update_coordinates(double *x_coordinates, int number_walkers, gsl_rng * r, double delta_tau);
-int spawn_kill(double *x_coordinates, int * array_of_death, int number_walkers, gsl_rng * r, double delta_tau, double ET)
 
+void update_coordinates(double *x_coordinates, int number_walkers, gsl_rng * r, double delta_tau);
+int spawn_kill(double *x_coordinates, int * array_of_death, int number_walkers, gsl_rng * r, double delta_tau, double ET);
+double restructured_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamma, double delta_tau, double *E_T_vector);
 
 
 int
@@ -506,15 +507,14 @@ double restructured_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamm
 
         for(int walker=0; walker < max_number_walkers; ++walker){coordinate_array[walker]=0.0;}
 
-
         //updating walker positions
         update_coordinates(coordinate_handling, Number_of_walkers, r, delta_tau);
 
-        //calculating what walkers to kill
+        //calculating which walkers to kill
 
         new_number_of_walkers = spawn_kill(coordinate_handling, array_of_death, Number_of_walkers, r, delta_tau, E_T);
 
-        
+
 
 
     }
@@ -555,6 +555,7 @@ void update_coordinates(double *x_coordinates, int number_walkers, gsl_rng * r, 
     }
 
 }
+
 
 //returns new number of walkers, saves what walkers to copy/kill
 int spawn_kill(double *x_coordinates, int * array_of_death, int number_walkers, gsl_rng * r, double delta_tau, double ET)
