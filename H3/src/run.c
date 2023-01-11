@@ -38,7 +38,7 @@ run(
     double  *E_T_vec = malloc(sizeof(double)*N_steps+1);
     //ET = diffusion_monte_carlo(N_steps, N_0_walkers, gamma, E_T_vec, N_walker_vec, delta_tau);
     //ET = clean_DMC(N_steps, N_eq_steps, N_0_walkers, gamma, delta_tau, E_T_vec);
-    ET = cheap_DMC(N_steps, N_eq_steps, N_0_walkers, gamma, delta_tau, E_T_vec);
+    ET = restructured_DMC(N_steps, N_eq_steps, N_0_walkers, gamma, delta_tau, E_T_vec);
 
 
     printf("final ET= %f\n", ET);
@@ -514,12 +514,50 @@ double restructured_DMC(int N_steps, int N_eq_steps, int N0_walkers, double gamm
 
         new_number_of_walkers = spawn_kill(coordinate_handling, array_of_death, Number_of_walkers, r, delta_tau, E_T);
 
+        // spawning new walkers
+
+        int tot_spawned =0;
+        for(int old_walker =0; old_walker< Number_of_walkers; ++old_walker)
+        {
+            double xcoord = coordinate_handling[old_walker];
+            int m_spawn = array_of_death[old_walker];
+            
+            if(m_spawn>0)
+            {
+                for(int new_walker =0; new_walker<m_spawn; ++new_walker)
+                {
+                    coordinate_array[tot_spawned+ new_number_of_walkers];
+                }
+            }
+            tot_spawned += m_spawn;
+        }
 
 
+        //calculate new energy
 
+        Number_of_walkers = new_number_of_walkers;
+        double E_average  =0.0, new_ET=0.0;
+
+        if(time_step>0)
+        {
+            for(int step=0; step<time_step; ++step)
+            {
+                E_average += E_T_vector[step];
+            }
+            E_average/=time_step;
+        }
+        else
+        {
+            E_average= 0.5;
+        }
+
+        new_ET = E_average - gamma *log((double) Number_of_walkers/N0_walkers);
+        E_T_vector[time_step+1]= new_ET;
+
+
+    free(coordinate_handling), free(array_of_death);
     }
-   
-
+   return E_T_vector[N_steps];
 }
 
 
