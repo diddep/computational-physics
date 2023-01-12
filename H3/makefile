@@ -24,7 +24,8 @@ LIB = \
 
 OBJ = \
       obj/tools.o \
-      obj/run.o
+      obj/run.o\
+	  obj/task2.o
 MAIN = \
        obj/main.o
 

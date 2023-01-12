@@ -28,7 +28,7 @@ run(
     // This makes it possible to test
     // 100% of you code
 
-    int N_steps = 5*5000, N_eq_steps=1000, N_0_walkers=200, save_cutoff=N_steps-2500;
+    int N_steps = 5*200000, N_eq_steps=2000, N_0_walkers=200, save_cutoff=N_steps-3500;
 
     double gamma = 0.5, ET=0.5, delta_tau=0.02;
     int *N_walker_vec = malloc(sizeof(int)*N_steps+1);

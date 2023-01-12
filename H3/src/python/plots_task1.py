@@ -22,8 +22,8 @@ plt.rc('figure', titlesize=BIGGER_SIZE)
 
 
 #coordinate_array= pd.read_csv("../../csv/task1_distribution.csv", engine="pyarrow", names= ["coordinates"])
-ET_array= pd.read_csv("../../csv/task1_ET_vec.csv", engine="pyarrow", names= ["energy"])
-walker_array= pd.read_csv("../../csv/evolution_walkers.csv", engine="pyarrow", names= ["energy"])
+#ET_array= pd.read_csv("../../csv/task1_ET_vec.csv", engine="pyarrow", names= ["energy"])
+#walker_array= pd.read_csv("../../csv/evolution_walkers.csv", engine="pyarrow", names= ["energy"])
 
 
 dtau = 0.02
@@ -32,14 +32,19 @@ dtau = 0.02
 #ET= 0.371350
 #final ET= 0.377123
 #final ET= 0.373763
-
+#final ET= 0.379698
+#final ET= 0.376354 200k walkers
+#final ET= 0.357426
 
 coordinate_array = np.genfromtxt("../../csv/task1_distribution.csv", delimiter=',')
+ET_array= np.genfromtxt("../../csv/task1_ET_vec.csv", delimiter=',')
+walker_array =  np.genfromtxt("../../csv/evolution_walkers.csv", delimiter=',')
+
 
 #coordinate_array =coordinate_array.values[0,:].astype(float)
 
-ET_array = ET_array.values[0,:].astype(float)
-walker_array = walker_array.values[0,:].astype(int)
+#ET_array = ET_array.values[0,:].astype(float)
+#walker_array = walker_array.values[0,:].astype(int)
 
 iteration_array = np.arange(0, len(ET_array))*dtau
 
@@ -54,9 +59,12 @@ def wavefunction(xarray):
 xcoord = np.linspace(-3,15, 1000)
 wavefunc = wavefunction(xcoord)
 
+averageE = np.array(ET_array[-3500])
+
+print("average ET=", averageE)
 fig_distribution, ax_distribution = plt.subplots(1,1)
 
-n_bins =90
+n_bins =110
 
 counts, bins = np.histogram(coordinate_array, bins = n_bins, density = False)
 
