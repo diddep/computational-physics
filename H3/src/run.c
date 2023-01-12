@@ -146,7 +146,11 @@ double restructured_DMC(int N_steps, int N_eq_steps,int save_cutoff, int N0_walk
         Number_of_walkers = new_number_of_walkers;
         double E_average  =0.0, new_ET=0.0;
 
-        if(time_step>0)
+        if(time_step<1)
+        {
+            E_average= 0.5;
+        }
+        else if(time_step <N_eq_steps|| time_step==N_eq_steps)
         {
             for(int step=0; step<time_step; ++step)
             {
@@ -156,7 +160,11 @@ double restructured_DMC(int N_steps, int N_eq_steps,int save_cutoff, int N0_walk
         }
         else
         {
-            E_average= 0.5;
+            for(int step=N_eq_steps; step<time_step; ++step)
+            {
+                E_average += E_T_vector[step];
+            }
+            E_average/=(time_step+N_eq_steps);
         }
 
         new_ET = E_average - gamma *log((double) Number_of_walkers/N0_walkers);

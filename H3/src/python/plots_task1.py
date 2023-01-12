@@ -33,6 +33,7 @@ dtau = 0.02
 #final ET= 0.377123
 #final ET= 0.373763
 
+
 coordinate_array = np.genfromtxt("../../csv/task1_distribution.csv", delimiter=',')
 
 #coordinate_array =coordinate_array.values[0,:].astype(float)
@@ -50,12 +51,12 @@ def wavefunction(xarray):
     return np.square(psi0)
 
 
-xcoord = np.linspace(-1,15, 1000)
+xcoord = np.linspace(-3,15, 1000)
 wavefunc = wavefunction(xcoord)
 
 fig_distribution, ax_distribution = plt.subplots(1,1)
 
-n_bins =75
+n_bins =90
 
 counts, bins = np.histogram(coordinate_array, bins = n_bins, density = False)
 
