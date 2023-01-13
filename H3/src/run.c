@@ -46,7 +46,7 @@ run(
     
     if(task ==1)
     {
-        int N_steps = 5*20000, N_eq_steps=2000, N_0_walkers=200, save_cutoff=N_steps-3500;
+        int N_steps = 10000, N_eq_steps=2000, N_0_walkers=200, save_cutoff=N_steps-5000;
 
         double gamma = 0.5, ET=0.5, delta_tau=0.02;
         int *N_walker_vec = malloc(sizeof(int)*N_steps+1);
@@ -58,7 +58,8 @@ run(
 
     if(task ==2)
     {
-        int N_steps = 10000, N_eq_steps=1000, N_0_walkers=1000, save_cutoff=N_steps-3500;
+        //N_steps =10k stabil teori: fel när E average nollställs
+        int N_steps = 2*1e5, N_eq_steps=10000, N_0_walkers=1000, save_cutoff=N_steps-3500;
 
         double gamma = 0.5, ET=-3, delta_tau=0.01;
         int *N_walker_vec = malloc(sizeof(int)*N_steps+1);
@@ -195,7 +196,7 @@ double restructured_DMC(int N_steps, int N_eq_steps,int save_cutoff, int N0_walk
             {
                 E_average += E_T_vector[step];
             }
-            E_average/=(time_step+N_eq_steps);
+            E_average/=(time_step-N_eq_steps);
         }
 
         new_ET = E_average - gamma *log((double) Number_of_walkers/N0_walkers);
@@ -359,13 +360,13 @@ double dmc_6dim(int Number_of_steps,int N_eq_steps, int N0_walkers, double ET_0,
         destroy_2D_array(coordinate_handling, Number_of_walkers);
         Number_of_walkers = new_number_of_walkers;
         evolution_walker_vec[time_step]= (double) Number_of_walkers;
-        //printf("new number of walkers = %d\n", Number_of_walkers);
+        printf("new number of walkers = %d\n", Number_of_walkers);
 
         double E_average  =0.0, new_ET=0.0;
 
         if(time_step<1)
         {
-            E_average= 0.5;
+            E_average= -3;
         }
         else if(time_step <N_eq_steps|| time_step==N_eq_steps)
         {
@@ -381,45 +382,25 @@ double dmc_6dim(int Number_of_steps,int N_eq_steps, int N0_walkers, double ET_0,
             {
                 E_average += E_T_vector[step];
             }
-            E_average/=(time_step+N_eq_steps);
+            E_average/=(time_step-N_eq_steps);
         }
 
         new_ET = E_average - gamma *log((double) Number_of_walkers/N0_walkers);
         E_T_vector[time_step+1]= new_ET;
         printf("new energy = %f\n", new_ET);
+        printf("time step %d\n", time_step);
 
         free(array_of_death);
     }
 
-    char filename_distribution[200], filename_ET_vec[200], filename_evolution_walkers[200];
-    char cwd[200], buf[200];
-
-    int written = snprintf(buf, 200, "%s", cwd);
-
-    snprintf(buf + written, 200 - written, "../csv/task2_distribution.csv");
-    strcpy(filename_distribution, buf);
-
-    snprintf(buf + written, 200 - written, "../csv/task2_ET_vec.csv");
-    strcpy(filename_ET_vec, buf);
-
-    snprintf(buf + written, 200 - written, "../csv/task2_evolution_walkers.csv");
-    strcpy(filename_evolution_walkers, buf);
-
-    char filename_distribution_1[] = {"../csv/task2_distribution.csv"};
-    char filename_ET_vec_1[] = {"../csv/task2_ET_vec.csv"};
-    char filename_evolution_walkers_1[] = {"../csv/task2_evolution_walkers.csv"};
-    
-    
-    
+    char filename_ET_vec[] = {"./csv/task2_ET_vec.csv"};
+    char filename_evolution_walkers[] = {"./csv/task2_evolution_walkers.csv"};
 
     bool open_with_write = true;
 
-    //save_vector_to_csv(coordinate_array, Number_of_walkers, filename_distribution, true);
-    //save_vector_to_csv(save_coordinates, saved_walkers, filename_distribution, true);
-    save_vector_to_csv(E_T_vector,Number_of_steps, filename_ET_vec_1, true);
+    save_vector_to_csv(E_T_vector, Number_of_steps, filename_ET_vec, true);
+    save_vector_to_csv(evolution_walker_vec, Number_of_steps, filename_evolution_walkers, true);
 
-    save_vector_to_csv(evolution_walker_vec, Number_of_steps, filename_evolution_walkers_1, true);
-    
     
     
     double final_energy= E_T_vector[Number_of_steps];
@@ -481,7 +462,7 @@ int spawn_kill_6d(double **walker_coordinates, int *array_of_death,int Number_of
         wf = weight_factor_6d(walker_coordinates[walker], delta_tau, ET);
         random_number = gsl_ran_flat(r, 0.0, 1);
         m_spawn  = (int) floor(wf+ random_number);
-        if(m_spawn>5){m_spawn=1;}
+        if(m_spawn>5){m_spawn=5;}
         //printf("spawn %d\n", m_spawn);
         array_of_death[walker] = m_spawn;
         new_number_walkers+= m_spawn;
